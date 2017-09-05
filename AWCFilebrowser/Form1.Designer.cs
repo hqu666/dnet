@@ -75,6 +75,8 @@
 			this.ProgressTitolLabel = new System.Windows.Forms.Label();
 			this.progressBar1 = new System.Windows.Forms.ProgressBar();
 			this.playListBox = new System.Windows.Forms.ListBox();
+			this.PlayListContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.ファイルブラウザで選択 = new System.Windows.Forms.ToolStripMenuItem();
 			this.parentPathLabel = new System.Windows.Forms.Label();
 			this.grarnPathLabel = new System.Windows.Forms.Label();
 			this.plRewButton = new System.Windows.Forms.Button();
@@ -82,8 +84,6 @@
 			this.plTotalLabel = new System.Windows.Forms.Label();
 			this.plPosisionLabel = new System.Windows.Forms.Label();
 			this.upDirButton = new System.Windows.Forms.Button();
-			this.PlayListContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-			this.ファイルブラウザで選択 = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
@@ -112,7 +112,6 @@
 			// fileTree
 			// 
 			this.fileTree.AllowDrop = true;
-			this.fileTree.ContextMenuStrip = this.fileTreeContextMenuStrip;
 			this.fileTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.fileTree.Location = new System.Drawing.Point(0, 0);
 			this.fileTree.Name = "fileTree";
@@ -124,6 +123,7 @@
 			this.fileTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.TreeView1_DragDrop);
 			this.fileTree.DragOver += new System.Windows.Forms.DragEventHandler(this.TreeView1_DragOver);
 			this.fileTree.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FileTree_KeyUp);
+			this.fileTree.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FilelistBoxMouseUp);
 			// 
 			// fileTreeContextMenuStrip
 			// 
@@ -611,7 +611,6 @@
 			// playListBox
 			// 
 			this.playListBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-			this.playListBox.ContextMenuStrip = this.PlayListContextMenuStrip;
 			this.playListBox.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.playListBox.FormattingEnabled = true;
 			this.playListBox.ItemHeight = 12;
@@ -623,6 +622,20 @@
 			this.playListBox.Click += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.DoubleClick += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PlaylistBoxMouseUp);
+			// 
+			// PlayListContextMenuStrip
+			// 
+			this.PlayListContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ファイルブラウザで選択});
+			this.PlayListContextMenuStrip.Name = "PlayListContextMenuStrip";
+			this.PlayListContextMenuStrip.Size = new System.Drawing.Size(179, 26);
+			this.PlayListContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.PlayListContextMenuStrip_ItemClicked);
+			// 
+			// ファイルブラウザで選択
+			// 
+			this.ファイルブラウザで選択.Name = "ファイルブラウザで選択";
+			this.ファイルブラウザで選択.Size = new System.Drawing.Size(178, 22);
+			this.ファイルブラウザで選択.Text = "ファイルブラウザで選択";
 			// 
 			// parentPathLabel
 			// 
@@ -697,20 +710,6 @@
 			this.upDirButton.Text = "上の階層をリストアップ";
 			this.upDirButton.UseVisualStyleBackColor = true;
 			this.upDirButton.Click += new System.EventHandler(this.UpDirButton_Click);
-			// 
-			// PlayListContextMenuStrip
-			// 
-			this.PlayListContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ファイルブラウザで選択});
-			this.PlayListContextMenuStrip.Name = "PlayListContextMenuStrip";
-			this.PlayListContextMenuStrip.Size = new System.Drawing.Size(179, 26);
-			this.PlayListContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.PlayListContextMenuStrip_ItemClicked);
-			// 
-			// ファイルブラウザで選択
-			// 
-			this.ファイルブラウザで選択.Name = "ファイルブラウザで選択";
-			this.ファイルブラウザで選択.Size = new System.Drawing.Size(178, 22);
-			this.ファイルブラウザで選択.Text = "ファイルブラウザで選択";
 			// 
 			// Form1
 			// 

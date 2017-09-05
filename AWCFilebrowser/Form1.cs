@@ -1498,10 +1498,12 @@ namespace file_tree_clock_web1
 				string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
 
 				string contlolPart = @"<!DOCTYPE html>
-	<html>
-		<head>
-			<meta charset = " + '"' + "UTF-8" + '"' + " >\n";
-				contlolPart += "\t\t\t<meta http-equiv = " + '"' + "X-UA-Compatible" + '"' + " content =  " + '"' + "requiresActiveX =true" + '"' + " />\n";
+<html>
+	<head>
+		<meta charset = " + '"' + "UTF-8" + '"' + " >\n";
+				contlolPart += "\t\t<meta http-equiv = " + '"' + "Pragma" + '"' + " content =  " + '"' + "no-cache" + '"' + " />\n";          //キャッシュを残さない；HTTP1.0プロトコル
+				contlolPart += "\t\t<meta http-equiv = " + '"' + "Cache-Control" + '"' + " content =  " + '"' + "no-cache" + '"' + " />\n";	//キャッシュを残さない；HTTP1.1プロトコル
+				contlolPart += "\t\t<meta http-equiv = " + '"' + "X-UA-Compatible" + '"' + " content =  " + '"' + "requiresActiveX =true" + '"' + " />\n";
 				//	contlolPart += "\n\t\t\t<link rel = " + '"' + "stylesheet" + '"' + " type = " + '"' + "text/css" + '"' + " href = " + '"' + "brows.css" + '"' + "/>\n";
 				string retType = GetFileTypeStr(fileName);
 				dbMsg += ",retType=" + retType;
@@ -1674,12 +1676,12 @@ namespace file_tree_clock_web1
 						dbMsg += ">level>" + level;
 						findStr = findNames[level];
 					}
-					foreach (TreeNode node in tree) { 
+					foreach (TreeNode node in tree) {
 						string nodeFullPath = node.FullPath;
 						if (nodeFullPath.Contains(findStr)) {       //nodeText.Contains(findStr)
 							string nodeText = node.Text;
 							int nIndex = node.Index;
-							dbMsg += "("+nIndex+")" + nodeFullPath;
+							dbMsg += "(" + nIndex + ")" + nodeFullPath;
 							treeSelectList.Add(nIndex);
 							System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(nodeFullPath);
 							if (di.Exists) {                                                    //まだフォルダなら
@@ -1693,9 +1695,9 @@ namespace file_tree_clock_web1
 								dbMsg += "::選択開始;SelectedNode=" + fileTree.SelectedNode.FullPath;
 								TreeNode sNode = fileTree.Nodes[treeSelectList[0]];
 								dbMsg += ",sNode=" + sNode.FullPath;
-								for (int i = 1; i <= treeSelectList.Count-1; i++) {
+								for (int i = 1; i <= treeSelectList.Count - 1; i++) {
 									int sIndex = treeSelectList[i];
-									dbMsg += "(" + sIndex + ")" ;
+									dbMsg += "(" + sIndex + ")";
 									fileTree.SelectedNode = sNode.Nodes[sIndex];
 									sNode = fileTree.SelectedNode;
 									dbMsg += sNode.FullPath;
@@ -2069,6 +2071,37 @@ namespace file_tree_clock_web1
 			}
 		}
 
+		string flRightClickItemUrl = "";
+		/// <summary>
+		/// fileTreeで右クリックされたアイテムからフルパスをグローバル変数に設定
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		void FilelistBoxMouseUp(object sender, MouseEventArgs e) {
+			string TAG = "[PlaylistBox1_MouseUp]";
+			string dbMsg = TAG;
+			try {
+				if (e.Button == System.Windows.Forms.MouseButtons.Right) {          // 右クリックされた？
+				/*	int index = fileTree.IndexFromPoint(e.Location);             // マウス座標から選択すべきアイテムのインデックスを取得
+					dbMsg += ",index=" + index;
+					if (index >= 0) {               // インデックスが取得できたら
+						*/
+						TreeNode flRightItem = fileTree.GetNodeAt(e.X, e.Y);
+						flRightClickItemUrl = flRightItem.FullPath;
+						dbMsg += ",flRightClickItemUrl=" + flRightClickItemUrl;
+					//	playListBox.ClearSelected();                    // すべての選択状態を解除してから
+					//playListBox.SelectedIndex = index;                  // アイテムを選択
+					Point pos = fileTree.PointToScreen(e.Location);
+					dbMsg += ",pos=" + pos;
+					fileTreeContextMenuStrip.Show(pos);						// コンテキストメニューを表示
+					//	}
+				}
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
 
 		/// <summary>
 		/// ファイルリストの右クリックで開くコンテキストメニューの処理
@@ -2092,7 +2125,7 @@ namespace file_tree_clock_web1
 					dbMsg += ">>" + selectItem;  // selectItem=media2.flv>>M:\sample/media2.flv,選択；ペースト,
 				}
 				string destDirName = selectItem + Path.DirectorySeparatorChar + "新しいフォルダ";
-				string selectFullName = selectNode.FullPath;
+				string selectFullName = flRightClickItemUrl;// selectNode.FullPath;
 				switch (clickedMenuItem) {                                           // クリックされた項目の Name を判定します。 
 					case "フォルダ作成":
 						dbMsg += ",選択；フォルダ作成=" + destDirName;
@@ -2641,8 +2674,9 @@ namespace file_tree_clock_web1
 						//	playListBox.ClearSelected();                    // すべての選択状態を解除してから
 						//playListBox.SelectedIndex = index;                  // アイテムを選択
 						// コンテキストメニューを表示
-						//Point pos = listBox1.PointToScreen(e.Location);
-						//contextMenuStrip1.Show(pos);
+						Point pos = playListBox.PointToScreen(e.Location);
+						dbMsg += ",pos=" + pos;
+						PlayListContextMenuStrip.Show(pos);
 					}
 				}
 				MyLog(dbMsg);
