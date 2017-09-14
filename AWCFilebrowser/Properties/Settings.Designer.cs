@@ -22,5 +22,29 @@ namespace AWSFileBroeser.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(" @\"C:\\Users\"")]
+        public string currentFile {
+            get {
+                return ((string)(this["currentFile"]));
+            }
+            set {
+                this["currentFile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".m3u")]
+        public string playLists {
+            get {
+                return ((string)(this["playLists"]));
+            }
+            set {
+                this["playLists"] = value;
+            }
+        }
     }
 }
