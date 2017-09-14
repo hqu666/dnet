@@ -617,7 +617,6 @@
 			this.playListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
 			this.playListBox.Size = new System.Drawing.Size(228, 308);
 			this.playListBox.TabIndex = 0;
-			this.playListBox.Click += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.SelectedIndexChanged += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.PlayListBox_DragDrop);
 			this.playListBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.PlayListBox_DragEnter);

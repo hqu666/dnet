@@ -121,10 +121,12 @@ namespace file_tree_clock_web1
 		int PlaylistDragDropNo;
 		int PlaylistDragOverNo;
 		int PlaylistDragEnterNo;
-		int PlayListMouseDownNo;
 		int PlaylistMouseUp;
 		string plRightClickItemUrl = "";
 		ListBox draglist;
+		Point mouceDownPoint;
+		int PlayListMouseDownNo;
+		string PlayListMouseDownValue = "";
 		int dragSouceIDl = -1;
 		int dragSouceIDP = -1;                          //ドラッグ開始時のマウスの位置から取得
 		string dragSouceUrl = "";
@@ -2845,6 +2847,24 @@ AddType video/MP2T .ts
 			}
 		}
 
+		private void PlayFromPlayList(string plaingItem) {
+			string TAG = "[PlayFromPlayList]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
+				//	plaingItem = playListBox.SelectedValue.ToString();
+				dbMsg += ";plaingItem=" + plaingItem;
+				lsFullPathName = plaingItem;
+				PlayListLabelWrigt((playListBox.SelectedIndex + 1).ToString() + "/" + PlayListBoxItem.Count.ToString(), plaingItem);
+				MakeWebSouce(plaingItem);
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
+
 		/// <summary>
 		/// プレイリストからの再生動作
 		/// </summary>
@@ -3315,12 +3335,12 @@ AddType video/MP2T .ts
 			}
 		}
 
-/// <summary>
-/// プレイリストに一行追加
-/// </summary>
-/// <param name="playList"></param>
-/// <param name="addRecord"></param>
-/// <param name="insarPosition"></param>
+		/// <summary>
+		/// プレイリストに一行追加
+		/// </summary>
+		/// <param name="playList"></param>
+		/// <param name="addRecord"></param>
+		/// <param name="insarPosition"></param>
 		private void Item2PlayListIndex(string playList, string addRecord, int insarPosition) {
 			string TAG = "[Item2PlayListIndex]";
 			string dbMsg = TAG;
@@ -3876,6 +3896,40 @@ AddType video/MP2T .ts
 			}
 		}
 
+
+		private void PlayListBox_Click(object sender, EventArgs e) {
+			string TAG = "[PlayListBox_Click]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
+				plaingItem = playListBox.SelectedValue.ToString();
+				dbMsg += ";plaingItem=" + plaingItem;
+				PlayFromPlayList(plaingItem);
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+
+		}
+
+		private void PlayListBox_MouseClick(object sender, MouseEventArgs e) {
+			string TAG = "[PlayListBox_MouseClick]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
+				plaingItem = playListBox.SelectedValue.ToString();
+				dbMsg += ";plaingItem=" + plaingItem;
+				PlayFromPlayList(plaingItem);
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+
+		}
+
+
 		/// <summary>
 		/// 始めのマウスクリック
 		/// https://dobon.net/vb/dotnet/control/draganddrop.html
@@ -3889,29 +3943,18 @@ AddType video/MP2T .ts
 				draglist = (ListBox)sender;
 				PlayListMouseDownNo = draglist.SelectedIndex;
 				dbMsg += "(Down;" + PlayListMouseDownNo + ")";
-				string listSelectValue = draglist.SelectedValue.ToString();
-				dbMsg += listSelectValue;
+				 PlayListMouseDownValue = draglist.SelectedValue.ToString();
+				dbMsg += PlayListMouseDownValue;
 
 				dragSouceIDl = draglist.SelectedIndex;
 				dbMsg += "(dragSouc;" + dragSouceIDl + ")";
 				dragSouceUrl = draglist.SelectedValue.ToString();
 				dbMsg += "Url;" + dragSouceUrl;
-		/*		Point dragPoint = Control.MousePosition;
-				dragPoint = draglist.PointToClient(dragPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
-				dragSouceIDP = draglist.IndexFromPoint(dragPoint);//マウス下のListBoxのインデックスを得る
+				mouceDownPoint = Control.MousePosition;
+				mouceDownPoint = draglist.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
+				dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
+				dragSouceIDP = draglist.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
 				dbMsg += "(Pointから;" + dragSouceIDP + ")";
-				if (dragSouceIDP > -1) {
-					draglist.DoDragDrop(draglist.Items[dragSouceIDP].ToString(), DragDropEffects.Move);//ドラッグスタート
-				}*/
-
-
-				/*		https://dobon.net/vb/dotnet/control/draganddrop.html
-				 *if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-							if (list.IndexFromPoint(e.X, e.Y) >= 0) {
-								PlaylistMouseDownPoint = new Point(e.X, e.Y);
-								dbMsg += ",PlaylistMouseDownPoint(" + PlaylistMouseDownPoint.X + " , " + PlaylistMouseDownPoint.Y + ")";
-							}
-						}*/
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -3924,7 +3967,22 @@ AddType video/MP2T .ts
 			string TAG = "[PlayListBox_MouseMove]";
 			string dbMsg = TAG;
 			try {
+				dbMsg += "(MovePoint;" + e.X + "," + e.Y + ")";
 
+				/*	dbMsg += "Button=" + e.Button;
+					if (e.Button == System.Windows.Forms.MouseButtons.Left) {        //左ボタン*/
+				if (mouceDownPoint != Point.Empty) {
+			//		Point mouceMovePoint = Control.MousePosition;
+			//		mouceMovePoint = draglist.PointToClient(mouceMovePoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
+					dbMsg += "(DownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
+					if (mouceDownPoint.X != e.X || mouceDownPoint.Y != e.Y) {
+						if (-1 < dragSouceIDP) {
+							draglist.DoDragDrop(draglist.Items[dragSouceIDP].ToString(), DragDropEffects.Move);//ドラッグスタート
+						}           //http://www.kisoplus.com/sample2/sub/listbox.html
+									//		https://dobon.net/vb/dotnet/control/draganddrop.html
+
+					}
+				}
 
 				/*		https://dobon.net/vb/dotnet/control/draganddrop.html
 		if (PlaylistMouseDownPoint != Point.Empty) {
@@ -3950,7 +4008,7 @@ AddType video/MP2T .ts
 				}
 			}
 			*/
-	//			MyLog(dbMsg);
+							MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
@@ -3967,18 +4025,18 @@ AddType video/MP2T .ts
 			string TAG = "[PlaylistBoxMouseUp]";
 			string dbMsg = TAG;
 			try {
-				ListBox list = (ListBox)sender;
-				PlaylistMouseUp = list.SelectedIndex;
+				ListBox droplist = (ListBox)sender;
+				PlaylistMouseUp = droplist.SelectedIndex;
 				dbMsg += "(MouseUp:" + PlaylistMouseUp + ")";
-				string listSelectValue = list.SelectedValue.ToString();
-				dbMsg += listSelectValue;
+				string listSelectValue = "";
+				if (-1< PlaylistMouseUp) {
+					listSelectValue = droplist.SelectedValue.ToString();
+					dbMsg += listSelectValue;
+				}
 
-				/*		https://dobon.net/vb/dotnet/control/draganddrop.html
-		PlaylistMouseDownPoint = Point.Empty;
-		*/
 				if (e.Button == System.Windows.Forms.MouseButtons.Right) {
 					dbMsg += "右ボタンを離した";
-						plIndex = playListBox.IndexFromPoint(e.Location);             //プレイリスト上のマウス座標から選択すべきアイテムのインデックスを取得
+					plIndex = playListBox.IndexFromPoint(e.Location);             //プレイリスト上のマウス座標から選択すべきアイテムのインデックスを取得
 					dbMsg += ",index=" + plIndex;
 					if (plIndex >= 0) {               // インデックスが取得できたら
 						plRightClickItemUrl = PlayListBoxItem[plIndex].FullPathStr;
@@ -3991,32 +4049,38 @@ AddType video/MP2T .ts
 						PlayListContextMenuStrip.Show(pos);
 					}
 				} else if (e.Button == System.Windows.Forms.MouseButtons.Left) {        //左ボタン
-					dbMsg += "左ボタンを離した("+ dragSouceIDl+")"+ dragSouceUrl;
-					int listChangeNo = list.SelectedIndex;      //移動先のインデックスを取得
-					dbMsg += "を;" + listChangeNo + "に移動";
-					if (dragSouceIDl != listChangeNo) {
-						if (-1 < dragSouceIDl && "" != dragSouceUrl) {
-							string playList = PlaylistComboBox.Text;
-							if (draglist == list) {         //プレイリスト内の移動なら
-								DelFromPlayList(playList, dragSouceIDl);
-								if (dragSouceIDl < listChangeNo) {
-									listChangeNo--;
-								}
-							}
-							dragSouceIDl = -1;
-							Item2PlayListIndex(playList, dragSouceUrl, listChangeNo);
-							dragSouceUrl = "";
-							dbMsg += ",最終選択=" + listChangeNo;
-							list.SelectedIndex = listChangeNo;          //選択先のインデックスを指定
-							plaingItem = playListBox.SelectedValue.ToString();
-							dbMsg += ";plaingItem=" + plaingItem;
+					dbMsg += "左ボタンを離した(" + PlayListMouseDownNo + ")" + dragSouceUrl;
+					int listChangeNo = droplist.SelectedIndex;      //移動先のインデックスを取得
+					dbMsg += ">>(" + listChangeNo;
+					if (PlayListMouseDownNo != listChangeNo) {
+						dbMsg += "に移動";
+						/*	ここでdropを受け取る場合	http://note.phyllo.net/?eid=563651	☆カーソルエフェクトは無い
+										if (-1 < dragSouceIDl && "" != dragSouceUrl) {
+											string playList = PlaylistComboBox.Text;
+											if (draglist == droplist) {         //プレイリスト内の移動なら
+												DelFromPlayList(playList, dragSouceIDl);
+												if (dragSouceIDl < listChangeNo) {
+													listChangeNo--;
+												}
+											}
+											dragSouceIDl = -1;
+											Item2PlayListIndex(playList, dragSouceUrl, listChangeNo);
+											dragSouceUrl = "";
+											dbMsg += ",最終選択=" + listChangeNo;
+											droplist.SelectedIndex = listChangeNo;          //選択先のインデックスを指定
+											plaingItem = playListBox.SelectedValue.ToString();
+											dbMsg += ";plaingItem=" + plaingItem;
+										}*/
+					} else {
+						dbMsg += ")" + listSelectValue;
+						if (listSelectValue == PlayListMouseDownValue) {
+							PlayFromPlayList(listSelectValue);
 						}
 					}
-					
 				} else {
-					dbMsg += "dragではない" ;
+					dbMsg += "dragではない";
 				}
-
+				mouceDownPoint = Point.Empty;
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -4051,29 +4115,29 @@ AddType video/MP2T .ts
 					}
 				}
 		*/
-/*
-		private void PlayListBox_QueryContinueDrag(object sender, QueryContinueDragEventArgs e) {
-			string TAG = "[PlayListBox_QueryContinueDrag]";
-			string dbMsg = TAG;
-			try {
+		/*
+				private void PlayListBox_QueryContinueDrag(object sender, QueryContinueDragEventArgs e) {
+					string TAG = "[PlayListBox_QueryContinueDrag]";
+					string dbMsg = TAG;
+					try {
 
 
-				/*		https://dobon.net/vb/dotnet/control/draganddrop.html
-//マウスの右ボタンが押されていればドラッグをキャンセル
-//"2"はマウスの右ボタンを表す
-dbMsg += "KeyState=" + e.KeyState;
-if ((e.KeyState & 2) == 2) {
-	e.Action = DragAction.Cancel;
-}
-
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-
-				MyLog(dbMsg);
-			}
+						/*		https://dobon.net/vb/dotnet/control/draganddrop.html
+		//マウスの右ボタンが押されていればドラッグをキャンセル
+		//"2"はマウスの右ボタンを表す
+		dbMsg += "KeyState=" + e.KeyState;
+		if ((e.KeyState & 2) == 2) {
+			e.Action = DragAction.Cancel;
 		}
-*/
+
+						MyLog(dbMsg);
+					} catch (Exception er) {
+						dbMsg += "<<以降でエラー発生>>" + er.Message;
+
+						MyLog(dbMsg);
+					}
+				}
+		*/
 		private void PlayListBox_DragEnter(object sender, DragEventArgs e) {
 			string TAG = "[PlayListBox_DragEnter]";
 			string dbMsg = TAG;
@@ -4093,53 +4157,75 @@ if ((e.KeyState & 2) == 2) {
 			}
 		}
 
-/*		/// <summary>
-		/// ドラッグ中
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void PlayListBox_DragOver(object sender, DragEventArgs e) {
-			string TAG = "[PlayListBox_DragOver]";// + fileName;
-			string dbMsg = TAG;
-			try {
-				/*		https://dobon.net/vb/dotnet/control/draganddrop.html
+		/*		/// <summary>
+				/// ドラッグ中
+				/// </summary>
+				/// <param name="sender"></param>
+				/// <param name="e"></param>
+				private void PlayListBox_DragOver(object sender, DragEventArgs e) {
+					string TAG = "[PlayListBox_DragOver]";// + fileName;
+					string dbMsg = TAG;
+					try {
+						/*		https://dobon.net/vb/dotnet/control/draganddrop.html
 
-if (e.Data.GetDataPresent(typeof(string))) {                //ドラッグされているデータがstring型か調べる
-	if ((e.KeyState & 8) == 8 && (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {                //Ctrlキーが押されていればCopy//"8"はCtrlキーを表す
-		e.Effect = DragDropEffects.Copy;
-	} else if ((e.KeyState & 32) == 32 && (e.AllowedEffect & DragDropEffects.Link) == DragDropEffects.Link) {   //Altキーが押されていればLink//"32"はAltキーを表す
-		e.Effect = DragDropEffects.Link;
-	} else if ((e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move) {                              //何も押されていなければMove
-		e.Effect = DragDropEffects.Move;
-	} else {
-		e.Effect = DragDropEffects.None;
-	}
-} else {
-	e.Effect = DragDropEffects.None;                    //string型でなければ受け入れない
-}
-
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(dbMsg);
+		if (e.Data.GetDataPresent(typeof(string))) {                //ドラッグされているデータがstring型か調べる
+			if ((e.KeyState & 8) == 8 && (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {                //Ctrlキーが押されていればCopy//"8"はCtrlキーを表す
+				e.Effect = DragDropEffects.Copy;
+			} else if ((e.KeyState & 32) == 32 && (e.AllowedEffect & DragDropEffects.Link) == DragDropEffects.Link) {   //Altキーが押されていればLink//"32"はAltキーを表す
+				e.Effect = DragDropEffects.Link;
+			} else if ((e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move) {                              //何も押されていなければMove
+				e.Effect = DragDropEffects.Move;
+			} else {
+				e.Effect = DragDropEffects.None;
 			}
+		} else {
+			e.Effect = DragDropEffects.None;                    //string型でなければ受け入れない
 		}
-*/
+
+						MyLog(dbMsg);
+					} catch (Exception er) {
+						dbMsg += "<<以降でエラー発生>>" + er.Message;
+						MyLog(dbMsg);
+					}
+				}
+		*/
 		private void PlayListBox_DragDrop(object sender, DragEventArgs e) {
 			string TAG = "[PlayListBox_DragDrop]";
 			string dbMsg = TAG;
 			try {
 
-				//ドラッグしてきたアイテムの文字列をstrに格納する
-				string str = e.Data.GetData(DataFormats.Text).ToString();
+				ListBox droplist = (ListBox)sender;
+				string str = e.Data.GetData(DataFormats.Text).ToString();               //ドラッグしてきたアイテムの文字列をstrに格納する
+				dbMsg += "Drop;" + str;
 
-				Point p = Control.MousePosition;
-				p = playListBox.PointToClient(p);//ドロップ時のマウスの位置をクライアント座標に変換
-				int ind = playListBox.IndexFromPoint(p);//マウス下のＬＢのインデックスを得る
-				dbMsg += "(ind;" + ind + ")"+ str;
-				if (ind > -1 && ind < playListBox.Items.Count) {
-					playListBox.Items[dragSouceIDP] = playListBox.Items[ind];
-					playListBox.Items[ind] = str;
+				Point dropPoint = Control.MousePosition;
+				dropPoint = playListBox.PointToClient(dropPoint);//ドロップ時のマウスの位置をクライアント座標に変換
+				dbMsg += "(dropPoint;" + dropPoint.X + "," + dropPoint.Y + ")";
+				int listChangeNo = playListBox.IndexFromPoint(dropPoint);//マウス下のＬＢのインデックスを得る
+				dbMsg += "(ind;" + listChangeNo + ")" + str;
+				if (listChangeNo > -1 && listChangeNo < playListBox.Items.Count) {
+					dbMsg += "を;" + listChangeNo + "に移動";
+					if (dragSouceIDl != listChangeNo) {
+						if (-1 < dragSouceIDl && "" != dragSouceUrl) {
+							string playList = PlaylistComboBox.Text;
+							if (draglist == droplist) {         //プレイリスト内の移動なら
+								DelFromPlayList(playList, dragSouceIDl);
+								if (dragSouceIDl < listChangeNo) {
+									listChangeNo--;
+								}
+							}
+							dragSouceIDl = -1;
+							Item2PlayListIndex(playList, dragSouceUrl, listChangeNo);
+							dragSouceUrl = "";
+							dbMsg += ",最終選択=" + listChangeNo;
+							droplist.SelectedIndex = listChangeNo;          //選択先のインデックスを指定
+							plaingItem = playListBox.SelectedValue.ToString();
+							dbMsg += ";plaingItem=" + plaingItem;
+						}
+					}
+
+					//					playListBox.Items[dragSouceIDP] = playListBox.Items[ind];
+					//					playListBox.Items[ind] = str;
 				}
 
 
@@ -4461,6 +4547,7 @@ if (e.Data.GetDataPresent(typeof(string))) {                    //ドロップ�
 				Console.WriteLine(msg);
 			}
 		}
+
 		//http://www.usefullcode.net/2016/03/index.html
 	}
 }
