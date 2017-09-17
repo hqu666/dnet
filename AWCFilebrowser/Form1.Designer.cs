@@ -130,9 +130,12 @@
 			this.fileTree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView1_BeforeExpand);
 			this.fileTree.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.TreeView1_ItemDrag);
 			this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
+			this.fileTree.Click += new System.EventHandler(this.FileTree_Click);
 			this.fileTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.TreeView1_DragDrop);
 			this.fileTree.DragOver += new System.Windows.Forms.DragEventHandler(this.TreeView1_DragOver);
+			this.fileTree.DoubleClick += new System.EventHandler(this.FileTree_DoubleClick);
 			this.fileTree.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FileTree_KeyUp);
+			this.fileTree.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FileTree_MouseMove);
 			this.fileTree.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FilelistBoxMouseUp);
 			// 
 			// fileTreeContextMenuStrip
