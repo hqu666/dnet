@@ -8,5 +8,8 @@
     <Setting Name="playLists" Type="System.String" Scope="User">
       <Value Profile="(Default)">.m3u</Value>
     </Setting>
+    <Setting Name="currentList" Type="System.String" Scope="User">
+      <Value Profile="(Default)">""</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

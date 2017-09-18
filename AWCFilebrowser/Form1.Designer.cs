@@ -90,6 +90,8 @@
 			this.ファイルブラウザで選択plToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.削除plToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.他のアプリケーションで開くplToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.videoFT2PLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.audioFT2PLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -153,7 +155,7 @@
             this.プレイリストに追加ToolStripMenuItem,
             this.プレイリストを作成ToolStripMenuItem});
 			this.fileTreeContextMenuStrip.Name = "contextMenuStrip1";
-			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(195, 246);
+			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(195, 268);
 			this.fileTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.fileTreeContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ContextMenuStrip1_ItemClicked);
 			// 
@@ -220,6 +222,9 @@
 			// 
 			// プレイリストを作成ToolStripMenuItem
 			// 
+			this.プレイリストを作成ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.videoFT2PLToolStripMenuItem,
+            this.audioFT2PLToolStripMenuItem});
 			this.プレイリストを作成ToolStripMenuItem.Name = "プレイリストを作成ToolStripMenuItem";
 			this.プレイリストを作成ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.プレイリストを作成ToolStripMenuItem.Text = "プレイリストを作成";
@@ -838,6 +843,20 @@
 			this.他のアプリケーションで開くplToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.他のアプリケーションで開くplToolStripMenuItem.Text = "他のアプリケーションで開く";
 			// 
+			// videoFT2PLToolStripMenuItem
+			// 
+			this.videoFT2PLToolStripMenuItem.Name = "videoFT2PLToolStripMenuItem";
+			this.videoFT2PLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.videoFT2PLToolStripMenuItem.Text = "video";
+			this.videoFT2PLToolStripMenuItem.Click += new System.EventHandler(this.PlayListMakeContextMenuStrip_SubMenuClick);
+			// 
+			// audioFT2PLToolStripMenuItem
+			// 
+			this.audioFT2PLToolStripMenuItem.Name = "audioFT2PLToolStripMenuItem";
+			this.audioFT2PLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.audioFT2PLToolStripMenuItem.Text = "audio";
+			this.audioFT2PLToolStripMenuItem.Click += new System.EventHandler(this.PlayListMakeContextMenuStrip_SubMenuClick);
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -950,6 +969,8 @@
 		private System.Windows.Forms.Button PlayListFileAddBottun;
 		private System.Windows.Forms.ToolStripMenuItem 削除plToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem 他のアプリケーションで開くplToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem videoFT2PLToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem audioFT2PLToolStripMenuItem;
 	}
 }
 

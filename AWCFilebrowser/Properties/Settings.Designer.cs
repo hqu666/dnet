@@ -46,5 +46,17 @@ namespace AWSFileBroeser.Properties {
                 this["playLists"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\"\"")]
+        public string currentList {
+            get {
+                return ((string)(this["currentList"]));
+            }
+            set {
+                this["currentList"] = value;
+            }
+        }
     }
 }
