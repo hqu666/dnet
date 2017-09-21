@@ -134,18 +134,13 @@
 			this.fileTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.fileTree.Location = new System.Drawing.Point(0, 0);
 			this.fileTree.Name = "fileTree";
-			this.fileTree.Size = new System.Drawing.Size(307, 315);
+			this.fileTree.Size = new System.Drawing.Size(307, 425);
 			this.fileTree.TabIndex = 7;
 			this.fileTree.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.FileTree_BeforeLabelEdit);
-			this.fileTree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.TreeView1_BeforeExpand);
-			this.fileTree.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.TreeView1_ItemDrag);
-			this.fileTree.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TreeView1_AfterSelect);
-			this.fileTree.Click += new System.EventHandler(this.FileTree_Click);
-			this.fileTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.TreeView1_DragDrop);
-			this.fileTree.DragOver += new System.Windows.Forms.DragEventHandler(this.TreeView1_DragOver);
+			this.fileTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileTree_DragDrop);
+			this.fileTree.DragOver += new System.Windows.Forms.DragEventHandler(this.FileTree_DragOver);
 			this.fileTree.DoubleClick += new System.EventHandler(this.FileTree_DoubleClick);
 			this.fileTree.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FileTree_KeyUp);
-			this.fileTree.MouseMove += new System.Windows.Forms.MouseEventHandler(this.FileTree_MouseMove);
 			this.fileTree.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FilelistBoxMouseUp);
 			// 
 			// fileTreeContextMenuStrip
@@ -388,7 +383,7 @@
 			this.playerWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
 			this.playerWebBrowser.Name = "playerWebBrowser";
 			this.playerWebBrowser.ScrollBarsEnabled = false;
-			this.playerWebBrowser.Size = new System.Drawing.Size(694, 452);
+			this.playerWebBrowser.Size = new System.Drawing.Size(694, 562);
 			this.playerWebBrowser.TabIndex = 25;
 			this.playerWebBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.WebBrowser1_DocumentCompleted);
 			this.playerWebBrowser.Resize += new System.EventHandler(this.ReSizeViews);
@@ -408,7 +403,7 @@
 			// 
 			this.baseSplitContainer.Panel2.AutoScroll = true;
 			this.baseSplitContainer.Panel2.Controls.Add(this.viewSplitContainer);
-			this.baseSplitContainer.Size = new System.Drawing.Size(1243, 452);
+			this.baseSplitContainer.Size = new System.Drawing.Size(1243, 562);
 			this.baseSplitContainer.SplitterDistance = 307;
 			this.baseSplitContainer.TabIndex = 27;
 			// 
@@ -429,7 +424,7 @@
 			// FileBrowserSplitContainer.Panel2
 			// 
 			this.FileBrowserSplitContainer.Panel2.Controls.Add(this.FileBrowserCenterSplitContainer);
-			this.FileBrowserSplitContainer.Size = new System.Drawing.Size(307, 452);
+			this.FileBrowserSplitContainer.Size = new System.Drawing.Size(307, 562);
 			this.FileBrowserSplitContainer.SplitterDistance = 47;
 			this.FileBrowserSplitContainer.TabIndex = 0;
 			// 
@@ -476,8 +471,8 @@
 			this.FileBrowserCenterSplitContainer.Panel2.Controls.Add(this.label4);
 			this.FileBrowserCenterSplitContainer.Panel2.Controls.Add(this.label2);
 			this.FileBrowserCenterSplitContainer.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-			this.FileBrowserCenterSplitContainer.Size = new System.Drawing.Size(307, 401);
-			this.FileBrowserCenterSplitContainer.SplitterDistance = 315;
+			this.FileBrowserCenterSplitContainer.Size = new System.Drawing.Size(307, 511);
+			this.FileBrowserCenterSplitContainer.SplitterDistance = 425;
 			this.FileBrowserCenterSplitContainer.TabIndex = 0;
 			// 
 			// continuousPlayCheckBox
@@ -547,7 +542,7 @@
 			this.viewSplitContainer.Panel2.AutoScroll = true;
 			this.viewSplitContainer.Panel2.Controls.Add(this.progresPanel);
 			this.viewSplitContainer.Panel2.Controls.Add(this.playerWebBrowser);
-			this.viewSplitContainer.Size = new System.Drawing.Size(932, 452);
+			this.viewSplitContainer.Size = new System.Drawing.Size(932, 562);
 			this.viewSplitContainer.SplitterDistance = 234;
 			this.viewSplitContainer.TabIndex = 26;
 			// 
@@ -577,8 +572,8 @@
 			this.PlayListsplitContainer.Panel2.Controls.Add(this.plTotalLabel);
 			this.PlayListsplitContainer.Panel2.Controls.Add(this.plPosisionLabel);
 			this.PlayListsplitContainer.Panel2.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.PlayListsplitContainer.Size = new System.Drawing.Size(234, 452);
-			this.PlayListsplitContainer.SplitterDistance = 366;
+			this.PlayListsplitContainer.Size = new System.Drawing.Size(234, 562);
+			this.PlayListsplitContainer.SplitterDistance = 476;
 			this.PlayListsplitContainer.TabIndex = 2;
 			// 
 			// PlayListTopSplitContainer
@@ -600,7 +595,7 @@
 			// 
 			this.PlayListTopSplitContainer.Panel2.Controls.Add(this.playListBox);
 			this.PlayListTopSplitContainer.Panel2.Padding = new System.Windows.Forms.Padding(3);
-			this.PlayListTopSplitContainer.Size = new System.Drawing.Size(234, 366);
+			this.PlayListTopSplitContainer.Size = new System.Drawing.Size(234, 476);
 			this.PlayListTopSplitContainer.SplitterDistance = 48;
 			this.PlayListTopSplitContainer.TabIndex = 1;
 			// 
@@ -647,7 +642,7 @@
 			this.playListBox.Location = new System.Drawing.Point(3, 3);
 			this.playListBox.Name = "playListBox";
 			this.playListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
-			this.playListBox.Size = new System.Drawing.Size(228, 308);
+			this.playListBox.Size = new System.Drawing.Size(228, 418);
 			this.playListBox.TabIndex = 0;
 			this.playListBox.SelectedIndexChanged += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.PlayListBox_DragDrop);
@@ -912,7 +907,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1243, 452);
+			this.ClientSize = new System.Drawing.Size(1243, 562);
 			this.Controls.Add(this.baseSplitContainer);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(1055, 39);

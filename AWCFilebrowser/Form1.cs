@@ -200,15 +200,16 @@ namespace file_tree_clock_web1
 			AWSFileBroeser.Properties.Settings.Default.SettingChanging += new System.Configuration.SettingChangingEventHandler(Default_SettingChanging);//プリファレンスの変更イベント
 																																						//		playListWidth = splitContainer2.Width;
 																																						//dbMsg += "playListWidth" + playListWidth;
-																																						/*	//イベントハンドラを追加する
-																																							fileTree.ItemDrag += new ItemDragEventHandler( TreeView1_ItemDrag );
-																																							fileTree.DragOver += new DragEventHandler( TreeView1_DragOver );
-																																							fileTree.DragDrop += new DragEventHandler( TreeView1_DragDrop );*/
-			continuousPlayCheckBox.Checked = false;//連続再生ボタン
 			fileTree.AllowDrop = true;
+			fileTree.ItemDrag += new ItemDragEventHandler(FileTree_ItemDrag);      //イベントハンドラを追加する
+			fileTree.DragOver += new DragEventHandler(FileTree_DragOver);
+			fileTree.DragDrop += new DragEventHandler(FileTree_DragDrop);
+
 			playListBox.AllowDrop = true;
 			playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
 			playListBox.DragDrop += new DragEventHandler(PlayListBox_DragDrop);
+
+			continuousPlayCheckBox.Checked = false;//連続再生ボタン
 			MyLog(dbMsg);
 		}
 
@@ -2007,8 +2008,8 @@ AddType video/MP2T .ts
 					InputDialog f = new InputDialog(msgStr, titolStr, destName);
 					if (f.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
 						destName = f.ResultText;
-						selectNode.Text = destName;					//ラベルを書換え
-						selectNode.EndEdit(true);					//更新を反映
+						selectNode.Text = destName;                 //ラベルを書換え
+						selectNode.EndEdit(true);                   //更新を反映
 						dbMsg += ",元=" + selectItem + ",先=" + destName;
 						string renewName = passNameStr + Path.DirectorySeparatorChar + destName;
 						if (File.Exists(selectItem)) {
@@ -2199,7 +2200,7 @@ AddType video/MP2T .ts
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		void FilelistBoxMouseUp(object sender, MouseEventArgs e) {
-			string TAG = "[PlaylistBox1_MouseUp]";
+			string TAG = "[FilelistBoxMouseUp]";
 			string dbMsg = TAG;
 			try {
 				if (e.Button == System.Windows.Forms.MouseButtons.Right) {          // 右クリックされた？
@@ -2471,9 +2472,10 @@ AddType video/MP2T .ts
 		///fileTreeの操作////////////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// FileTreeItemのクリック/セレクト動作
+		/// 呼出し元	FileTree_DoubleClick
 		/// </summary>
 		private void FileTreeItemSelect(TreeNode selectNode) {
-			string TAG = "[TreeView1_AfterSelect]";
+			string TAG = "[FileTreeItemSelect]";
 			string dbMsg = TAG;
 			try {
 				//		dbMsg += "sender=" + sender;                    //sender=	常にSystem.Windows.Forms.TreeView, Nodes.Count: 5, Nodes[0]: TreeNode: C:\,
@@ -2594,6 +2596,7 @@ AddType video/MP2T .ts
 				TreeView tv = (TreeView)sender;
 				TreeNode selectedNode = tv.SelectedNode;
 				dbMsg += " ,SelectedNode=" + selectedNode.FullPath;
+				FileTreeItemSelect(selectedNode);
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -2601,8 +2604,13 @@ AddType video/MP2T .ts
 			}
 		}
 
+		/// <summary>
+		/// ダブルクリックで選択ノードに合わせた動作分岐へ
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void FileTree_DoubleClick(object sender, EventArgs e) {
-			string TAG = "[FileTree_Click]";
+			string TAG = "[FileTree_DoubleClick]";
 			string dbMsg = TAG;
 			try {
 				TreeView tv = (TreeView)sender;
@@ -2627,9 +2635,9 @@ AddType video/MP2T .ts
 			//	dbMsg += "sender=" + sender;
 			//	dbMsg += "e=" + e;
 			try {
-				TreeNode tn = e.Node;//, tn2;
-				string sarchDir = tn.Text;//展開するノードのフルパスを取得		FullPath だとM:\\DL
-				dbMsg += ",sarchDir=" + sarchDir;
+			//	TreeNode tn = e.Node;//, tn2;
+			//	string sarchDir = tn.Text;//展開するノードのフルパスを取得		FullPath だとM:\\DL
+			//	dbMsg += ",sarchDir=" + sarchDir;
 				/*		string motoPass = passNameLabel.Text + "";
 						dbMsg += ",motoPass=" + motoPass;
 						if (motoPass != "") {
@@ -2690,6 +2698,11 @@ AddType video/MP2T .ts
 			}
 		}
 
+		/// <summary>
+		/// ラベル編集モードに入ったら強制的にTargetReNameへ
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void FileTree_BeforeLabelEdit(object sender, NodeLabelEditEventArgs e) {
 			string TAG = "[FileTree_KeyUp]";
 			string dbMsg = TAG;
@@ -2706,10 +2719,9 @@ AddType video/MP2T .ts
 			}
 		}
 
-
 		/// <summary>
 		/// failreeが選択されている時に同時に押されているキーの有無を判定する
-		/// F2；ラベル編集
+		/// F2が押されていたらラベル編集に入る
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -2733,21 +2745,29 @@ AddType video/MP2T .ts
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void TreeView1_ItemDrag(object sender, ItemDragEventArgs e) {
-			string TAG = "[TreeView1_ItemDrag]";
+		private void FileTree_ItemDrag(object sender, ItemDragEventArgs e) {
+			string TAG = "[FileTree_ItemDrag]";
 			string dbMsg = TAG;
 			try {
+				TreeView tv = (TreeView)sender;
+				mouceDownPoint = Control.MousePosition;
+				mouceDownPoint = tv.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
+				dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";      //(mouceDownPoint;735,-39)
+																									//	dragSouceIDP = tv.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
+																									//	dbMsg += "(Pointから;" + dragSouceIDP + ")";
+																									////////////////////////////////////////////////////////////////////////////////////////////////
 				cutSouce = "";       //カットするアイテムのurl
 				copySouce = "";      //コピーするアイテムのurl
-				TreeView tv = (TreeView)sender;
 				dragFrom = tv.Name;
-				tv.SelectedNode = (TreeNode)e.Item;
+				dragNode = (TreeNode)e.Item;
+				tv.SelectedNode = dragNode;//(TreeNode)e.Item;
 				dragSouceIDl = tv.SelectedNode.Index; //draglist.SelectedIndex;
 				dbMsg += "(dragSouc;" + dragSouceIDl + ")";     //(dragSouc;0)Url;M:\\sample\123.flv
 				dragSouceUrl = tv.SelectedNode.FullPath; // draglist.SelectedValue.ToString();
 				dbMsg += "dragSouceUrl;" + dragSouceUrl;
-				//		tv.Focus();
-				ddeTree = tv.DoDragDrop(dragSouceUrl, DragDropEffects.All);       //e.Item
+						tv.Focus();
+				ddeTree = tv.DoDragDrop(dragNode, DragDropEffects.All);       //e.Item
+		//		ddeTree = tv.DoDragDrop(dragSouceUrl, DragDropEffects.All);       //e.Item
 				b_dragSouceUrl = "";
 				dbMsg += "のドラッグを開始";
 				if ((ddeTree & DragDropEffects.Move) == DragDropEffects.Move) {
@@ -2755,20 +2775,11 @@ AddType video/MP2T .ts
 															   //	dbMsg += " , 移動した時は、ドラッグしたノードを削除";
 															   //		tv.Nodes.Remove((TreeNode)e.Item);
 				}
-				dragNode = (TreeNode)e.Item;
 				////////////////////////////////////////////////////////////////////////////////////////////////
 				PlayListMouseDownNo = tv.SelectedNode.Index; //3?	draglist.SelectedIndex;
 				dbMsg += " (Down;" + PlayListMouseDownNo + ")";     //(Down;0)M:\\sample\123.flv
 				PlayListMouseDownValue = tv.SelectedNode.FullPath; //draglist.SelectedValue.ToString();
 				dbMsg += PlayListMouseDownValue;
-
-				mouceDownPoint = Control.MousePosition;
-				mouceDownPoint = tv.PointToClient(mouceDownPoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
-				dbMsg += "(mouceDownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";      //(mouceDownPoint;735,-39)
-																									//	dragSouceIDP = tv.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
-																									//	dbMsg += "(Pointから;" + dragSouceIDP + ")";
-																									////////////////////////////////////////////////////////////////////////////////////////////////
-
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -2777,10 +2788,10 @@ AddType video/MP2T .ts
 		}
 
 		private void FileTree_MouseMove(object sender, MouseEventArgs e) {
-			/*			string TAG = "[FileTree_MouseMove]";
-						string dbMsg = TAG;
-						try {
-							dbMsg += "(MovePoint;" + e.X + "," + e.Y + ")";
+			string TAG = "[FileTree_MouseMove]";
+			string dbMsg = TAG;
+			try {
+				/*			dbMsg += "(MovePoint;" + e.X + "," + e.Y + ")";
 							Point movePoint = new Point(e.X, e.Y);
 							movePoint = fileTree.PointToClient(movePoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
 							dbMsg += ">>(" + movePoint.X + "," + movePoint.Y + ")";
@@ -2801,12 +2812,12 @@ AddType video/MP2T .ts
 									MyLog(dbMsg);
 								}
 							}
-							//	}       //if (e.Button == System.Windows.Forms.MouseButtons.Left)
-							MyLog(dbMsg);
-						} catch (Exception er) {
-							dbMsg += "<<以降でエラー発生>>" + er.Message;
-							MyLog(dbMsg);
-						}*/
+							//	}       //if (e.Button == System.Windows.Forms.MouseButtons.Left)*/
+				//		MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
 		}
 
 		/// <summary>
@@ -2814,13 +2825,13 @@ AddType video/MP2T .ts
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void TreeView1_DragOver(object sender, DragEventArgs e) {
-			string TAG = "[TreeView1_DragOver]";
+		private void FileTree_DragOver(object sender, DragEventArgs e) {
+			string TAG = "[FileTree_DragOver]";
 			string dbMsg = TAG;
 			try {
 				TreeView tv = (TreeView)sender;
 				dbMsg += " ,SelectedNode=" + tv.SelectedNode.FullPath;
-				if (e.Data.GetDataPresent(typeof(TreeNode))) {              //ドラッグされているデータがTreeNodeか調べる
+				if (tv == fileTree) {              //ドラッグされているデータがTreeNodeか調べる		e.Data.GetDataPresent(typeof(TreeNode))
 					if ((e.KeyState & 8) == 8 && (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {
 						dbMsg += " , Ctrlキーが押されている>>Copy";//Ctrlキーが押されていればCopy//"8"はCtrlキーを表す
 						copySouce = tv.SelectedNode.FullPath;      //コピーするアイテムのurl
@@ -2863,7 +2874,8 @@ AddType video/MP2T .ts
 				if (mouceDownPoint != Point.Empty) {
 					int filrTreeRight = fileTree.Left + fileTree.Width;
 					dbMsg += "filrTreeRight=" + filrTreeRight;
-					if (filrTreeRight < movePoint.X) {    //PlayListに入った	|| playListBoxLeft < e.X
+					if (filrTreeRight < movePoint.X) {    //	|| playListBoxLeft < e.X
+						dbMsg += ">PlayListに入った>";
 						if (-1 < dragSouceIDP) {
 							dbMsg += "(dragSouc;" + dragSouceIDl + ")dragSouceUrl;" + dragSouceUrl;
 							b_dragSouceUrl = "";
@@ -2872,11 +2884,12 @@ AddType video/MP2T .ts
 							mouceDownPoint = Point.Empty;
 						}
 						MyLog(dbMsg);
+					} else {
+						dbMsg += ">fileTree内>";
 					}
 				}
-				//		MyLog(dbMsg);
 			} catch (Exception er) {
-				dbMsg += "でエラー発生" + er.Message;
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 		}
@@ -2886,17 +2899,18 @@ AddType video/MP2T .ts
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void TreeView1_DragDrop(object sender, DragEventArgs e) {
-			string TAG = "[TreeView1_DragDrop]";
+		private void FileTree_DragDrop(object sender, DragEventArgs e) {
+			string TAG = "[FileTree_DragDrop]";
 			string dbMsg = TAG;
 			try {
-				if (e.Data.GetDataPresent(typeof(TreeNode))) {                              //ドロップされたデータがTreeNodeか調べる
-					TreeView tv = (TreeView)sender;
+				TreeView tv = (TreeView)sender;
+				if (tv == fileTree) {                              //e.Data.GetDataPresent(typeof(TreeNode))	ドロップされたデータがTreeNodeか調べる
 					dbMsg += " Drop先は" + tv.SelectedNode.FullPath;
 					TreeNode source = (TreeNode)e.Data.GetData(typeof(TreeNode));         //ドロップされたデータ(TreeNode)を取得
+					dbMsg += ",source=" + source.FullPath.ToString();
 					fileTreeDrropNode = tv.GetNodeAt(tv.PointToClient(new Point(e.X, e.Y))); //ドロップ先のTreeNodeを取得する
-
-					string dropSouce = fileTreeDrropNode.FullPath;
+					string dropSouce = fileTreeDrropNode.FullPath.ToString();
+					dbMsg += ",dropSouce=" + dropSouce;
 					if (fileTreeDrropNode != null && fileTreeDrropNode != source && !IsChildNode(source, fileTreeDrropNode)) { //マウス下のNodeがドロップ先として適切か調べる
 						if (copySouce != "") {
 							dbMsg += ",copy=" + copySouce;
@@ -2913,13 +2927,14 @@ AddType video/MP2T .ts
 							tv.SelectedNode = cln;                                                  //追加されたNodeを選択
 						*/
 						dbMsg += " , Effect(" + e.Effect + ")" + e.Effect.ToString();
-						if (e.Effect.ToString() == "Move" && cutSouce.Length < dragNode.Name.ToString().Length) {     //(ddeTree & DragDropEffects.Move) == DragDropEffects.Move
-																													  //		cutSouce = fileTree.SelectedNode.FullPath;       //カットするアイテムのurl
+						if (e.Effect.ToString() == "Move" ) {     //&& cutSouce.Length < dragNode.Name.ToString().Length	(ddeTree & DragDropEffects.Move) == DragDropEffects.Move
+																  //		cutSouce = fileTree.SelectedNode.FullPath;       //カットするアイテムのurl
 							dbMsg += " , 移動した時は、ドラッグしたノード=" + dragNode.Name.ToString();             //移動先に書き換わる
 							string dragNodeName = cutSouce.Replace(@":\\", @":\");
 							dbMsg += " , dragNodeName=" + dragNodeName + " を削除";
-							TreeNode[] tFind = fileTree.Nodes.Find(dragNodeName, true);
-							fileTree.Nodes.Remove(tFind[0]);
+							fileTree.Nodes.Remove(dragNode);
+							/*	TreeNode[] tFind = fileTree.Nodes.Find(dragNodeName, true);
+								fileTree.Nodes.Remove(tFind[0]);*/
 						}
 					} else {
 						e.Effect = DragDropEffects.None;
@@ -2931,36 +2946,42 @@ AddType video/MP2T .ts
 				dragFrom = "";
 				MyLog(dbMsg);
 			} catch (Exception er) {
-				dbMsg += "でエラー発生" + er.Message;
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 		}
 
 		/// <summary>
 		/// あるTreeNodeが別のTreeNodeの子ノードか調べる
+		/// https://dobon.net/vb/dotnet/control/tvdraganddrop.html
 		/// </summary>
 		/// <param name="parentNode">親ノードか調べるTreeNode</param>
 		/// <param name="childNode">子ノードか調べるTreeNode</param>
 		/// <returns>子ノードの時はTrue</returns>
-		private static bool IsChildNode(TreeNode parentNode, TreeNode childNode) {
+		private  bool IsChildNode(TreeNode parentNode, TreeNode childNode) {      //private static ?
 			string TAG = "[IsChildNode]";
 			string dbMsg = TAG;
-			//			try {
-
-			if (childNode.Parent == parentNode) {
-				return true;
-			} else if (childNode.Parent != null) {
-				return IsChildNode(parentNode, childNode.Parent);
-			} else {
-				return false;
+			bool retBool = true;
+			try {
+				dbMsg += "parentNode=" + parentNode.FullPath.ToString();
+				dbMsg += " / childNode=" + childNode.FullPath.ToString();
+				if (childNode.Parent == parentNode) {
+					retBool = true;
+				} else if (childNode.Parent != null) {
+					retBool = IsChildNode(parentNode, childNode.Parent);
+				} else {
+					retBool = false;
+				}
+				dbMsg += ">retBool=" + retBool;
+				MyLog( dbMsg );
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog( dbMsg );
 			}
-			/*	//		MyLog( dbMsg );
-					} catch (Exception er) {
-						dbMsg += "でエラー発生" + er.Message;
-				//		MyLog( dbMsg );
-					}*/
+			return retBool;
 		}
-		//連続再生///////////////////////////////////////////////////////////fileTreeの操作//
+
+		//プレイリスト///////////////////////////////////////////////////////////fileTreeの操作//
 		/// <summary>
 		/// 指定フォルダ内の指定TypeファイルをPlayListにリストアップ
 		/// </summary>
@@ -4563,22 +4584,6 @@ AddType video/MP2T .ts
 
 		private void PlayListBox_Click(object sender, EventArgs e) {
 			string TAG = "[PlayListBox_Click]";
-			string dbMsg = TAG;
-			try {
-				dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
-				plaingItem = playListBox.SelectedValue.ToString();
-				dbMsg += ";plaingItem=" + plaingItem;
-				PlayFromPlayList(plaingItem);
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(dbMsg);
-			}
-
-		}
-
-		private void PlayListBox_MouseClick(object sender, MouseEventArgs e) {
-			string TAG = "[PlayListBox_MouseClick]";
 			string dbMsg = TAG;
 			try {
 				dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
