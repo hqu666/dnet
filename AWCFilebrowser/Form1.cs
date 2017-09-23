@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Management;    // 参照設定に追加を忘れずに
 
-							//using System.MarshalByRefObject;
-							//using System.ComponentModel.Component;
-							//using System.Management.ManagementBaseObject;
-							//using System.Management.ManagementObject;
+//using System.MarshalByRefObject;
+//using System.ComponentModel.Component;
+//using System.Management.ManagementBaseObject;
+//using System.Management.ManagementObject;
 using Microsoft.VisualBasic.FileIO; //DelFiles,MoveFolderのFileSystem
 using System.Diagnostics;
 using AWSFileBroeser;
@@ -1689,8 +1689,6 @@ AddType video/MP2T .ts
 			}
 		}
 
-
-
 		protected override void OnPaint(PaintEventArgs e) {
 			string TAG = "[OnPaint]";
 			string dbMsg = TAG;
@@ -1782,15 +1780,19 @@ AddType video/MP2T .ts
 							} else {
 								dbMsg += "::選択開始;SelectedNode=" + fileTree.SelectedNode.FullPath;
 								TreeNode sNode = fileTree.Nodes[treeSelectList[0]];
-								dbMsg += ",sNode=" + sNode.FullPath;
-								for (int i = 1; i <= treeSelectList.Count - 1; i++) {
-									int sIndex = treeSelectList[i];
-									dbMsg += "(" + sIndex + ")";
-									fileTree.SelectedNode = sNode.Nodes[sIndex];
-									sNode = fileTree.SelectedNode;
-									dbMsg += sNode.FullPath;
+								string pDir = sNode.FullPath.ToString();
+								dbMsg += ",sNode=" + pDir;
+								fileTree.SelectedNode = sNode;
+								sNode.Expand();
+								/*ファイルまで含む場合
+								 *for (int i = 1; i <= treeSelectList.Count - 1; i++) {
+										int sIndex = treeSelectList[i];
+										dbMsg += "(" + sIndex + ")";
+										fileTree.SelectedNode = sNode.Nodes[sIndex];
+										sNode = fileTree.SelectedNode;
+										dbMsg += sNode.FullPath;
 
-								}
+									}*/
 								fileTree.Focus();
 							}
 							MyLog(dbMsg);
@@ -1992,35 +1994,38 @@ AddType video/MP2T .ts
 			string dbMsg = TAG;
 			try {
 				dbMsg += " , destName=" + destName;
-				TreeNode selectNode = fileTree.SelectedNode;
-				string selectItem = selectNode.FullPath;// fileNameLabel.Text + "";
-				dbMsg += " , selectItem=" + selectItem;
+				//	TreeNode selectNode = fileTree.SelectedNode;
+				ListViewItem selectItem = FilelistView.FocusedItem; //selectNode.FullPath;// fileNameLabel.Text + "";
+				string selectItemStr = selectItem.Text; //selectNode.FullPath;// fileNameLabel.Text + "";
+				dbMsg += " , selectItem=" + selectItemStr;
 				if (!destName.Contains(@":\")) {                        //ドライブ選択でなければ		passNameStr != selectItem
-					TreeNode SelectedNodeParent = fileTree.SelectedNode.Parent;
-					string passNameStr = SelectedNodeParent.FullPath;   // passNameLabel.Text + "";
+																		//			TreeNode SelectedNodeParent = fileTree.SelectedNode.Parent;
+					string passNameStr = passNameLabel.Text;// fileTree.SelectedNode.FullPath; //SelectedNodeParent.FullPath;   // passNameLabel.Text + "";
 					dbMsg += " , passNameStr=" + passNameStr;
-					/*	if (selectItem != passNameLabel.Text) {
-							selectItem = passNameLabel.Text + Path.DirectorySeparatorChar + selectItem;
-							dbMsg += ">>" + selectItem;  // selectItem=media2.flv>>M:\sample/media2.flv,選択；ペースト,
-						}*/
-					string titolStr = selectItem + "の名称変更";
-					string msgStr = "元の名称\n" + selectItem;
+					if (selectItemStr != passNameLabel.Text) {
+						selectItemStr = passNameLabel.Text + Path.DirectorySeparatorChar + selectItemStr;
+						dbMsg += ">>" + selectItemStr;  // selectItem=media2.flv>>M:\sample/media2.flv,選択；ペースト,
+					}
+					string titolStr = selectItemStr + "の名称変更";
+					string msgStr = "元の名称\n" + selectItemStr;
 					dbMsg += ",titolStr=" + titolStr + ",msgStr=" + msgStr;
 
 					InputDialog f = new InputDialog(msgStr, titolStr, destName);
 					if (f.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
 						destName = f.ResultText;
-						selectNode.Text = destName;                 //ラベルを書換え
-						selectNode.EndEdit(true);                   //更新を反映
-						dbMsg += ",元=" + selectItem + ",先=" + destName;
+						selectItem.Text = destName;                 //ラベルを書換え	//fileTree			selectNode.Text = destName;
+						selectItem.Focused = false;                  //更新を反映		//fileTree			selectNode.EndEdit(true); 
+						selectItem.Selected = false;
+						selectItem.Selected = true;
+						dbMsg += ",元=" + selectItemStr + ",先=" + destName;
 						string renewName = passNameStr + Path.DirectorySeparatorChar + destName;
-						if (File.Exists(selectItem)) {
+						if (File.Exists(selectItemStr)) {
 							dbMsg += ">>ファイル名変更>" + renewName;
-							FileSystem.RenameFile(selectItem, destName);
+							FileSystem.RenameFile(selectItemStr, destName);
 							//	MoveMyFile(selectItem, renewName);
-						} else if (Directory.Exists(selectItem)) {
+						} else if (Directory.Exists(selectItemStr)) {
 							dbMsg += ">>フォルダ名変更>" + renewName;
-							FileSystem.RenameDirectory(selectItem, destName);
+							FileSystem.RenameDirectory(selectItemStr, destName);
 							//	MoveFolder(selectItem, renewName);
 						}
 
@@ -3148,9 +3153,9 @@ AddType video/MP2T .ts
 				mineType.Text = "";
 				if (fileAttributes.Contains("Directory")) {
 					dbMsg += ",Directoryを選択";
-					TreeNode[] tFind =  fileTree.Nodes.Find(fullName, true);
+					TreeNode[] tFind = fileTree.Nodes.Find(fullName, true);
 					dbMsg += ">Find>" + tFind.Length + "件";
-					TreeNode selectNode= ftSelectNode;// = SearchNode(fileTree.Nodes, selectItem);
+					TreeNode selectNode = ftSelectNode;// = SearchNode(fileTree.Nodes, selectItem);
 					if (0 < tFind.Length) {
 						selectNode = tFind[0];
 					}
@@ -3260,6 +3265,39 @@ AddType video/MP2T .ts
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
+			}
+		}
+
+
+		private void FilelistView_BeforeLabelEdit(object sender, LabelEditEventArgs e) {
+			string TAG = "[FilelistView_BeforeLabelEdit]";
+			string dbMsg = TAG;
+			try {
+				ListView lv = (ListView)sender;
+				string destName = lv.FocusedItem.Text;          //.SelectedItems[0].ToString();          //.FullPath;
+				dbMsg += ",destName=" + destName;
+				TargetReName(destName);
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+				throw new NotImplementedException();//要求されたメソッドまたは操作が実装されない場合にスローされる例外。
+			}
+		}
+
+		private void FilelistView_KeyUp(object sender, KeyEventArgs e) {
+			string TAG = "[FilelistView_KeyUp]";
+			string dbMsg = TAG;
+			try {
+				ListView lv = (ListView)sender;
+				if (e.KeyCode == Keys.F2 && lv.FocusedItem != null && lv.LabelEdit) {               //F2キーが離されたときは、フォーカスのあるアイテムの編集を開始
+					lv.FocusedItem.BeginEdit();
+				}
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+				throw new NotImplementedException();//要求されたメソッドまたは操作が実装されない場合にスローされる例外。
 			}
 		}
 
@@ -3423,7 +3461,7 @@ AddType video/MP2T .ts
 					PlaylistComboBox.Items[0] = carrentDir;
 					PlaylistComboBox.SelectedIndex = 0;
 				} else {
-					viewSplitContainer.Panel1Collapsed = true;
+		//			viewSplitContainer.Panel1Collapsed = true;
 					playListBox.Items.Clear();
 				}
 				//		ToView( fileNameLabel.Text );
@@ -3718,6 +3756,22 @@ AddType video/MP2T .ts
 						dbMsg += ",選択；ファイルブラウザで選択=" + plRightClickItemUrl;
 						treeSelectList = new List<int>();
 						FindSelectFileViews(fileTree.Nodes, 0, 0, plRightClickItemUrl);
+						FileInfo fi = new FileInfo(plRightClickItemUrl);
+						string dName = fi.Directory.ToString();
+						dbMsg += ",fi.Directory=" + dName;
+						FileListVewDrow(dName);
+						passNameLabel.Text = dName;
+						string fName = fi.Name.ToString();
+						dbMsg += ",fi.Name=" + fName;
+						fileNameLabel.Text = fName;
+						/*		string[] fNames = fName.Split('.');
+								fName = fNames[0];
+								dbMsg += ">>" + fName;*/
+						int tIndex = FilelistView.FindItemWithText(fName).Index;
+						dbMsg += "," + tIndex + "番目";
+						FilelistView.Items[tIndex].Focused = true;
+						FilelistView.Items[tIndex].Selected = true;
+						FilelistView.Focus();
 						break;
 
 					case "削除":
@@ -5358,11 +5412,11 @@ AddType video/MP2T .ts
 						if (-1 < lcIndex) {
 							PlaylistComboBox.SelectedIndex = lcIndex;
 						}
-						if (appSettings.CurrentList != "") {                        //プレイリスト
+			/*			if (appSettings.CurrentList != "") {                        //プレイリスト
 							viewSplitContainer.Panel1Collapsed = false;
 						} else {
 							viewSplitContainer.Panel1Collapsed = true;
-						}
+						}*/
 					}
 
 				} else {
@@ -5467,8 +5521,6 @@ AddType video/MP2T .ts
 				Console.WriteLine(msg);
 			}
 		}
-
-
 		//http://www.usefullcode.net/2016/03/index.html
 	}
 }

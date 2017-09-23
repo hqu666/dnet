@@ -61,6 +61,11 @@
 			this.FileBrowserSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.playListRedoroe = new System.Windows.Forms.Button();
 			this.FileBrowserCenterSplitContainer = new System.Windows.Forms.SplitContainer();
+			this.FileViewBodySplitContainer = new System.Windows.Forms.SplitContainer();
+			this.FilelistView = new System.Windows.Forms.ListView();
+			this.NameColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.SizeColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.UpDateColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.continuousPlayCheckBox = new System.Windows.Forms.CheckBox();
 			this.mineType = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
@@ -99,11 +104,6 @@
 			this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.FileViewBodySplitContainer = new System.Windows.Forms.SplitContainer();
-			this.FilelistView = new System.Windows.Forms.ListView();
-			this.NameColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.SizeColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.UpDateColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -117,6 +117,10 @@
 			this.FileBrowserCenterSplitContainer.Panel1.SuspendLayout();
 			this.FileBrowserCenterSplitContainer.Panel2.SuspendLayout();
 			this.FileBrowserCenterSplitContainer.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.FileViewBodySplitContainer)).BeginInit();
+			this.FileViewBodySplitContainer.Panel1.SuspendLayout();
+			this.FileViewBodySplitContainer.Panel2.SuspendLayout();
+			this.FileViewBodySplitContainer.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.viewSplitContainer)).BeginInit();
 			this.viewSplitContainer.Panel1.SuspendLayout();
 			this.viewSplitContainer.Panel2.SuspendLayout();
@@ -132,10 +136,6 @@
 			this.progresPanel.SuspendLayout();
 			this.PlayListContextMenuStrip.SuspendLayout();
 			this.ListContextMenuStrip.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.FileViewBodySplitContainer)).BeginInit();
-			this.FileViewBodySplitContainer.Panel1.SuspendLayout();
-			this.FileViewBodySplitContainer.Panel2.SuspendLayout();
-			this.FileViewBodySplitContainer.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// fileTree
@@ -484,6 +484,60 @@
 			this.FileBrowserCenterSplitContainer.Size = new System.Drawing.Size(405, 661);
 			this.FileBrowserCenterSplitContainer.SplitterDistance = 575;
 			this.FileBrowserCenterSplitContainer.TabIndex = 0;
+			// 
+			// FileViewBodySplitContainer
+			// 
+			this.FileViewBodySplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.FileViewBodySplitContainer.Location = new System.Drawing.Point(0, 0);
+			this.FileViewBodySplitContainer.Name = "FileViewBodySplitContainer";
+			// 
+			// FileViewBodySplitContainer.Panel1
+			// 
+			this.FileViewBodySplitContainer.Panel1.Controls.Add(this.fileTree);
+			// 
+			// FileViewBodySplitContainer.Panel2
+			// 
+			this.FileViewBodySplitContainer.Panel2.Controls.Add(this.FilelistView);
+			this.FileViewBodySplitContainer.Size = new System.Drawing.Size(405, 575);
+			this.FileViewBodySplitContainer.SplitterDistance = 172;
+			this.FileViewBodySplitContainer.TabIndex = 8;
+			// 
+			// FilelistView
+			// 
+			this.FilelistView.AccessibleRole = System.Windows.Forms.AccessibleRole.ListItem;
+			this.FilelistView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.NameColumnHeader,
+            this.SizeColumnHeader,
+            this.UpDateColumnHeader});
+			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
+			listViewGroup1.Header = "ListViewGroup";
+			listViewGroup1.Name = "listViewGroup1";
+			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            listViewGroup1});
+			this.FilelistView.LabelEdit = true;
+			this.FilelistView.Location = new System.Drawing.Point(0, 0);
+			this.FilelistView.Name = "FilelistView";
+			this.FilelistView.Size = new System.Drawing.Size(229, 575);
+			this.FilelistView.TabIndex = 0;
+			this.FilelistView.UseCompatibleStateImageBehavior = false;
+			this.FilelistView.View = System.Windows.Forms.View.Details;
+			this.FilelistView.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.FilelistView_BeforeLabelEdit);
+			this.FilelistView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FilelistView_ItemCheck);
+			this.FilelistView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FilelistView_KeyUp);
+			this.FilelistView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FilelistView_MouseUp);
+			// 
+			// NameColumnHeader
+			// 
+			this.NameColumnHeader.Text = "名前";
+			this.NameColumnHeader.Width = 105;
+			// 
+			// SizeColumnHeader
+			// 
+			this.SizeColumnHeader.Text = "サイズ";
+			// 
+			// UpDateColumnHeader
+			// 
+			this.UpDateColumnHeader.Text = "更新日";
 			// 
 			// continuousPlayCheckBox
 			// 
@@ -912,57 +966,6 @@
 			this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
 			this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
 			// 
-			// FileViewBodySplitContainer
-			// 
-			this.FileViewBodySplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.FileViewBodySplitContainer.Location = new System.Drawing.Point(0, 0);
-			this.FileViewBodySplitContainer.Name = "FileViewBodySplitContainer";
-			// 
-			// FileViewBodySplitContainer.Panel1
-			// 
-			this.FileViewBodySplitContainer.Panel1.Controls.Add(this.fileTree);
-			// 
-			// FileViewBodySplitContainer.Panel2
-			// 
-			this.FileViewBodySplitContainer.Panel2.Controls.Add(this.FilelistView);
-			this.FileViewBodySplitContainer.Size = new System.Drawing.Size(405, 575);
-			this.FileViewBodySplitContainer.SplitterDistance = 172;
-			this.FileViewBodySplitContainer.TabIndex = 8;
-			// 
-			// FilelistView
-			// 
-			this.FilelistView.AccessibleRole = System.Windows.Forms.AccessibleRole.ListItem;
-			this.FilelistView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.NameColumnHeader,
-            this.SizeColumnHeader,
-            this.UpDateColumnHeader});
-			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup1.Header = "ListViewGroup";
-			listViewGroup1.Name = "listViewGroup1";
-			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
-			this.FilelistView.Location = new System.Drawing.Point(0, 0);
-			this.FilelistView.Name = "FilelistView";
-			this.FilelistView.Size = new System.Drawing.Size(229, 575);
-			this.FilelistView.TabIndex = 0;
-			this.FilelistView.UseCompatibleStateImageBehavior = false;
-			this.FilelistView.View = System.Windows.Forms.View.Details;
-			this.FilelistView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FilelistView_ItemCheck);
-			this.FilelistView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FilelistView_MouseUp);
-			// 
-			// NameColumnHeader
-			// 
-			this.NameColumnHeader.Text = "名前";
-			this.NameColumnHeader.Width = 105;
-			// 
-			// SizeColumnHeader
-			// 
-			this.SizeColumnHeader.Text = "サイズ";
-			// 
-			// UpDateColumnHeader
-			// 
-			this.UpDateColumnHeader.Text = "更新日";
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -990,6 +993,10 @@
 			this.FileBrowserCenterSplitContainer.Panel2.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.FileBrowserCenterSplitContainer)).EndInit();
 			this.FileBrowserCenterSplitContainer.ResumeLayout(false);
+			this.FileViewBodySplitContainer.Panel1.ResumeLayout(false);
+			this.FileViewBodySplitContainer.Panel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.FileViewBodySplitContainer)).EndInit();
+			this.FileViewBodySplitContainer.ResumeLayout(false);
 			this.viewSplitContainer.Panel1.ResumeLayout(false);
 			this.viewSplitContainer.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.viewSplitContainer)).EndInit();
@@ -1008,10 +1015,6 @@
 			this.progresPanel.PerformLayout();
 			this.PlayListContextMenuStrip.ResumeLayout(false);
 			this.ListContextMenuStrip.ResumeLayout(false);
-			this.FileViewBodySplitContainer.Panel1.ResumeLayout(false);
-			this.FileViewBodySplitContainer.Panel2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.FileViewBodySplitContainer)).EndInit();
-			this.FileViewBodySplitContainer.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
