@@ -1967,8 +1967,6 @@ AddType video/MP2T .ts
 			try {
 				dbMsg += ",元=" + sourceName + ",先=" + destName;
 				System.IO.FileInfo fi = new System.IO.FileInfo(sourceName);   //変更元のFileInfoのオブジェクトを作成します。 @"C:\files1\sample1.txt" 
-				
-
 				fi.MoveTo(destName);                                           //MoveToメソッドで移動先を指定してファイルを移動します。@"D:\files2\sample2.txt"
 																			   // http://www.openreference.org/articles/view/329
 																			   //	fi = null;
@@ -2923,6 +2921,7 @@ AddType video/MP2T .ts
 						cutSouce = dragSouce;     //カットするアイテムのurl
 						e.Effect = DragDropEffects.None;
 					}
+					DDEfect = e.Effect;
 					if (copySouce != "") {
 						dbMsg += ",copy=" + copySouce;
 					}
@@ -2994,62 +2993,12 @@ AddType video/MP2T .ts
 				dbMsg += ",dragSouceUrl=" + dragSouceUrl;
 				dbMsg += ",DDEfect=" + DDEfect;
 				e.Effect = DDEfect;
-
-
-
-
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 		}
-
-
-
-		private void Drop2FileTree(DragEventArgs e) {
-			string TAG = "[Drop2FileTree]";
-			string dbMsg = TAG;
-			try {
-				TreeView tv = fileTree;// (TreeView)sender;
-				dbMsg += " Drop先は" + tv.SelectedNode.FullPath;
-				TreeNode source = (TreeNode)e.Data.GetData(typeof(TreeNode));         //ドロップされたデータ(TreeNode)を取得
-				dbMsg += ",source=" + source.FullPath.ToString();
-				fileTreeDrropNode = tv.GetNodeAt(tv.PointToClient(new Point(e.X, e.Y))); //ドロップ先のTreeNodeを取得する
-				string dropSouce = fileTreeDrropNode.FullPath.ToString();
-				dbMsg += ",dropSouce=" + dropSouce;
-				if (fileTreeDrropNode != null && fileTreeDrropNode != source && !IsChildNode(source, fileTreeDrropNode)) { //マウス下のNodeがドロップ先として適切か調べる
-					if (copySouce != "") {
-						dbMsg += ",copy=" + copySouce;
-					}
-					if (cutSouce != "") {
-						dbMsg += ",cut=" + cutSouce;
-					}
-					dbMsg += ",peast先=" + dropSouce;
-					PeastSelecter(copySouce, cutSouce, dropSouce);
-					dbMsg += " , Effect(" + e.Effect + ")" + e.Effect.ToString();
-					if (e.Effect.ToString() == "Move") {     //&& cutSouce.Length < dragNode.Name.ToString().Length	(DDEfect & DragDropEffects.Move) == DragDropEffects.Move
-															 //		cutSouce = fileTree.SelectedNode.FullPath;       //カットするアイテムのurl
-						dbMsg += " , 移動した時は、ドラッグしたノード=" + dragNode.Name.ToString();             //移動先に書き換わる
-						string dragNodeName = cutSouce.Replace(@":\\", @":\");
-						dbMsg += " , dragNodeName=" + dragNodeName + " を削除";
-						fileTree.Nodes.Remove(dragNode);
-						/*	TreeNode[] tFind = fileTree.Nodes.Find(dragNodeName, true);
-							fileTree.Nodes.Remove(tFind[0]);*/
-					}
-				} else {
-					e.Effect = DragDropEffects.None;
-				}
-				fileTreeDrropNode = null;
-				dragFrom = "";
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(dbMsg);
-			}
-		}
-
-
 
 		/// <summary>
 		/// ドロップされたとき
@@ -3060,6 +3009,9 @@ AddType video/MP2T .ts
 			string TAG = "[FileTree_DragDrop]";
 			string dbMsg = TAG;
 			try {
+				dbMsg += "dragFrom=" + dragFrom;
+				dbMsg += ",dragSouceUrl=" + dragSouceUrl;
+				dbMsg += ",DDEfect=" + DDEfect;
 				TreeView tv = (TreeView)sender;
 				if (dragFrom == fileTree.Name) {   //tv == fileTree>>e.Data.GetDataPresent(typeof(TreeNode))	ドロップされたデータがTreeNodeか調べる	
 					dbMsg += " Drop先は" + tv.SelectedNode.FullPath;
@@ -3085,14 +3037,26 @@ AddType video/MP2T .ts
 						tv.SelectedNode = cln;                                                  //追加されたNodeを選択
 					*/
 					dbMsg += " , Effect(" + e.Effect + ")" + e.Effect.ToString();
-					if (dragFrom == fileTree.Name && e.Effect.ToString() == "Move") {     //&& cutSouce.Length < dragNode.Name.ToString().Length	(DDEfect & DragDropEffects.Move) == DragDropEffects.Move
-																						  //		cutSouce = fileTree.SelectedNode.FullPath;       //カットするアイテムのurl
-						dbMsg += " , 移動した時は、ドラッグしたノード=" + dragNode.Name.ToString();             //移動先に書き換わる
-						string dragNodeName = cutSouce.Replace(@":\\", @":\");
-						dbMsg += " , dragNodeName=" + dragNodeName + " を削除";
-						fileTree.Nodes.Remove(dragNode);
-						/*	TreeNode[] tFind = fileTree.Nodes.Find(dragNodeName, true);
-							fileTree.Nodes.Remove(tFind[0]);*/
+					if (e.Effect.ToString() == "Move") {     //&& cutSouce.Length < dragNode.Name.ToString().Length	(DDEfect & DragDropEffects.Move) == DragDropEffects.Move
+						if (dragFrom == fileTree.Name) {     //&& cutSouce.Length < dragNode.Name.ToString().Length	(DDEfect & DragDropEffects.Move) == DragDropEffects.Move
+															 //		cutSouce = fileTree.SelectedNode.FullPath;       //カットするアイテムのurl
+							dbMsg += " , 移動した時は、ドラッグしたノード=" + dragNode.Name.ToString();             //移動先に書き換わる
+							string dragNodeName = cutSouce.Replace(@":\\", @":\");
+							dbMsg += " , dragNodeName=" + dragNodeName + " を削除";
+							fileTree.Nodes.Remove(dragNode);
+							/*	TreeNode[] tFind = fileTree.Nodes.Find(dragNodeName, true);
+								fileTree.Nodes.Remove(tFind[0]);*/
+						} else if (dragFrom == FilelistView.Name) {
+							System.IO.FileInfo fi = new System.IO.FileInfo(cutSouce);   //変更元のFileInfoのオブジェクトを作成します。 @"C:\files1\sample1.txt" 
+							cutSouce = fi.DirectoryName;
+							dbMsg += ",cutSouce=" + cutSouce;
+							FileListVewDrow(cutSouce);
+
+							/*	int delIndex = FilelistView.Items.IndexOfKey(dragSouceUrl);
+								dbMsg += ",delIndex=" + delIndex;
+								FilelistView.Items[delIndex].Remove();*/
+						}
+
 					}
 				} else {
 					e.Effect = DragDropEffects.None;
@@ -3540,20 +3504,9 @@ AddType video/MP2T .ts
 						dbMsg += ",cut=" + cutSouce;
 					}
 					DDEfect = e.Effect;
-				} else {
-					dbMsg += " ,TreeNodeでなければ受け入れない";
-					e.Effect = DragDropEffects.None;
-					/*			if (e.Effect != DragDropEffects.None) {                 //マウス下のNodeを選択する
-									TreeNode target = tv.GetNodeAt(tv.PointToClient(new Point(e.X, e.Y)));             //マウスのあるNodeを取得する
-									TreeNode source = (TreeNode)e.Data.GetData(typeof(TreeNode));                     //ドラッグされているNodeを取得する
-									if (target != null && target != source && !IsChildNode(source, target)) {             //マウス下のNodeがドロップ先として適切か調べる
-										if (target.IsSelected == false) {                                                   //Nodeを選択する
-											tv.SelectedNode = target;
-										}
-									} else {
-										e.Effect = DragDropEffects.None;
-									}
-								}*/
+					/*	} else {
+							dbMsg += " ,FilelistViewでなければ受け入れない";
+							e.Effect = DragDropEffects.None;*/
 				}
 				DDEfect = e.Effect;
 				//		MyLog(dbMsg);
@@ -3584,7 +3537,6 @@ AddType video/MP2T .ts
 						dbMsg += ",dragSouceUrl=" + dragSouceUrl;
 						dbMsg += ",DDEfect=" + DDEfect;
 
-
 						if (FilelistViewRight < moucePoint.X) {
 							dbMsg += ">playListBox>";
 							e.Action = DragAction.Cancel;
@@ -3606,6 +3558,84 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
+
+		private void FilelistView_DragEnter(object sender, DragEventArgs e) {
+			string TAG = "[FilelistView_DragEnter]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += "dragFrom=" + dragFrom;
+				dbMsg += ",dragSouceUrl=" + dragSouceUrl;
+				dbMsg += ",DDEfect=" + DDEfect;
+				e.Effect = DDEfect;
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
+		private void FilelistView_DragDrop(object sender, DragEventArgs e) {
+			string TAG = "[FilelistView_DragDrop]";
+			string dbMsg = TAG;
+			try {
+				ListView lv = (ListView)sender;
+				Point moucePoint = Control.MousePosition;
+				moucePoint = lv.PointToClient(moucePoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
+				dbMsg += "(moucePoint;" + moucePoint.X + "," + moucePoint.Y + ")";      //(mouceDownPoint;735,-39)
+				Point ePoint = lv.PointToClient(new Point(e.X, e.Y));
+				dbMsg += "(ePoint;" + ePoint.X + "," + ePoint.Y + ")";      //(mouceDownPoint;735,-39)
+				ListViewItem dropItem = lv.GetItemAt(ePoint.X, ePoint.Y);
+				string dropSouce = lv.Items[0].Name;
+				System.IO.FileInfo fi = new System.IO.FileInfo(dropSouce);   //変更元のFileInfoのオブジェクトを作成します。 @"C:\files1\sample1.txt" 
+				string dropParent = fi.DirectoryName;
+				if (dropItem == null) {
+					dropSouce = dropParent;
+				} else {
+					//	FileInfo fi = new FileInfo(addFiles);
+					string fileAttributes = fi.Attributes.ToString();
+					dbMsg += ",fileAttributes=" + fileAttributes;
+					if (fileAttributes.Contains("Directory")) {
+						dropSouce = dropParent + Path.DirectorySeparatorChar + dropItem.Name;           // lv.Items[0].Name;
+					} else {
+						dropSouce = dropParent;
+					}
+				}
+				dbMsg += ",dropSouce=" + dropSouce;
+				if (copySouce != "") {
+					dbMsg += ",copy=" + copySouce;
+				}
+				if (cutSouce != "") {
+					dbMsg += ",cut=" + cutSouce;
+				}
+				dbMsg += ",peast先=" + dropSouce;
+				PeastSelecter(copySouce, cutSouce, dropSouce);
+				/*表示だけの書き換えなら
+					TreeNode cln = ( TreeNode ) source.Clone();                             //ドロップされたNodeのコピーを作成
+					target.Nodes.Add( cln );												//Nodeを追加
+					target.Expand();														//ドロップ先のNodeを展開
+					tv.SelectedNode = cln;                                                  //追加されたNodeを選択
+				*/
+				dbMsg += " , Effect(" + e.Effect + ")" + e.Effect.ToString();
+				if (dragFrom == fileTree.Name && e.Effect.ToString() == "Move") {     //&& cutSouce.Length < dragNode.Name.ToString().Length	(DDEfect & DragDropEffects.Move) == DragDropEffects.Move
+																					  //		cutSouce = fileTree.SelectedNode.FullPath;       //カットするアイテムのurl
+					dbMsg += " , 移動した時は、ドラッグしたノード=" + dragNode.Name.ToString();             //移動先に書き換わる
+					string dragNodeName = cutSouce.Replace(@":\\", @":\");
+					dbMsg += " , dragNodeName=" + dragNodeName + " を削除";
+					fileTree.Nodes.Remove(dragNode);
+					/*	TreeNode[] tFind = fileTree.Nodes.Find(dragNodeName, true);
+						fileTree.Nodes.Remove(tFind[0]);*/
+				}
+				FileListVewDrow(dropSouce);
+				fileTreeDrropNode = null;
+				dragFrom = "";
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
+
 
 		//プレイリスト///////////////////////////////////////////////////////////FileListVewの操作//
 		/// <summary>

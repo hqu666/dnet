@@ -528,6 +528,8 @@
 			this.FilelistView.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.FilelistView_BeforeLabelEdit);
 			this.FilelistView.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.FilelistView_ItemCheck);
 			this.FilelistView.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.FilelistView_ItemDrag);
+			this.FilelistView.DragDrop += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragDrop);
+			this.FilelistView.DragEnter += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragEnter);
 			this.FilelistView.DragOver += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragOver);
 			this.FilelistView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.FilelistView_QueryContinueDrag);
 			this.FilelistView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FilelistView_KeyUp);
