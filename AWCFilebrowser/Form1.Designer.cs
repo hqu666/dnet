@@ -144,7 +144,7 @@
 			this.fileTree.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.fileTree.Location = new System.Drawing.Point(0, 0);
 			this.fileTree.Name = "fileTree";
-			this.fileTree.Size = new System.Drawing.Size(169, 575);
+			this.fileTree.Size = new System.Drawing.Size(175, 575);
 			this.fileTree.TabIndex = 7;
 			this.fileTree.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.FileTree_BeforeLabelEdit);
 			this.fileTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileTree_DragDrop);
@@ -246,14 +246,14 @@
 			// videoFT2PLToolStripMenuItem
 			// 
 			this.videoFT2PLToolStripMenuItem.Name = "videoFT2PLToolStripMenuItem";
-			this.videoFT2PLToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+			this.videoFT2PLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.videoFT2PLToolStripMenuItem.Text = "video";
 			this.videoFT2PLToolStripMenuItem.Click += new System.EventHandler(this.PlayListMakeContextMenuStrip_SubMenuClick);
 			// 
 			// audioFT2PLToolStripMenuItem
 			// 
 			this.audioFT2PLToolStripMenuItem.Name = "audioFT2PLToolStripMenuItem";
-			this.audioFT2PLToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+			this.audioFT2PLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.audioFT2PLToolStripMenuItem.Text = "audio";
 			this.audioFT2PLToolStripMenuItem.Click += new System.EventHandler(this.PlayListMakeContextMenuStrip_SubMenuClick);
 			// 
@@ -376,6 +376,7 @@
 			this.passNameLabel.Name = "passNameLabel";
 			this.passNameLabel.Size = new System.Drawing.Size(0, 12);
 			this.passNameLabel.TabIndex = 21;
+			this.passNameLabel.Click += new System.EventHandler(this.PassNameLabel_Click);
 			// 
 			// fileNameLabel
 			// 
@@ -394,7 +395,7 @@
 			this.playerWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
 			this.playerWebBrowser.Name = "playerWebBrowser";
 			this.playerWebBrowser.ScrollBarsEnabled = false;
-			this.playerWebBrowser.Size = new System.Drawing.Size(661, 712);
+			this.playerWebBrowser.Size = new System.Drawing.Size(697, 712);
 			this.playerWebBrowser.TabIndex = 25;
 			this.playerWebBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.WebBrowser1_DocumentCompleted);
 			this.playerWebBrowser.Resize += new System.EventHandler(this.ReSizeViews);
@@ -414,8 +415,8 @@
 			// 
 			this.baseSplitContainer.Panel2.AutoScroll = true;
 			this.baseSplitContainer.Panel2.Controls.Add(this.viewSplitContainer);
-			this.baseSplitContainer.Size = new System.Drawing.Size(1304, 712);
-			this.baseSplitContainer.SplitterDistance = 400;
+			this.baseSplitContainer.Size = new System.Drawing.Size(1355, 712);
+			this.baseSplitContainer.SplitterDistance = 415;
 			this.baseSplitContainer.TabIndex = 27;
 			// 
 			// FileBrowserSplitContainer
@@ -435,18 +436,18 @@
 			// FileBrowserSplitContainer.Panel2
 			// 
 			this.FileBrowserSplitContainer.Panel2.Controls.Add(this.FileBrowserCenterSplitContainer);
-			this.FileBrowserSplitContainer.Size = new System.Drawing.Size(400, 712);
+			this.FileBrowserSplitContainer.Size = new System.Drawing.Size(415, 712);
 			this.FileBrowserSplitContainer.SplitterDistance = 47;
 			this.FileBrowserSplitContainer.TabIndex = 0;
 			// 
 			// playListRedoroe
 			// 
 			this.playListRedoroe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.playListRedoroe.Location = new System.Drawing.Point(325, 25);
+			this.playListRedoroe.Location = new System.Drawing.Point(292, 25);
 			this.playListRedoroe.Name = "playListRedoroe";
-			this.playListRedoroe.Size = new System.Drawing.Size(75, 23);
+			this.playListRedoroe.Size = new System.Drawing.Size(123, 23);
 			this.playListRedoroe.TabIndex = 27;
-			this.playListRedoroe.Text = "プレイリストへ";
+			this.playListRedoroe.Text = "選択したファイルを再生";
 			this.playListRedoroe.UseVisualStyleBackColor = true;
 			this.playListRedoroe.Click += new System.EventHandler(this.PlayListRedoroe_Click);
 			// 
@@ -482,7 +483,7 @@
 			this.FileBrowserCenterSplitContainer.Panel2.Controls.Add(this.label4);
 			this.FileBrowserCenterSplitContainer.Panel2.Controls.Add(this.label2);
 			this.FileBrowserCenterSplitContainer.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-			this.FileBrowserCenterSplitContainer.Size = new System.Drawing.Size(400, 661);
+			this.FileBrowserCenterSplitContainer.Size = new System.Drawing.Size(415, 661);
 			this.FileBrowserCenterSplitContainer.SplitterDistance = 575;
 			this.FileBrowserCenterSplitContainer.TabIndex = 0;
 			// 
@@ -499,8 +500,8 @@
 			// FileViewBodySplitContainer.Panel2
 			// 
 			this.FileViewBodySplitContainer.Panel2.Controls.Add(this.FilelistView);
-			this.FileViewBodySplitContainer.Size = new System.Drawing.Size(400, 575);
-			this.FileViewBodySplitContainer.SplitterDistance = 169;
+			this.FileViewBodySplitContainer.Size = new System.Drawing.Size(415, 575);
+			this.FileViewBodySplitContainer.SplitterDistance = 175;
 			this.FileViewBodySplitContainer.TabIndex = 8;
 			// 
 			// FilelistView
@@ -521,7 +522,7 @@
 			this.FilelistView.LabelEdit = true;
 			this.FilelistView.Location = new System.Drawing.Point(0, 0);
 			this.FilelistView.Name = "FilelistView";
-			this.FilelistView.Size = new System.Drawing.Size(227, 575);
+			this.FilelistView.Size = new System.Drawing.Size(236, 575);
 			this.FilelistView.TabIndex = 0;
 			this.FilelistView.UseCompatibleStateImageBehavior = false;
 			this.FilelistView.View = System.Windows.Forms.View.Details;
@@ -538,7 +539,7 @@
 			// NameColumnHeader
 			// 
 			this.NameColumnHeader.Text = "名前";
-			this.NameColumnHeader.Width = 144;
+			this.NameColumnHeader.Width = 174;
 			// 
 			// SizeColumnHeader
 			// 
@@ -555,7 +556,7 @@
 			// 
 			this.continuousPlayCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.continuousPlayCheckBox.AutoSize = true;
-			this.continuousPlayCheckBox.Location = new System.Drawing.Point(323, 6);
+			this.continuousPlayCheckBox.Location = new System.Drawing.Point(338, 6);
 			this.continuousPlayCheckBox.Name = "continuousPlayCheckBox";
 			this.continuousPlayCheckBox.Size = new System.Drawing.Size(72, 16);
 			this.continuousPlayCheckBox.TabIndex = 26;
@@ -618,7 +619,7 @@
 			this.viewSplitContainer.Panel2.AutoScroll = true;
 			this.viewSplitContainer.Panel2.Controls.Add(this.progresPanel);
 			this.viewSplitContainer.Panel2.Controls.Add(this.playerWebBrowser);
-			this.viewSplitContainer.Size = new System.Drawing.Size(900, 712);
+			this.viewSplitContainer.Size = new System.Drawing.Size(936, 712);
 			this.viewSplitContainer.SplitterDistance = 235;
 			this.viewSplitContainer.TabIndex = 26;
 			// 
@@ -983,7 +984,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
-			this.ClientSize = new System.Drawing.Size(1304, 712);
+			this.ClientSize = new System.Drawing.Size(1355, 712);
 			this.Controls.Add(this.baseSplitContainer);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(1055, 39);

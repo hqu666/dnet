@@ -1862,7 +1862,8 @@ AddType video/MP2T .ts
 		//		System.IO.FileInfo fMove = null;
 
 		/// <summary>
-		/// プレイリストへボタンのクリック
+		/// 選択したファイルを再生　ボタンのクリック
+		/// ☆このボタンが表示されていればプレイリスト再生中 , 非表示の時はファイルブラウザから再生
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -1873,6 +1874,7 @@ AddType video/MP2T .ts
 				string selectFullName = passNameLabel.Text + Path.DirectorySeparatorChar + fileNameLabel.Text;
 				dbMsg += selectFullName;
 				PlayFromFileBrousert(selectFullName);
+				playListRedoroe.Visible = false;                     //ファイルブラウザで選択されたアイテムを再生
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -3306,8 +3308,8 @@ AddType video/MP2T .ts
 						他のアプリケーションで開くToolStripMenuItem.Visible = true;
 						dbMsg += "Checked=" + continuousPlayCheckBox.Checked;
 						if (continuousPlayCheckBox.Checked) {                   //連続再生中
-							playListRedoroe.Visible = true;                     //プレイリストへボタン表示
-						} else {                                                //でなければ
+																				//				playListRedoroe.Visible = true;                     //プレイリストへボタン表示
+						} else if (playListRedoroe.Visible == false) {                                                //でなければ
 							PlayFromFileBrousert(fullName);                       //再生動作へ
 						}
 					}
@@ -3373,7 +3375,9 @@ AddType video/MP2T .ts
 						fileTree.SelectedNode = selectNode;
 						fileTree.Focus();*/
 					//-		SelectedItems.owner.FocusedItem { Text = "video.mp4"}	System.Windows.Forms.ListViewItem
-					FileViewItemSelect(selectItem);
+					if (playListRedoroe.Visible == false) {    //ファイルブラウザで選択されたアイテムを再生
+						FileViewItemSelect(selectItem);
+					}
 				}
 				MyLog(dbMsg);
 			} catch (Exception er) {
@@ -3635,6 +3639,39 @@ AddType video/MP2T .ts
 			}
 		}
 
+		/// <summary>
+		/// 上の階層を表示
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void PassNameLabel_Click(object sender, EventArgs e) {
+			string TAG = "[PassNameLabel_Click]";
+			string dbMsg = TAG;
+			try {
+				string passName = passNameLabel.Text;
+				dbMsg += ",passName" + passName;
+				System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(passName);
+				if (di.Exists) {
+					dbMsg += ",Root" + di.Root.Name;
+					if (di.Name != di.Root.Name) {      //ドライブルートでなければ
+						string ParentName = di.Parent.FullName;
+						dbMsg += ",ParentName" + ParentName;
+						FindSelectFileViews(fileTree.Nodes, 0, 0, ParentName);
+						FileListVewDrow(ParentName);
+						passNameLabel.Text = ParentName;
+						di = new System.IO.DirectoryInfo(ParentName);
+						FileInfo[] files = di.GetFiles();
+						dbMsg += ",ParentName" + files[0].Name;
+						fileNameLabel.Text = files[0].Name;
+					}
+				}
+
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
 
 
 		//プレイリスト///////////////////////////////////////////////////////////FileListVewの操作//
@@ -3841,6 +3878,8 @@ AddType video/MP2T .ts
 				dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
 				plaingItem = playListBox.SelectedValue.ToString();
 				dbMsg += ";plaingItem=" + plaingItem;
+				playListRedoroe.Visible = true;                     //ファイルブラウザで選択されたアイテムを再生
+
 				PlayFromPlayList(plaingItem);
 				/*		lsFullPathName = plaingItem;
 						PlayListLabelWrigt((playListBox.SelectedIndex + 1).ToString() + "/" + PlayListBoxItem.Count.ToString(), plaingItem);
