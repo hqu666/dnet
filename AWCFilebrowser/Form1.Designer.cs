@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.フォルダ作成ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -246,14 +246,14 @@
 			// videoFT2PLToolStripMenuItem
 			// 
 			this.videoFT2PLToolStripMenuItem.Name = "videoFT2PLToolStripMenuItem";
-			this.videoFT2PLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.videoFT2PLToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
 			this.videoFT2PLToolStripMenuItem.Text = "video";
 			this.videoFT2PLToolStripMenuItem.Click += new System.EventHandler(this.PlayListMakeContextMenuStrip_SubMenuClick);
 			// 
 			// audioFT2PLToolStripMenuItem
 			// 
 			this.audioFT2PLToolStripMenuItem.Name = "audioFT2PLToolStripMenuItem";
-			this.audioFT2PLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.audioFT2PLToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
 			this.audioFT2PLToolStripMenuItem.Text = "audio";
 			this.audioFT2PLToolStripMenuItem.Click += new System.EventHandler(this.PlayListMakeContextMenuStrip_SubMenuClick);
 			// 
@@ -513,10 +513,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup1.Header = "ListViewGroup";
-			listViewGroup1.Name = "listViewGroup1";
+			listViewGroup2.Header = "ListViewGroup";
+			listViewGroup2.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
+            listViewGroup2});
 			this.FilelistView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
@@ -719,6 +719,7 @@
 			this.playListBox.Location = new System.Drawing.Point(3, 3);
 			this.playListBox.Name = "playListBox";
 			this.playListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
+			this.playListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.playListBox.Size = new System.Drawing.Size(229, 568);
 			this.playListBox.TabIndex = 0;
 			this.playListBox.SelectedIndexChanged += new System.EventHandler(this.PlayListBox_Select);
