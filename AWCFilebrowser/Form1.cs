@@ -123,6 +123,8 @@ namespace file_tree_clock_web1
 		int PlaylistDragOverNo;
 		int PlaylistDragEnterNo;
 		int PlaylistMouseUp;
+		List<string> DragURLs = new List<string>();
+
 		string plRightClickItemUrl = "";       //PlayListクリックアイテムのFullPath
 		string dragFrom = "";
 		ListBox draglist;
@@ -208,8 +210,9 @@ namespace file_tree_clock_web1
 			this.ScrollControlIntoView(fileTree);
 
 			FilelistView.AllowDrop = true;
-			FilelistView.ItemDrag += new ItemDragEventHandler(FilelistView_ItemDrag);
+			FilelistView.ItemDrag += new ItemDragEventHandler(FilelistView_ItemDrag);               //☆Dragの発生源をここだけに限定しないと二重発生する
 			FilelistView.DragOver += new DragEventHandler(FilelistView_DragOver);
+			FilelistView.DragDrop += new DragEventHandler(FilelistView_DragDrop);
 
 			playListBox.AllowDrop = true;
 			playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
@@ -1037,16 +1040,16 @@ AddType video/MP2T .ts
 			string TAG = "[WebBrowser1_DocumentCompleted]";
 			string dbMsg = TAG;
 			try {
-				HtmlDocument wDoc = playerWebBrowser.Document;
-				string wText = playerWebBrowser.DocumentText;
-				/*
-								if (( wText.Contains( "object" ) ) || ( wText.Contains( "embed" ) )) {
-									HtmlElement playerElem = playerWebBrowser.Document.GetElementById( wiPlayerID );
-									playerElem.AttachEventHandler( "PlayStateChangeEvent", new EventHandler( PlayStateChangeEvent ) );     //PlayState.MediaEnded		CurrentState 
-									dbMsg += ",Controls=" + playerWebBrowser.Controls;
-									dbMsg += ",ReadyState=" + playerWebBrowser.ReadyState;
-								}
-				*/
+				/*	HtmlDocument wDoc = playerWebBrowser.Document;
+					string wText = playerWebBrowser.DocumentText;
+
+									if (( wText.Contains( "object" ) ) || ( wText.Contains( "embed" ) )) {
+										HtmlElement playerElem = playerWebBrowser.Document.GetElementById( wiPlayerID );
+										playerElem.AttachEventHandler( "PlayStateChangeEvent", new EventHandler( PlayStateChangeEvent ) );     //PlayState.MediaEnded		CurrentState 
+										dbMsg += ",Controls=" + playerWebBrowser.Controls;
+										dbMsg += ",ReadyState=" + playerWebBrowser.ReadyState;
+									}
+					*/
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -2825,6 +2828,15 @@ AddType video/MP2T .ts
 				dbMsg += "(dragSouc;" + dragSouceIDl + ")";     //(dragSouc;0)Url;M:\\sample\123.flv
 				dragSouceUrl = tv.SelectedNode.FullPath; // draglist.SelectedValue.ToString();
 				dbMsg += "dragSouceUrl;" + dragSouceUrl;
+				DragURLs = new List<string>();
+			//	for (int i = 0; i < lv.SelectedItems.Count; ++i) {
+			//		dbMsg += "(" + i + ")";
+			//		ListViewItem itemxs = lv.SelectedItems[i];
+			//		string SelectedItems = lv.SelectedItems[i].Name;     //(dragSouc;0)Url;M:\\sample\123.flv
+			//		dbMsg += SelectedItems;
+					DragURLs.Add(dragSouceUrl);
+			//	}
+
 				tv.Focus();
 				DDEfect = tv.DoDragDrop(dragNode, DragDropEffects.All);       //e.Item
 																			  //		DDEfect = tv.DoDragDrop(dragSouceUrl, DragDropEffects.All);       //e.Item
@@ -2881,7 +2893,7 @@ AddType video/MP2T .ts
 		}
 
 		/// <summary>
-		/// ドラッグしている時
+		/// FileTreからドラッグしている時
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
@@ -2897,22 +2909,10 @@ AddType video/MP2T .ts
 					Point movePoint = new Point(e.X, e.Y);
 					movePoint = fileTree.PointToClient(movePoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
 					dbMsg += ">>(" + movePoint.X + "," + movePoint.Y + ")";
-					/*	int MouseX = System.Windows.Forms.Cursor.Position.X;
-						int MouseY = System.Windows.Forms.Cursor.Position.Y;
-						dbMsg += ",Mouse(" + MouseX + "," + MouseX + ")";
-						Point MousePosition = new Point(MouseX, MouseX);
-						MousePosition = fileTree.PointToClient(MousePosition);//ドラッグ開始時のマウスの位置をクライアント座標に変換
-						dbMsg += ">>(" + MousePosition.X + "," + MousePosition.Y + ")";
-		*/
 					TreeView tv = fileTree;// (TreeView)sender;
 					string dragSouce = "";
-					//		if (dragFrom == fileTree.Name) {
 					dragSouce = tv.SelectedNode.FullPath;
-					/*	} else if (dragFrom == FilelistView.Name) {
-							dragSouce = FilelistView.FocusedItem.Name;
-						}*/
 					dbMsg += " ,dragSouce=" + dragSouce;
-					//	if (tv == fileTree) {              //ドラッグされているデータがTreeNodeか調べる		e.Data.GetDataPresent(typeof(TreeNode))
 					if ((e.KeyState & 8) == 8 && (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {
 						dbMsg += " , Ctrlキーが押されている>>Copy";//Ctrlキーが押されていればCopy//"8"はCtrlキーを表す
 						copySouce = dragSouce;      //コピーするアイテムのurl
@@ -2932,50 +2932,6 @@ AddType video/MP2T .ts
 					if (cutSouce != "") {
 						dbMsg += ",cut=" + cutSouce;
 					}
-					/*	} else {
-							dbMsg += " ,TreeNodeでなければ受け入れない";
-							e.Effect = DragDropEffects.None;
-							if (e.Effect != DragDropEffects.None) {                 //マウス下のNodeを選択する
-								TreeNode target = tv.GetNodeAt(tv.PointToClient(new Point(e.X, e.Y)));             //マウスのあるNodeを取得する
-								TreeNode source = (TreeNode)e.Data.GetData(typeof(TreeNode));                     //ドラッグされているNodeを取得する
-								if (target != null && target != source && !IsChildNode(source, target)) {             //マウス下のNodeがドロップ先として適切か調べる
-									if (target.IsSelected == false) {                                                   //Nodeを選択する
-										tv.SelectedNode = target;
-									}
-								} else {
-									e.Effect = DragDropEffects.None;
-								}
-							}
-						}*/
-
-					/*		dbMsg += "(DownPoint;" + mouceDownPoint.X + "," + mouceDownPoint.Y + ")";
-						if (mouceDownPoint != Point.Empty) {
-							int filrTreeRight = fileTree.Left + fileTree.Width;
-							dbMsg += ",filrTreeRight=" + filrTreeRight;
-							dbMsg += ",fileTree=" + fileTree.Top + "～" + fileTree.Bottom;
-									if (filrTreeRight < movePoint.X) {    //	|| playListBoxLeft < e.X
-											dbMsg += ">PlayListに入った>";
-											if (-1 < dragSouceIDP) {
-												dbMsg += "(dragSouc;" + dragSouceIDl + ")dragSouceUrl;" + dragSouceUrl;
-												b_dragSouceUrl = "";
-												playListBox.DoDragDrop(dragSouceUrl, DragDropEffects.Move);//ドラッグスタート
-												dbMsg += ">>DoDragDrop";
-												mouceDownPoint = Point.Empty;
-											}
-										} else if ((fileTree.Bottom - 10) < movePoint.Y) {   //(MovePoint;314,662)>>(148,422),Mouse(314,314)>>(148,74)(DownPoint;134,270),filrTreeRight=307,fileTree=0～425>>下端割
-											dbMsg += ">>下端割";
-											//	panel1.AutoScrollPosition = new Point(x * -1, y * -1);
-											//			fileTree.e.EnsureVisible();
-											MyLog(dbMsg);
-										} else if (movePoint.Y < fileTree.Top + 10) {     //(MovePoint;284,240)>>(118,0),Mouse(284,284)>>(118,44) (DownPoint;85,254),filrTreeRight=307,fileTree=0～425>fileTree内>
-											dbMsg += ">>上端超え";
-											//		fileTree.AutoScrollOffset= new Point(0, 100);				//.TopNode.EnsureVisible();
-											MyLog(dbMsg);
-										} else {
-											dbMsg += ">fileTree内>";
-										}*/
-				} else if (dragFrom == FilelistView.Name) {
-
 				}
 				if (DDEfect == DragDropEffects.None) {
 					MyLog(dbMsg);
@@ -3441,6 +3397,8 @@ AddType video/MP2T .ts
 			string TAG = "[FilelistView_ItemDrag]";
 			string dbMsg = TAG;
 			try {
+				cutSouce = "";       //カットするアイテムのurl
+				copySouce = "";      //コピーするアイテムのurl
 				ListView lv = (ListView)sender;
 				dragFrom = lv.Name;
 				mouceDownPoint = Control.MousePosition;
@@ -3449,15 +3407,23 @@ AddType video/MP2T .ts
 																									//	dragSouceIDP = tv.IndexFromPoint(mouceDownPoint);//マウス下のListBoxのインデックスを得る
 																									//	dbMsg += "(Pointから;" + dragSouceIDP + ")";
 																									////////////////////////////////////////////////////////////////////////////////////////////////
-				cutSouce = "";       //カットするアイテムのurl
-				copySouce = "";      //コピーするアイテムのurl
-									 //		dragNode = (TreeNode)e.Item;
-									 //	tv.SelectedNode = dragNode;//(TreeNode)e.Item;
+																									//		dragNode = (TreeNode)e.Item;
+																									//	tv.SelectedNode = dragNode;//(TreeNode)e.Item;
 				ListViewItem FocusedItem = lv.FocusedItem;                           //フォーカスのあるアイテムのTextを表示する
 				dragSouceIDl = FocusedItem.Index; //draglist.SelectedIndex;
 				dbMsg += dragFrom + "(dragSouc;" + dragSouceIDl + ")から";     //(dragSouc;0)Url;M:\\sample\123.flv
 				dragSouceUrl = FocusedItem.Name; // draglist.SelectedValue.ToString();
 				dbMsg += "dragSouceUrl;" + dragSouceUrl;
+				DragURLs = new List<string>();
+				for (int i = 0; i < lv.SelectedItems.Count; ++i) {
+					dbMsg += "(" + i + ")";
+					ListViewItem itemxs = lv.SelectedItems[i];
+					string SelectedItems= lv.SelectedItems[i].Name;     //(dragSouc;0)Url;M:\\sample\123.flv
+					dbMsg += SelectedItems;
+					DragURLs.Add(SelectedItems);
+				}
+				dbMsg += ">>" + DragURLs.Count + "件";     //(dragSouc;0)Url;M:\\sample\123.flv
+
 				lv.Focus();
 				DDEfect = lv.DoDragDrop(dragSouceUrl, DragDropEffects.All);       //e.Item
 																				  //		DDEfect = tv.DoDragDrop(dragSouceUrl, DragDropEffects.All);       //e.Item
@@ -3488,6 +3454,8 @@ AddType video/MP2T .ts
 			string TAG = "[FilelistView_DragOver]";
 			string dbMsg = TAG;
 			try {
+				copySouce = "";
+				cutSouce = "";
 				dbMsg += "dragFrom=" + dragFrom;
 				dbMsg += ",dragSouceUrl=" + dragSouceUrl;
 				dbMsg += ",DDEfect=" + DDEfect;
@@ -3497,20 +3465,20 @@ AddType video/MP2T .ts
 				dbMsg += ">>(" + movePoint.X + "," + movePoint.Y + ")";
 				if (dragFrom == FilelistView.Name) {              //ドラッグされているデータがTreeNodeか調べる		e.Data.GetDataPresent(typeof(TreeNode))
 					ListView lv = (ListView)sender;
-					string FocusedItemName = lv.FocusedItem.Name;
-					dbMsg += " ,FocusedItemName=" + FocusedItemName;
+					string dragSouce = lv.FocusedItem.Name;
+					dbMsg += " ,FocusedItemName=" + dragSouce;
 					copySouce = "";
 					cutSouce = "";
 					if ((e.KeyState & 8) == 8 && (e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy) {
 						dbMsg += " , Ctrlキーが押されている>>Copy";//Ctrlキーが押されていればCopy//"8"はCtrlキーを表す
-						copySouce = FocusedItemName;      //コピーするアイテムのurl
+						copySouce = dragSouce;      //コピーするアイテムのurl
 						e.Effect = DragDropEffects.Copy;
 					} else if ((e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move) {
 						dbMsg += " , 何も押されていない>>Move";
-						cutSouce = FocusedItemName;     //カットするアイテムのurl
+						cutSouce = dragSouce;     //カットするアイテムのurl
 						e.Effect = DragDropEffects.Move;
 					} else {
-						cutSouce = FocusedItemName;     //カットするアイテムのurl
+						cutSouce = dragSouce;     //カットするアイテムのurl
 						e.Effect = DragDropEffects.None;
 					}
 					DDEfect = e.Effect;
@@ -3551,7 +3519,7 @@ AddType video/MP2T .ts
 					if ((e.KeyState & 2) == 2) {                //"2"はマウスの右ボタンを表す
 						dbMsg += "マウスの右ボタンでドラッグをキャンセル";
 						e.Action = DragAction.Cancel;
-					} else if ((e.KeyState & 1) == 1) {				//左ボタンがクリックされている時だけ処理開始
+					} else if ((e.KeyState & 1) == 1) {             //左ボタンがクリックされている時だけ処理開始
 						Point moucePoint = Control.MousePosition;
 						moucePoint = lv.PointToClient(moucePoint);//ドラッグ開始時のマウスの位置をクライアント座標に変換
 						dbMsg += "(moucePoint;" + moucePoint.X + "," + moucePoint.Y + ")";      //(mouceDownPoint;735,-39)
@@ -3901,9 +3869,9 @@ AddType video/MP2T .ts
 			string dbMsg = TAG;
 			try {
 				int seleCount = playListBox.SelectedItems.Count;
-				dbMsg +=  seleCount+"項目を選択";
-				if (1<seleCount) {
-				//	plaingItem = playListBox.SelectedItems[0].ToString();
+				dbMsg += seleCount + "項目を選択";
+				if (1 < seleCount) {
+					//	plaingItem = playListBox.SelectedItems[0].ToString();
 				} else {
 					dbMsg += "(" + playListBox.SelectedIndex + ")" + playListBox.Text;
 					plaingItem = playListBox.SelectedValue.ToString();
@@ -3967,6 +3935,7 @@ AddType video/MP2T .ts
 				if ((PlayListBoxItem.Count - 1) < plaingID) {
 					plaingID = 0;
 				}
+				playListBox.ClearSelected();
 				playListBox.SelectedIndex = plaingID;           //リスト上で選択
 				plaingItem = playListBox.SelectedValue.ToString();
 				dbMsg += ">>(" + plaingID + ")" + playListBox.Text;
@@ -3996,6 +3965,7 @@ AddType video/MP2T .ts
 				if (plaingID < 0) {
 					plaingID = (PlayListBoxItem.Count - 1);
 				}
+				playListBox.ClearSelected();
 				playListBox.SelectedIndex = plaingID;           //リスト上で選択
 				plaingItem = playListBox.SelectedValue.ToString();
 				dbMsg += ">>(" + plaingID + ")" + playListBox.Text;
@@ -4010,7 +3980,6 @@ AddType video/MP2T .ts
 			}
 
 		}
-
 
 		/// <summary>
 		/// 連続再生チェックボックスのクリック
@@ -4143,7 +4112,6 @@ AddType video/MP2T .ts
 			}
 		}
 
-
 		/// <summary>
 		/// プレイリストのコンテキストメニュ
 		/// </summary>
@@ -4209,7 +4177,6 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
-
 
 		private void PlaylistComboBox_TextChanged(object sender, EventArgs e) {
 			string TAG = "[PlaylistComboBox_TextChanged]";
@@ -4329,24 +4296,24 @@ AddType video/MP2T .ts
 				dbMsg += startCount + "件";
 				int seleCount = playListBox.SelectedItems.Count;
 				dbMsg += seleCount + "項目を選択";
-				dbMsg += ","+playListBox.SelectedItems[0] + "～" + playListBox.SelectedItems[playListBox.SelectedItems.Count-1];
-					dbMsg += playListName + " から　" + fileName + " を削除";
-					PlayListItems PLI = PlayListBoxItem.Find(x => x.FullPathStr.Contains(fileName));        //☆List<T>内検索
-					string NotationName = PLI.NotationName;
-					dbMsg += ";" + NotationName + "は";
-					int delPosition = playListBox.FindString(PLI.NotationName);
-					dbMsg += delPosition + "番目";
-					if (-1 < delPosition) {
-						DelFromPlayList(playListName, delPosition);         //☆	playListBox.Items.Remove(fileName);では消せない
-					}
-					int endCount = playListBox.Items.Count;
-					dbMsg += endCount + "件";
-					if (delPosition < playListBox.Items.Count) {
-						playListBox.SelectedIndex = delPosition;                //削除した次の項目を選択
-					} else {
-						playListBox.SelectedIndex = playListBox.Items.Count - 1;                //削除した次の項目を選択
-					}
-					MyLog(dbMsg);
+				dbMsg += "," + playListBox.SelectedItems[0] + "～" + playListBox.SelectedItems[playListBox.SelectedItems.Count - 1];
+				dbMsg += playListName + " から　" + fileName + " を削除";
+				PlayListItems PLI = PlayListBoxItem.Find(x => x.FullPathStr.Contains(fileName));        //☆List<T>内検索
+				string NotationName = PLI.NotationName;
+				dbMsg += ";" + NotationName + "は";
+				int delPosition = playListBox.FindString(PLI.NotationName);
+				dbMsg += delPosition + "番目";
+				if (-1 < delPosition) {
+					DelFromPlayList(playListName, delPosition);         //☆	playListBox.Items.Remove(fileName);では消せない
+				}
+				int endCount = playListBox.Items.Count;
+				dbMsg += endCount + "件";
+				if (delPosition < playListBox.Items.Count) {
+					playListBox.SelectedIndex = delPosition;                //削除した次の項目を選択
+				} else {
+					playListBox.SelectedIndex = playListBox.Items.Count - 1;                //削除した次の項目を選択
+				}
+				MyLog(dbMsg);
 			} catch (Exception e) {
 				dbMsg += "<<以降でエラー発生>>" + e.Message;
 				MyLog(dbMsg);
@@ -4472,40 +4439,32 @@ AddType video/MP2T .ts
 			string TAG = "[ReadPlayList]" + fileName;
 			string dbMsg = TAG;
 			try {
+				if (0 < playListBox.Items.Count) {
+					dbMsg += ",処理前=" + playListBox.Items.Count + "件";
+					playListBox.DataSource = null;
+				}
 				string rText = ReadTextFile(fileName, "UTF-8"); //"Shift_JIS"では文字化け発生
 																//	dbMsg += ",rText=" + rText;
 																//	rText = rText.Replace('/', Path.DirectorySeparatorChar);
 				string[] files = System.Text.RegularExpressions.Regex.Split(rText, "\r\n");
-				plaingItem = files[0];
-				dbMsg += ",一行目=" + plaingItem;
-				Uri urlObj = new Uri(plaingItem);                    //  http://dobon.net/vb/dotnet/file/uritofilepath.html
-				if (urlObj.IsFile) {                     //変換するURIがファイルを表していることを確認する
-					plaingItem = urlObj.LocalPath + Uri.UnescapeDataString(urlObj.Fragment);                          //Windows形式のパス表現に変換する
-					dbMsg += "  >> " + plaingItem;
-				}
-				string type = GetFileTypeStr(plaingItem);
-				dbMsg += "、type＝> " + type;
-				string titolStr = "プレイリスト：" + fileName + "（" + type + "）をリストアップ";
-				viewSplitContainer.Panel1Collapsed = false;//リストエリアを開く
-														   //		viewSplitContainer.Width = playListWidth;
-				progresPanel.Visible = true;
-				dbMsg += ";;playList準備；既存;" + PlayListBoxItem.Count + "件";
-				PlayListBoxItem = new List<PlayListItems>();
-				string valuestr = PlayListBoxItem.Count.ToString();
-				int listCount = 0;
-				targetCountLabel.Text = listCount.ToString();                    //確認
-				int nowToTal = files.Length;
-				dbMsg += ";nowToTal;" + nowToTal + "件";
-				progressBar1.Maximum = nowToTal;
-				ProgressTitolLabel.Text = titolStr;
-				progCountLabel.Text = valuestr;                     //確認
-				targetCountLabel.Text = "0";                        //リストアップ
-				prgMessageLabel.Text = "リストアップ開始";
-				ProgressMaxLabel.Text = nowToTal.ToString();        //Max
-																	//		pDialog = new ProgressDialog(titolStr, maxvaluestr, valuestr);保留；プログレスダイアログ
-																	//		pDialog.ShowDialog(this);										//プログレスダイアログ表示
-
 				if (files != null) {
+					viewSplitContainer.Panel1Collapsed = false;//リストエリアを開く //		viewSplitContainer.Width = playListWidth;
+					progresPanel.Visible = true;
+					dbMsg += ";;playList準備；既存;" + PlayListBoxItem.Count + "件";
+					PlayListBoxItem = new List<PlayListItems>();
+					string valuestr = PlayListBoxItem.Count.ToString();
+					int listCount = 0;
+					targetCountLabel.Text = listCount.ToString();                    //確認
+					int nowToTal = files.Length;
+					dbMsg += ";nowToTal;" + nowToTal + "件";
+					progressBar1.Maximum = nowToTal;
+					progCountLabel.Text = valuestr;                     //確認
+					targetCountLabel.Text = "0";                        //リストアップ
+					prgMessageLabel.Text = "リストアップ開始";
+					ProgressMaxLabel.Text = nowToTal.ToString();        //Max
+																		//		pDialog = new ProgressDialog(titolStr, maxvaluestr, valuestr);保留；プログレスダイアログ
+																		//		pDialog.ShowDialog(this);										//プログレスダイアログ表示
+
 					dbMsg += "ファイル=" + files.Length + "件";
 					string rFileName = "";
 					foreach (string plFileName in files) {
@@ -4515,8 +4474,21 @@ AddType video/MP2T .ts
 						if (plFileName != "") {
 							FileInfo fi = new FileInfo(fileName);
 							if (fi.Exists) {                     //変換するURIがファイルを表していることを確認する☆読み込み時にリロードのループになる
+								Uri urlObj = new Uri(plFileName);                    //  http://dobon.net/vb/dotnet/file/uritofilepath.html
+								if (PlayListBoxItem.Count == 0) {
+									plaingItem = plFileName;
+									dbMsg += ",一行目=" + plaingItem;
+									//		Uri urlObj = new Uri(plaingItem);                    //  http://dobon.net/vb/dotnet/file/uritofilepath.html
+									if (urlObj.IsFile) {                     //変換するURIがファイルを表していることを確認する
+										plaingItem = urlObj.LocalPath + Uri.UnescapeDataString(urlObj.Fragment);                          //Windows形式のパス表現に変換する
+										dbMsg += "  >> " + plaingItem;
+									}
+									string type = GetFileTypeStr(plaingItem);
+									dbMsg += "、type＝> " + type;
+									string titolStr = "プレイリスト：" + fileName + "（" + type + "）をリストアップ";
+									ProgressTitolLabel.Text = titolStr;
+								}
 								string winPath = plFileName;
-								urlObj = new Uri(plFileName);                    //  http://dobon.net/vb/dotnet/file/uritofilepath.html
 								if (urlObj.IsFile) {                     //変換するURIがファイルを表していることを確認する
 									winPath = urlObj.LocalPath + Uri.UnescapeDataString(urlObj.Fragment);                          //Windows形式のパス表現に変換する
 									dbMsg += "  ,winPath= " + winPath;
@@ -4695,7 +4667,6 @@ AddType video/MP2T .ts
 			return stringList;
 		}
 
-
 		private List<string> Files2PlayListIndexBody(List<string> itemList, string addFiles, int insarPosition) {
 			string TAG = "[Files2PlayListIndex]";
 			string dbMsg = TAG;
@@ -4704,6 +4675,7 @@ AddType video/MP2T .ts
 				FileInfo fi = new FileInfo(addFiles);
 				string fileAttributes = fi.Attributes.ToString();
 				dbMsg += ",fileAttributes=" + fileAttributes;
+
 				if (fileAttributes.Contains("Directory")) {
 					System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(lsFullPathName);
 					string[] files = Directory.GetFiles(addFiles);
@@ -4752,7 +4724,12 @@ AddType video/MP2T .ts
 				List<string> stringList = new List<string>();
 				stringList.AddRange(items);//配列→List
 				dbMsg += ",stringList=" + stringList.Count + "件";
-				stringList = Files2PlayListIndexBody(stringList, addFiles, insarPosition);
+				dbMsg += ",drag=" + DragURLs.Count + "件";
+				foreach (string aFiles in DragURLs) {
+					dbMsg += "(" + insarPosition + ")"+ aFiles;
+					stringList = Files2PlayListIndexBody(stringList, aFiles, insarPosition);
+					insarPosition++;
+				}
 				dbMsg += ">>" + stringList.Count + "件";
 				rText = "";
 				foreach (string lItem in stringList) {
@@ -4777,7 +4754,6 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
-
 
 		/// <summary>
 		/// アイテムを一つプレイリストに追記
@@ -4907,25 +4883,25 @@ AddType video/MP2T .ts
 				int seleCount = playListBox.SelectedItems.Count;
 				dbMsg += "(選択" + seleCount + "項目)";
 				int seleStarPosition = -1;
-				int seleEndPosition = delPosition ;
+				int seleEndPosition = delPosition;
 				List<int> plSelects = new List<int>();
 				for (int i = 0; i < playListBox.SelectedItems.Count; ++i) {
 					//if (playListBox.GetSelected(i)) {
-						plSelects.Add(playListBox.SelectedIndex);
-						if (seleStarPosition == -1) {
-							seleStarPosition = playListBox.SelectedIndex;
+					plSelects.Add(playListBox.SelectedIndex);
+					if (seleStarPosition == -1) {
+						seleStarPosition = playListBox.SelectedIndex;
 						dbMsg += "(" + seleStarPosition + ")";// + playListBox.SelectedItems[seleStarPosition];
-						}
+					}
 					//	}else
-					if (-1< seleStarPosition && seleStarPosition<= seleEndPosition) {
+					if (-1 < seleStarPosition && seleStarPosition <= seleEndPosition) {
 						seleEndPosition = playListBox.SelectedIndex;
-						dbMsg +=  "～(" + seleEndPosition + ")" + playListBox.Items[seleEndPosition];
+						dbMsg += "～(" + seleEndPosition + ")" + playListBox.Items[seleEndPosition];
 					}
 
 				}
 				if (seleStarPosition == -1) {
 					seleStarPosition = delPosition;
-					dbMsg += ">>(" + seleStarPosition + ")";	// + playListBox.Items[seleStarPosition];
+					dbMsg += ">>(" + seleStarPosition + ")";    // + playListBox.Items[seleStarPosition];
 				}
 				string rText = ReadTextFile(playList, "UTF-8"); //"Shift_JIS"では文字化け発生
 																//	dbMsg += ",rText=" + rText;
@@ -4949,7 +4925,7 @@ AddType video/MP2T .ts
 				foreach (int seleIndex in plSelects) {
 					dbMsg += " (" + seleIndex + ")";
 					string deldRecord = stringList[seleIndex];
-					dbMsg +=  deldRecord;
+					dbMsg += deldRecord;
 					stringList.RemoveAt(seleIndex);
 				}
 				/*			for (int i = seleStarPosition; i <= seleEndPosition; ++i) {
@@ -4961,7 +4937,9 @@ AddType video/MP2T .ts
 				dbMsg += ",stringList=" + stringList.Count + "件";
 				rText = "";
 				foreach (string lItem in stringList) {
-					rText += lItem + "\r\n";
+					if (lItem != "") {
+						rText += lItem + "\r\n";
+					}
 				}
 				dbMsg += ">>" + rText.Length + "文字";
 				System.IO.StreamWriter sw = new System.IO.StreamWriter(playList, false, new UTF8Encoding(true));     // BOM付き
@@ -4970,7 +4948,7 @@ AddType video/MP2T .ts
 				dbMsg += ">Exists=" + File.Exists(playList);
 				if (PlaylistComboBox.Text == playList) {
 					ReadPlayList(playList);             //	再読込み
-					if (delPosition< playListBox.Items.Count) {
+					if (delPosition < playListBox.Items.Count) {
 						playListBox.SelectedIndex = delPosition;
 					} else {
 						playListBox.SelectedIndex = playListBox.Items.Count - 1;
@@ -4983,7 +4961,6 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
-
 
 		private string MakePlayListRecordBody(string addRecord, string Type) {
 			string TAG = "[MakePlayListRecordBody]";
@@ -5436,7 +5413,7 @@ AddType video/MP2T .ts
 								dbMsg += "(dragSouc;" + dragSouceIDl + ")";     //(dragSouc;0)Url;M:\\sample\123.flv
 								dragSouceUrl = PlayListMouseDownValue;// playListBox.Items[dragSouceIDP].ToString();
 								dbMsg += "dragSouceUrl;" + dragSouceUrl;
-						//		draglist.DoDragDrop(dragSouceUrl, DragDropEffects.Move);//ドラッグスタート
+								//		draglist.DoDragDrop(dragSouceUrl, DragDropEffects.Move);//ドラッグスタート
 								if (dragFrom == "") {
 									dragFrom = draglist.Name;
 								}
@@ -5553,7 +5530,7 @@ AddType video/MP2T .ts
 			string TAG = "[PlayListBox_DragEnter]";
 			string dbMsg = TAG;
 			try {
-				dbMsg += "(" + e.X+ "," + e.Y+")";
+				dbMsg += "(" + e.X + "," + e.Y + ")";
 				dbMsg += "dragFrom=" + dragFrom;
 				dbMsg += ",dragSouceUrl=" + dragSouceUrl;
 				dbMsg += ",DDEfect=" + DDEfect;
@@ -5626,20 +5603,23 @@ AddType video/MP2T .ts
 				dbMsg += "dragFrom=" + dragFrom;
 				dbMsg += ",dragSouceUrl=" + dragSouceUrl;
 				dbMsg += ",DDEfect=" + DDEfect;
-				if (dragFrom != "" && dragSouceUrl!= "") {
+				if (dragFrom != "" && dragSouceUrl != "") {
 					Point dropPoint = Control.MousePosition;                            //dropPoint取得☆最優先にしないと取れなくなる
 					dropPoint = playListBox.PointToClient(dropPoint);                   //ドロップ時のマウスの位置をクライアント座標に変換
 					dbMsg += "(dropPoint;" + dropPoint.X + "," + dropPoint.Y + ")";
 					int dropPointIndex = playListBox.IndexFromPoint(dropPoint);         //マウス下のＬＢのインデックスを得る
 					dbMsg += "(dropPointIndex;" + dropPointIndex + "/" + playListBox.Items.Count + ")";//
+
 					ListBox droplist = (ListBox)sender;
 					string dropSouceUrl = "";
-					if (dropPointIndex < 0) {
+					if (-1 < dropPointIndex) {
+						dropSouceUrl = playListBox.Items[dropPointIndex].ToString();             //☆ (ListBox)senderで拾えない
+					} else if (0 < playListBox.Items.Count) {
 						dropSouceUrl = playListBox.Items[playListBox.Items.Count - 1].ToString();             //☆ (ListBox)senderで拾えない
 						dropPointIndex = playListBox.Items.Count;
 						dbMsg += ">>(dropPointIndex;" + dropPointIndex + ")";//
 					} else {
-						dropSouceUrl = playListBox.Items[dropPointIndex].ToString();             //☆ (ListBox)senderで拾えない
+						dropPointIndex = 0;
 					}
 					dbMsg += ",dropSouceUrl=" + dropSouceUrl;
 					string playList = PlaylistComboBox.Text;
@@ -5679,7 +5659,7 @@ AddType video/MP2T .ts
 				dragFrom = "";
 				dragSouceUrl = "";
 				dragSouceIDl = -1;
-				DDEfect= DragDropEffects.None;
+				DDEfect = DragDropEffects.None;
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
