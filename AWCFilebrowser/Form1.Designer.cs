@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.フォルダ作成ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -513,10 +513,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup1.Header = "ListViewGroup";
-			listViewGroup1.Name = "listViewGroup1";
+			listViewGroup5.Header = "ListViewGroup";
+			listViewGroup5.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
+            listViewGroup5});
 			this.FilelistView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
@@ -718,13 +718,15 @@
 			this.playListBox.Location = new System.Drawing.Point(3, 3);
 			this.playListBox.Name = "playListBox";
 			this.playListBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
-			this.playListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.playListBox.Size = new System.Drawing.Size(229, 568);
 			this.playListBox.TabIndex = 0;
 			this.playListBox.SelectedIndexChanged += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.DragDrop += new System.Windows.Forms.DragEventHandler(this.PlayListBox_DragDrop);
 			this.playListBox.DragEnter += new System.Windows.Forms.DragEventHandler(this.PlayListBox_DragEnter);
+			this.playListBox.DragOver += new System.Windows.Forms.DragEventHandler(this.PlayListBox_DragOver);
+			this.playListBox.DragLeave += new System.EventHandler(this.PlayListBox_DragLeave);
 			this.playListBox.DoubleClick += new System.EventHandler(this.PlayListBox_Select);
+			this.playListBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PlayListBox_KeyDown);
 			this.playListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlayListBox_MouseDown);
 			this.playListBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PlayListBox_MouseMove);
 			this.playListBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PlaylistBoxMouseUp);
