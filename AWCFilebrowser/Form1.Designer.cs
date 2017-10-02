@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.フォルダ作成ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -105,6 +105,7 @@
 			this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -156,7 +157,9 @@
 			// 
 			// fileTreeContextMenuStrip
 			// 
+			this.fileTreeContextMenuStrip.BackColor = System.Drawing.SystemColors.ControlLightLight;
 			this.fileTreeContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.titolToolStripMenuItem,
             this.フォルダ作成ToolStripMenuItem,
             this.名称変更ToolStripMenuItem,
             this.カットToolStripMenuItem,
@@ -169,49 +172,59 @@
             this.プレイリストに追加ToolStripMenuItem,
             this.プレイリストを作成ToolStripMenuItem});
 			this.fileTreeContextMenuStrip.Name = "contextMenuStrip1";
-			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(195, 246);
+			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 290);
+			this.fileTreeContextMenuStrip.Text = "Titol";
 			this.fileTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.fileTreeContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.FileTreeContextMenuStrip_ItemClicked);
 			// 
 			// フォルダ作成ToolStripMenuItem
 			// 
 			this.フォルダ作成ToolStripMenuItem.Name = "フォルダ作成ToolStripMenuItem";
-			this.フォルダ作成ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.フォルダ作成ToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.N)));
+			this.フォルダ作成ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.フォルダ作成ToolStripMenuItem.Text = "フォルダ作成";
 			// 
 			// 名称変更ToolStripMenuItem
 			// 
 			this.名称変更ToolStripMenuItem.Name = "名称変更ToolStripMenuItem";
-			this.名称変更ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.名称変更ToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F2;
+			this.名称変更ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.名称変更ToolStripMenuItem.Text = "名称変更";
 			// 
 			// カットToolStripMenuItem
 			// 
 			this.カットToolStripMenuItem.Name = "カットToolStripMenuItem";
+			this.カットToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
 			this.カットToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.カットToolStripMenuItem.Text = "カット";
 			// 
 			// コピーToolStripMenuItem
 			// 
 			this.コピーToolStripMenuItem.Name = "コピーToolStripMenuItem";
+			this.コピーToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
 			this.コピーToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.コピーToolStripMenuItem.Text = "コピー";
 			// 
 			// ペーストToolStripMenuItem
 			// 
 			this.ペーストToolStripMenuItem.Name = "ペーストToolStripMenuItem";
+			this.ペーストToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
 			this.ペーストToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.ペーストToolStripMenuItem.Text = "ペースト";
 			// 
 			// 削除ToolStripMenuItem
 			// 
 			this.削除ToolStripMenuItem.Name = "削除ToolStripMenuItem";
+			this.削除ToolStripMenuItem.ShortcutKeyDisplayString = "Delete";
+			this.削除ToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
 			this.削除ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.削除ToolStripMenuItem.Text = "削除";
 			// 
 			// 元に戻す
 			// 
 			this.元に戻す.Name = "元に戻す";
+			this.元に戻す.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
 			this.元に戻す.Size = new System.Drawing.Size(194, 22);
 			this.元に戻す.Text = "元に戻す";
 			this.元に戻す.Visible = false;
@@ -513,10 +526,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup3.Header = "ListViewGroup";
-			listViewGroup3.Name = "listViewGroup1";
+			listViewGroup5.Header = "ListViewGroup";
+			listViewGroup5.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup3});
+            listViewGroup5});
 			this.FilelistView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
@@ -988,6 +1001,15 @@
 			this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
 			this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
 			// 
+			// titolToolStripMenuItem
+			// 
+			this.titolToolStripMenuItem.BackColor = System.Drawing.SystemColors.ButtonFace;
+			this.titolToolStripMenuItem.Enabled = false;
+			this.titolToolStripMenuItem.ForeColor = System.Drawing.SystemColors.MenuText;
+			this.titolToolStripMenuItem.Name = "titolToolStripMenuItem";
+			this.titolToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.titolToolStripMenuItem.Text = "titol";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1119,6 +1141,7 @@
 		private System.Windows.Forms.ColumnHeader SizeColumnHeader;
 		private System.Windows.Forms.ColumnHeader UpDateColumnHeader;
 		private System.Windows.Forms.ToolStripMenuItem エクスプローラーで開くplToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem titolToolStripMenuItem;
 	}
 }
 
