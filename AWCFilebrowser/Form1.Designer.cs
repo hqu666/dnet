@@ -27,9 +27,10 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.フォルダ作成ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.名称変更ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.カットToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -105,7 +106,6 @@
 			this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -172,10 +172,19 @@
             this.プレイリストに追加ToolStripMenuItem,
             this.プレイリストを作成ToolStripMenuItem});
 			this.fileTreeContextMenuStrip.Name = "contextMenuStrip1";
-			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 290);
+			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 268);
 			this.fileTreeContextMenuStrip.Text = "Titol";
 			this.fileTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.fileTreeContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.FileTreeContextMenuStrip_ItemClicked);
+			// 
+			// titolToolStripMenuItem
+			// 
+			this.titolToolStripMenuItem.BackColor = System.Drawing.SystemColors.ButtonFace;
+			this.titolToolStripMenuItem.Enabled = false;
+			this.titolToolStripMenuItem.ForeColor = System.Drawing.SystemColors.MenuText;
+			this.titolToolStripMenuItem.Name = "titolToolStripMenuItem";
+			this.titolToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+			this.titolToolStripMenuItem.Text = "titol";
 			// 
 			// フォルダ作成ToolStripMenuItem
 			// 
@@ -196,21 +205,21 @@
 			// 
 			this.カットToolStripMenuItem.Name = "カットToolStripMenuItem";
 			this.カットToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-			this.カットToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.カットToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.カットToolStripMenuItem.Text = "カット";
 			// 
 			// コピーToolStripMenuItem
 			// 
 			this.コピーToolStripMenuItem.Name = "コピーToolStripMenuItem";
 			this.コピーToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-			this.コピーToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.コピーToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.コピーToolStripMenuItem.Text = "コピー";
 			// 
 			// ペーストToolStripMenuItem
 			// 
 			this.ペーストToolStripMenuItem.Name = "ペーストToolStripMenuItem";
 			this.ペーストToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-			this.ペーストToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.ペーストToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.ペーストToolStripMenuItem.Text = "ペースト";
 			// 
 			// 削除ToolStripMenuItem
@@ -218,33 +227,33 @@
 			this.削除ToolStripMenuItem.Name = "削除ToolStripMenuItem";
 			this.削除ToolStripMenuItem.ShortcutKeyDisplayString = "Delete";
 			this.削除ToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-			this.削除ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.削除ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.削除ToolStripMenuItem.Text = "削除";
 			// 
 			// 元に戻す
 			// 
 			this.元に戻す.Name = "元に戻す";
 			this.元に戻す.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
-			this.元に戻す.Size = new System.Drawing.Size(194, 22);
+			this.元に戻す.Size = new System.Drawing.Size(207, 22);
 			this.元に戻す.Text = "元に戻す";
 			this.元に戻す.Visible = false;
 			// 
 			// 他のアプリケーションで開くToolStripMenuItem
 			// 
 			this.他のアプリケーションで開くToolStripMenuItem.Name = "他のアプリケーションで開くToolStripMenuItem";
-			this.他のアプリケーションで開くToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.他のアプリケーションで開くToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.他のアプリケーションで開くToolStripMenuItem.Text = "他のアプリケーションで開く";
 			// 
 			// 再生ToolStripMenuItem
 			// 
 			this.再生ToolStripMenuItem.Name = "再生ToolStripMenuItem";
-			this.再生ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.再生ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.再生ToolStripMenuItem.Text = "再生";
 			// 
 			// プレイリストに追加ToolStripMenuItem
 			// 
 			this.プレイリストに追加ToolStripMenuItem.Name = "プレイリストに追加ToolStripMenuItem";
-			this.プレイリストに追加ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.プレイリストに追加ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.プレイリストに追加ToolStripMenuItem.Text = "プレイリストに追加";
 			// 
 			// プレイリストを作成ToolStripMenuItem
@@ -253,7 +262,7 @@
             this.videoFT2PLToolStripMenuItem,
             this.audioFT2PLToolStripMenuItem});
 			this.プレイリストを作成ToolStripMenuItem.Name = "プレイリストを作成ToolStripMenuItem";
-			this.プレイリストを作成ToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+			this.プレイリストを作成ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
 			this.プレイリストを作成ToolStripMenuItem.Text = "プレイリストを作成";
 			// 
 			// videoFT2PLToolStripMenuItem
@@ -526,20 +535,21 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup5.Header = "ListViewGroup";
-			listViewGroup5.Name = "listViewGroup1";
+			listViewGroup1.Header = "ListViewGroup";
+			listViewGroup1.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup5});
-			this.FilelistView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            listViewGroup1});
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
 			this.FilelistView.Location = new System.Drawing.Point(0, 0);
 			this.FilelistView.Name = "FilelistView";
+			this.FilelistView.ShowGroups = false;
 			this.FilelistView.Size = new System.Drawing.Size(236, 575);
 			this.FilelistView.TabIndex = 0;
 			this.FilelistView.UseCompatibleStateImageBehavior = false;
 			this.FilelistView.View = System.Windows.Forms.View.Details;
 			this.FilelistView.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.FilelistView_BeforeLabelEdit);
+			this.FilelistView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.FilelistView_ColumnClick);
 			this.FilelistView.DragDrop += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragDrop);
 			this.FilelistView.DragEnter += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragEnter);
 			this.FilelistView.DragOver += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragOver);
@@ -1001,15 +1011,6 @@
 			this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
 			this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
 			// 
-			// titolToolStripMenuItem
-			// 
-			this.titolToolStripMenuItem.BackColor = System.Drawing.SystemColors.ButtonFace;
-			this.titolToolStripMenuItem.Enabled = false;
-			this.titolToolStripMenuItem.ForeColor = System.Drawing.SystemColors.MenuText;
-			this.titolToolStripMenuItem.Name = "titolToolStripMenuItem";
-			this.titolToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
-			this.titolToolStripMenuItem.Text = "titol";
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1137,11 +1138,11 @@
 		private System.Windows.Forms.ToolStripMenuItem リストファイル選択LCToolStripMenuItem;
 		private System.Windows.Forms.SplitContainer FileViewBodySplitContainer;
 		private System.Windows.Forms.ListView FilelistView;
-		private System.Windows.Forms.ColumnHeader NameColumnHeader;
 		private System.Windows.Forms.ColumnHeader SizeColumnHeader;
 		private System.Windows.Forms.ColumnHeader UpDateColumnHeader;
 		private System.Windows.Forms.ToolStripMenuItem エクスプローラーで開くplToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem titolToolStripMenuItem;
+		private System.Windows.Forms.ColumnHeader NameColumnHeader;
 	}
 }
 

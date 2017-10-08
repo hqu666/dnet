@@ -104,6 +104,9 @@ namespace file_tree_clock_web1
 		string[] textFiles = new string[] { ".txt", ".html", ".htm", ".xhtml", ".xml", ".rss", ".xml", ".css", ".js", ".vbs", ".cgi", ".php" };
 		string[] applicationFiles = new string[] { ".zip", ".pdf", ".doc", ".xls", ".wpl", ".wmd", ".wms", ".wmz", ".wmd" };
 		string[] playListFiles = new string[] { ".m3u" };
+		//	ListViewSort LVSort;
+		ListViewItemComparer listViewItemSorter;        //ListViewItemSorterに指定するフィールド
+
 		string flRightClickItemUrl = "";        //fileTreeクリックアイテムのFullPath
 		string copySouce = "";      //コピーするアイテムのurl
 		string cutSouce = "";       //カットするアイテムのurl
@@ -197,7 +200,9 @@ namespace file_tree_clock_web1
 			string TAG = "[Form1_Load]";
 			string dbMsg = TAG;
 
-			fileTree.ImageList = this.imageList1;   //☆treeView1では設定できなかった
+			fileTree.ImageList = this.imageList1;             //☆treeView1では設定できなかった
+			FilelistView.SmallImageList = this.imageList1;
+
 			MakeDriveList();
 
 			AWSFileBroeser.Properties.Settings.Default.SettingChanging += new System.Configuration.SettingChangingEventHandler(Default_SettingChanging);//プリファレンスの変更イベント
@@ -213,6 +218,16 @@ namespace file_tree_clock_web1
 			FilelistView.ItemDrag += new ItemDragEventHandler(FilelistView_ItemDrag);               //☆Dragの発生源をここだけに限定しないと二重発生する
 			FilelistView.DragOver += new DragEventHandler(FilelistView_DragOver);
 			FilelistView.DragDrop += new DragEventHandler(FilelistView_DragDrop);
+			FilelistView.View = View.Details;                                                       //詳細表示にする
+			FilelistView.ColumnClick += new ColumnClickEventHandler(FilelistView_ColumnClick);        //ColumnClickイベントハンドラの追加
+			listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
+																					listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
+																					{
+																									ListViewItemComparer.ComparerMode.String,
+																									ListViewItemComparer.ComparerMode.Integer,
+																									ListViewItemComparer.ComparerMode.DateTime
+																					};
+			FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
 
 			playListBox.AllowDrop = true;
 			playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
@@ -1764,17 +1779,17 @@ AddType video/MP2T .ts
 				string findName = "";
 				TreeNodeCollection rNodeCollection = tree.Nodes;
 				int nCount = rNodeCollection.Count;
-				dbMsg += "nCount=" + nCount;
+				dbMsg += "、nCount=" + nCount;
 
 				for (int i = 0; i < findNames.Length; i++) {
 					if (i == 0) {
 						findName += findNames[i] + Path.DirectorySeparatorChar;
 					} else {
-						findName += Path.DirectorySeparatorChar+ findNames[i];
+						findName += Path.DirectorySeparatorChar + findNames[i];
 					}
-					dbMsg += "(" + i + "/" + findNames.Length + ")" + findName;
+					dbMsg += "\n(find;" + i + "/" + findNames.Length + "階層)" + findName;
 					for (int j = 0; j < nCount; j++) {
-						dbMsg += "\n(" + j + "/" + nCount + ")" ;
+						dbMsg += "(" + j + "/" + nCount + ")";
 						TreeNode cNode = rNodeCollection[j];
 						dbMsg += cNode.FullPath;
 						tree.SelectedNode = cNode;
@@ -1783,8 +1798,13 @@ AddType video/MP2T .ts
 							FolderItemListUp(findName, retNode);      //TreeNodeを再構築
 							retNode.Expand();
 							rNodeCollection = retNode.Nodes;
+							nCount = rNodeCollection.Count;
 							break;
 						}
+					}
+					if (retNode.FullPath == fullName) {
+						MyLog(dbMsg);
+						return retNode;
 					}
 				}
 				MyLog(dbMsg);
@@ -1794,52 +1814,6 @@ AddType video/MP2T .ts
 			}
 			return retNode;
 		}
-
-		/// <summary>
-		/// treeNodeをFullPathで照合検索する
-		/// </summary>
-		/// <param name="tree"></param>
-		/// <param name="fullName"></param>
-		/// <returns></returns>
-/*		public TreeNode FindFileTree(TreeView tree, string fullName) {     //TreeNodeCollection int level,
-			string TAG = "[FindFileTree]";
-			string dbMsg = TAG;
-			TreeNode retNode = tree.TopNode;
-			try {
-				dbMsg += "fullName=" + fullName;
-				string[] findNames = fullName.Split(Path.DirectorySeparatorChar);
-				string findName = findNames[0] + Path.DirectorySeparatorChar;
-				dbMsg += " . findName=" + findName;
-				for (int i = 0; i < tree.Nodes.Count; i++) {
-					TreeNode cNode = tree.Nodes[i];
-					dbMsg += "(" + i + ")" + cNode.FullPath;
-					if (cNode.FullPath == findName) {
-						retNode = cNode;
-						break;
-					}
-				}
-				dbMsg += "retNode=" + retNode.FullPath;     //[FindFileTree]fullName=M:\sample\MetallicaPromo . findName=M:\<<以降でエラー発生>>オブジェクト参照がオブジェクト インスタンスに設定されていません。
-				for (int j = 1; j < findNames.Count(); j++) {
-					dbMsg += "(" + j + ")";
-					findName = findName + Path.DirectorySeparatorChar + findNames[j];
-					dbMsg += findName;
-					for (int i = 0; i < retNode.Nodes.Count; i++) {
-						TreeNode cNode = retNode.Nodes[i];
-						dbMsg += "(" + i + ")" + cNode.FullPath;
-						if (cNode.FullPath == findName) {
-							retNode = cNode;
-							break;
-						}
-					}
-				}
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(dbMsg);
-			}
-			return retNode;
-		}*/
-
 		/// <summary>
 		/// FileTreeを検索して該当Nodeを選択
 		/// </summary>
@@ -1952,16 +1926,20 @@ AddType video/MP2T .ts
 				FileListVewDrow(openFolder);
 				TreeNode SelectedNode = FindTreeNode(fileTree, openFolder); // fileTree.SelectedNode;
 				dbMsg += ",SelectedNode=" + SelectedNode.FullPath;
-				TreeNode openNode =  SelectedNode.Parent;
-				if (openNode == null || openNode.FullPath != openFolder) {
-					dbMsg += ",openNode=" + openNode.FullPath;
+				TreeNode openNode = SelectedNode.Parent;
+				dbMsg += ",openNode=" + openNode;
+				if (openNode == null) {                             //ドライブルート
 					openNode = SelectedNode;
-					dbMsg += ">>" + openNode.FullPath;
+				} else if (openNode.FullPath != openFolder) {
+					openNode = SelectedNode;
 				}
-				openNode.Collapse();
+				dbMsg += ">openNode>" + openNode.FullPath;
+				//		openNode.Collapse();
 				FolderItemListUp(openFolder, openNode);      //TreeNodeを再構築
 				openNode.Expand();
-				fileTree.SelectedNode=null;
+				fileTree.SelectedNode = openNode;
+				fileTree.Focus();
+				//	FilelistView.Focus();
 				/*		string selectItem = fileTree.SelectedNode.FullPath;
 						dbMsg += ",selectItem=" + selectItem;//
 						string parentNameStr = selectItem;
@@ -2034,18 +2012,18 @@ AddType video/MP2T .ts
 				string farstName = DragURLs[0];
 				System.IO.FileInfo fi = new System.IO.FileInfo(farstName);
 				string rewriteFolder = fi.Directory.FullName;
-			//	TreeNode SelectedNode = fileTree.SelectedNode;
+				//	TreeNode SelectedNode = fileTree.SelectedNode;
 				TreeNode rewriteNode = FindTreeNode(fileTree, rewriteFolder);// SelectedNode;
-		/*		if (SelectedNode != null) {
-					dbMsg += ",SelectedNode=" + SelectedNode.FullPath;
-				} else {
-					rewriteNode=FindTreeNode(fileTree, rewriteFolder);
-				}*/
+																			 /*		if (SelectedNode != null) {
+																						 dbMsg += ",SelectedNode=" + SelectedNode.FullPath;
+																					 } else {
+																						 rewriteNode=FindTreeNode(fileTree, rewriteFolder);
+																					 }*/
 				string MessageStr = "";//	fileName + "を" + playListName + ""
 				foreach (string sourceName in DragURLs) {
 					MessageStr += sourceName + "\n";
 				}
-				MessageStr +=  "を削除します。";
+				MessageStr += "を削除します。";
 
 				DialogResult result = MessageBox.Show(MessageStr,
 					fi.DirectoryName + "から",
@@ -2249,7 +2227,7 @@ AddType video/MP2T .ts
 				FileInfo sourceInfo = new FileInfo(sourceName);
 				dbMsg += ",sourceInfo=" + sourceInfo.FullName;              //ドライブ名～拡張子
 				string sourceExtension = sourceInfo.Extension;
-				dbMsg += ",sourceExtension=" + sourceExtension; 
+				dbMsg += ",sourceExtension=" + sourceExtension;
 				dbMsg += ",先=" + destName;
 				FileInfo destInfo = new FileInfo(destName);
 				dbMsg += ",destInfo:FullName=" + destInfo.FullName;
@@ -3397,17 +3375,23 @@ AddType video/MP2T .ts
 				return null;
 			}*/
 		//FileListVew///////////////////////////////////////////////////////////fileTreeの操作//
+		/*
+		 設定備考
+		 ・HeaderStyle をCkickableで_ColumnClickが有効になる
+		 ・showGrupe をfalseにしないと一行目に線とdefalutの文字が入る
+			 */
 		/// <summary>
 		/// FileListVewの書き込み
 		/// http://study-csharp.blogspot.jp/2012/08/c-listview.html	
 		/// </summary>
 		/// <param name="sarchDir"></param>
-		private void FileListVewDrow(string sarchDir) {
+		public void FileListVewDrow(string sarchDir) {
 			string TAG = "[FileListVewDrow]";
 			string dbMsg = TAG;
 			try {
 				dbMsg += "sarchDir=" + sarchDir;
 				FilelistView.Items.Clear();
+
 				string[] files = Directory.GetFiles(sarchDir);        //		sarchDir	"C:\\\\マイナンバー.pdf"	string	☆sarchDir = "\\2013.m3u"でフルパスになっていない
 				if (files != null) {
 					foreach (string fileName in files) {
@@ -3419,8 +3403,7 @@ AddType video/MP2T .ts
 						dbMsg += ",Directory=" + fi.Directory.ToString();
 						dbMsg += ",Root=" + fi.Directory.Root.ToString();
 
-						//				string[] extStrs = fileName.Split('.');
-						string extentionStr = fi.Extension; //"." + extStrs[extStrs.Length - 1].ToLower();
+						string extentionStr = fi.Extension.ToLower(); //"." + extStrs[extStrs.Length - 1].ToLower();
 						dbMsg += ",拡張子=" + extentionStr;
 						if (-1 < Array.IndexOf(systemFiles, extentionStr) ||
 							0 < fileName.IndexOf("BOOTNXT", StringComparison.OrdinalIgnoreCase) ||
@@ -3440,21 +3423,25 @@ AddType video/MP2T .ts
 							}
 							dbMsg += ",iconType=" + iconType;
 							string rfileName = fileName.Replace(fi.Directory.Root.ToString(), fi.Directory.Root.ToString() + Path.DirectorySeparatorChar);
-							//	rfileName = rfileName.Replace(Path.DirectorySeparatorChar + "", "");
 							dbMsg += ",file=" + rfileName;
 
 							ListViewItem lvi;
 							lvi = FilelistView.Items.Add(fi.Name);
 							lvi.Name = rfileName;
-							string LengthStr = fi.Length.ToString();
-							if (1000 < fi.Length) {
-								double Length = fi.Length / 1024;
+							lvi.ImageIndex = iconType;                  //イメージを使用する	http://blog.hiros-dot.net/?p=2433
+							dbMsg += ",fi.Length=" + fi.Length;
+							float Length = (float)fi.Length;//new double(fi.Length);
+				//			Length = Length / (1024 * 1024);
+							dbMsg += ",Length=" + Length;
+							string LengthStr = fi.Length.ToString();        // string.Format("{0:f4}\r\n", fi.Length/1000 );
+							if (1000000 < Length) {
+								Length = fi.Length / (1024 * 1024);
+								LengthStr = Math.Round(Length, 2, MidpointRounding.AwayFromZero) + "MB";  //
+							} else if (1000 < Length) {
+								Length = fi.Length / 1024;
 								LengthStr = Math.Round(Length, 2, MidpointRounding.AwayFromZero) + "KB";
-							}
-							if (1000000 < fi.Length) {
-								double Length = fi.Length / 1024 / 1024;
-								LengthStr = Math.Round(Length, 2, MidpointRounding.AwayFromZero) + "MB";
-							}
+							}  
+							dbMsg += ",LengthStr=" + LengthStr;
 							lvi.SubItems.Add(LengthStr);
 							lvi.SubItems.Add(fi.LastWriteTime.ToString());
 						}
@@ -3474,20 +3461,76 @@ AddType video/MP2T .ts
 							ListViewItem lvi;
 							lvi = FilelistView.Items.Add(di.Name);
 							lvi.Name = rdirectoryName;
+							lvi.ImageIndex = 1;                                             //folder_close_icon.png
 							lvi.SubItems.Add((di.GetDirectories().Length + di.GetFiles().Length).ToString() + "アイテム");
 							lvi.SubItems.Add(di.LastWriteTime.ToString());
 						}
 					}           //ListBox1に結果を表示する
 				}
+		//		listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
+		/*		listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
+				{
+								ListViewItemComparer.ComparerMode.String,
+								ListViewItemComparer.ComparerMode.Integer,
+								ListViewItemComparer.ComparerMode.DateTime
+				};*/
+		//		FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
 				MyLog(dbMsg);
 			} catch (UnauthorizedAccessException UAEx) {
-				Console.WriteLine(TAG + "で" + UAEx.Message + "発生;" + dbMsg);
+				dbMsg += "<<以降でエラー発生>>" + UAEx.Message;
+				MyLog(dbMsg);
 			} catch (PathTooLongException PathEx) {
-				Console.WriteLine(TAG + "で" + PathEx.Message + "発生;" + dbMsg);
+				dbMsg += "<<以降でエラー発生>>" + PathEx.Message;
+				MyLog(dbMsg);
 			} catch (Exception er) {
-				Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
 			}
 		}
+
+		/// <summary>
+		/// ListVeiwのヘッダークリック
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public void FilelistView_ColumnClick(object sender, ColumnClickEventArgs e) {
+			string TAG = "[FilelistView_ColumnClick]";
+			string dbMsg = TAG;
+			try {
+				int bColumn = listViewItemSorter.Column;
+				dbMsg += ",現在=" + bColumn + "列目";
+				SortOrder bOrder = listViewItemSorter.Order;
+				dbMsg += ",Order=" + bOrder;
+				dbMsg += ".Mode=" + listViewItemSorter.Mode;
+				int tColumn = e.Column;
+				dbMsg += ">指定>" + tColumn + "列目";
+				listViewItemSorter.Column = tColumn;               //クリックされた列を設定
+				if (tColumn == bColumn) {
+					if (bOrder == SortOrder.None || bOrder == SortOrder.Descending) {
+						listViewItemSorter.Order = SortOrder.Ascending;
+					} else if (bOrder == SortOrder.Ascending) {
+						listViewItemSorter.Order = SortOrder.Descending;
+					}
+					dbMsg += ">Order>" + listViewItemSorter.Order;
+				}
+				/*		ListView lv = (ListView)sender;
+						dbMsg += ",Sorting=" + lv.Sorting;
+						if (lv.Sorting == SortOrder.None || lv.Sorting == SortOrder.Descending) {
+							lv.Sorting = SortOrder.Ascending;
+						} else if (lv.Sorting == SortOrder.Ascending) {
+							lv.Sorting = SortOrder.Descending;
+						}
+						dbMsg += ">>" + lv.Sorting;*/
+				//	lv.Sort();
+				FilelistView.Sort();                                                   //並び替える
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
+
 
 		private void FileViewItemSelect(string selectItem, string senderName) {
 			string TAG = "[FileViewItemSelect]";
@@ -4048,9 +4091,9 @@ AddType video/MP2T .ts
 					dbMsg += ";" + fullPath;
 					if (e.KeyCode == Keys.F2 && lv.LabelEdit) {               //F2キーが離されたときは、フォーカスのあるアイテムの編集を開始
 						lv.FocusedItem.BeginEdit();
-			/*		} else if (e.KeyCode == Keys.Delete) {
-						dbMsg += "をDelete;";
-						DelFiles(DragURLs, true);*/
+						/*		} else if (e.KeyCode == Keys.Delete) {
+									dbMsg += "をDelete;";
+									DelFiles(DragURLs, true);*/
 					} else if (e.KeyCode == Keys.N && e.Shift && e.Control) {
 						dbMsg += "にフォルダ作成";
 						MakeNewFolder(fullPath);
@@ -4566,25 +4609,21 @@ AddType video/MP2T .ts
 				switch (clickedMenuItem) {                                           // クリックされた項目の Name を判定します。 
 					case "ファイルブラウザで選択":
 						dbMsg += ",選択；ファイルブラウザで選択=" + plRightClickItemUrl;
-						treeSelectList = new List<int>();
-						FindSelectFileViews(fileTree.Nodes, 0, 0, plRightClickItemUrl);
 						string dName = fi.Directory.ToString();
 						dbMsg += ",fi.Directory=" + dName;
+						FindTreeNode(fileTree, dName);
+
 						FileListVewDrow(dName);
 						passNameLabel.Text = dName;
-						string fName = fi.Name.ToString();
-						dbMsg += ",fi.Name=" + fName;
-						fileNameLabel.Text = fName;
-						/*		string[] fNames = fName.Split('.');
-								fName = fNames[0];
-								dbMsg += ">>" + fName;*/
-						int tIndex = FilelistView.FindItemWithText(fName).Index;
+						string findName = fi.Name.ToString();
+						dbMsg += ",fi.Name=" + findName;
+						fileNameLabel.Text = findName;
+						int tIndex = FilelistView.FindItemWithText(findName).Index;
 						dbMsg += "," + tIndex + "番目";
 						FilelistView.Items[tIndex].Focused = true;
 						FilelistView.Items[tIndex].Selected = true;
 						FilelistView.Focus();
 						break;
-
 					case "エクスプローラーで開く":
 						dbMsg += ",選択；エクスプローラーで開く；" + plRightClickItemUrl;
 						if (fi.Exists) {
@@ -4597,8 +4636,6 @@ AddType video/MP2T .ts
 																		//		psi.Verb = "explore";                       //動詞に"explore"を指定して開く	"explore /e,/sselect";  
 																		//		psi.Verbs = "/e,/sselect";
 							System.Diagnostics.Process.Start(psi);  //オプションに"/e"を指定してエクスプローラ式で開く	https://dobon.net/vb/dotnet/process/openexplore.html
-
-							//		System.Diagnostics.Process.Start("EXPLORER.EXE /select", plRightClickItemUrl);
 						} else {
 							DialogResult result = MessageBox.Show("該当するファイルが有りません。",
 																	fi.FullName,
@@ -4608,12 +4645,10 @@ AddType video/MP2T .ts
 						}
 
 						break;
-
 					case "削除":
 						dbMsg += ",選択；削除；" + plRightClickItemUrl;
 						DelFromPlayList(PlaylistComboBox.Text, plIndex);
 						break;
-
 					case "他のアプリケーションで開く":
 						dbMsg += ",選択；他のアプリケーションで開く；" + plRightClickItemUrl;
 						SartApication(plRightClickItemUrl);
@@ -6548,7 +6583,6 @@ AddType video/MP2T .ts
 				Console.WriteLine(msg);
 			}
 		}
-
 		//http://www.usefullcode.net/2016/03/index.html
 	}
 }
