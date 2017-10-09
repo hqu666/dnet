@@ -104,7 +104,6 @@ namespace file_tree_clock_web1
 		string[] textFiles = new string[] { ".txt", ".html", ".htm", ".xhtml", ".xml", ".rss", ".xml", ".css", ".js", ".vbs", ".cgi", ".php" };
 		string[] applicationFiles = new string[] { ".zip", ".pdf", ".doc", ".xls", ".wpl", ".wmd", ".wms", ".wmz", ".wmd" };
 		string[] playListFiles = new string[] { ".m3u" };
-		//	ListViewSort LVSort;
 		ListViewItemComparer listViewItemSorter;        //ListViewItemSorterに指定するフィールド
 
 		string flRightClickItemUrl = "";        //fileTreeクリックアイテムのFullPath
@@ -220,15 +219,17 @@ namespace file_tree_clock_web1
 			FilelistView.DragDrop += new DragEventHandler(FilelistView_DragDrop);
 			FilelistView.View = View.Details;                                                       //詳細表示にする
 			FilelistView.ColumnClick += new ColumnClickEventHandler(FilelistView_ColumnClick);        //ColumnClickイベントハンドラの追加
-			listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
-																					listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
-																					{
-																									ListViewItemComparer.ComparerMode.String,
-																									ListViewItemComparer.ComparerMode.Integer,
-																									ListViewItemComparer.ComparerMode.DateTime
-																					};
-			FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
+																									  /*
+																												  listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
 
+																																												   listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
+																																													  {
+																																																	  ListViewItemComparer.ComparerMode.String,
+																																																	  ListViewItemComparer.ComparerMode.Integer,
+																																																	  ListViewItemComparer.ComparerMode.DateTime
+																																													  };
+																																													  FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
+																																													  */
 			playListBox.AllowDrop = true;
 			playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
 			playListBox.DragDrop += new DragEventHandler(PlayListBox_DragDrop);
@@ -3431,7 +3432,7 @@ AddType video/MP2T .ts
 							lvi.ImageIndex = iconType;                  //イメージを使用する	http://blog.hiros-dot.net/?p=2433
 							dbMsg += ",fi.Length=" + fi.Length;
 							float Length = (float)fi.Length;//new double(fi.Length);
-				//			Length = Length / (1024 * 1024);
+															//			Length = Length / (1024 * 1024);
 							dbMsg += ",Length=" + Length;
 							string LengthStr = fi.Length.ToString();        // string.Format("{0:f4}\r\n", fi.Length/1000 );
 							if (1000000 < Length) {
@@ -3440,7 +3441,7 @@ AddType video/MP2T .ts
 							} else if (1000 < Length) {
 								Length = fi.Length / 1024;
 								LengthStr = Math.Round(Length, 2, MidpointRounding.AwayFromZero) + "KB";
-							}  
+							}
 							dbMsg += ",LengthStr=" + LengthStr;
 							lvi.SubItems.Add(LengthStr);
 							lvi.SubItems.Add(fi.LastWriteTime.ToString());
@@ -3467,14 +3468,6 @@ AddType video/MP2T .ts
 						}
 					}           //ListBox1に結果を表示する
 				}
-		//		listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
-		/*		listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
-				{
-								ListViewItemComparer.ComparerMode.String,
-								ListViewItemComparer.ComparerMode.Integer,
-								ListViewItemComparer.ComparerMode.DateTime
-				};*/
-		//		FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
 				MyLog(dbMsg);
 			} catch (UnauthorizedAccessException UAEx) {
 				dbMsg += "<<以降でエラー発生>>" + UAEx.Message;
@@ -3497,32 +3490,56 @@ AddType video/MP2T .ts
 			string TAG = "[FilelistView_ColumnClick]";
 			string dbMsg = TAG;
 			try {
-				int bColumn = listViewItemSorter.Column;
-				dbMsg += ",現在=" + bColumn + "列目";
-				SortOrder bOrder = listViewItemSorter.Order;
-				dbMsg += ",Order=" + bOrder;
-				dbMsg += ".Mode=" + listViewItemSorter.Mode;
+				ListView lv = (ListView)sender;
 				int tColumn = e.Column;
-				dbMsg += ">指定>" + tColumn + "列目";
-				listViewItemSorter.Column = tColumn;               //クリックされた列を設定
-				if (tColumn == bColumn) {
-					if (bOrder == SortOrder.None || bOrder == SortOrder.Descending) {
-						listViewItemSorter.Order = SortOrder.Ascending;
-					} else if (bOrder == SortOrder.Ascending) {
-						listViewItemSorter.Order = SortOrder.Descending;
-					}
-					dbMsg += ">Order>" + listViewItemSorter.Order;
+				if (listViewItemSorter == null) {
+					listViewItemSorter = new ListViewItemComparer();
+					listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[] {
+										ListViewItemComparer.ComparerMode.String,
+										ListViewItemComparer.ComparerMode.Integer,
+										ListViewItemComparer.ComparerMode.DateTime
+								};
+					FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
+					dbMsg += "ListViewItemComparer生成";
+				} else {
+					int bColumn = listViewItemSorter.Column;
+					dbMsg += ",現在=" + bColumn + "列目";
+					SortOrder bOrder = listViewItemSorter.Order;
+					SortOrder sOrder = bOrder;//				default(SortOrder);
+					dbMsg += ",Order=" + bOrder;
+					dbMsg += ".Mode=" + listViewItemSorter.Mode;
+					ListViewItemComparer.ComparerMode sMode = default(ListViewItemComparer.ComparerMode);
+						dbMsg += ">指定;" + tColumn + "列目";
+							listViewItemSorter.Column = tColumn;           //①クリックされた列を設定
+							lv.Sort();									    //②並び替える
+					//type2;ここでListViewItemComparerの作成と設定
+					/*									if (tColumn == bColumn) {
+																if (bOrder == SortOrder.Descending) {
+																	sOrder = SortOrder.Ascending;
+																} else if (bOrder == SortOrder.Ascending || bOrder == SortOrder.None) {
+																	sOrder = SortOrder.Descending;
+																}
+																dbMsg += ",Order=" + sOrder;
+																listViewItemSorter.Order = sOrder;
+																//		lv.Sorting = sOrder;
+															}
+*/
+					/*				switch (tColumn) {
+									case 0:
+										sMode = ListViewItemComparer.ComparerMode.String;
+										break;
+									case 1:
+										sMode = ListViewItemComparer.ComparerMode.Integer;
+										break;
+									case 2:
+										sMode = ListViewItemComparer.ComparerMode.DateTime;
+										break;
+								}
+								dbMsg += ",sMode=" + sMode;
+								listViewItemSorter.Mode = sMode;
+								FilelistView.ListViewItemSorter = new ListViewItemComparer(tColumn, sOrder, sMode);
+						*/        //				lv.Sort();              //②並び替える
 				}
-				/*		ListView lv = (ListView)sender;
-						dbMsg += ",Sorting=" + lv.Sorting;
-						if (lv.Sorting == SortOrder.None || lv.Sorting == SortOrder.Descending) {
-							lv.Sorting = SortOrder.Ascending;
-						} else if (lv.Sorting == SortOrder.Ascending) {
-							lv.Sorting = SortOrder.Descending;
-						}
-						dbMsg += ">>" + lv.Sorting;*/
-				//	lv.Sort();
-				FilelistView.Sort();                                                   //並び替える
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;

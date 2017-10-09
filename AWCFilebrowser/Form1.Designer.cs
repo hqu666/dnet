@@ -549,7 +549,6 @@
 			this.FilelistView.UseCompatibleStateImageBehavior = false;
 			this.FilelistView.View = System.Windows.Forms.View.Details;
 			this.FilelistView.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.FilelistView_BeforeLabelEdit);
-			this.FilelistView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.FilelistView_ColumnClick);
 			this.FilelistView.DragDrop += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragDrop);
 			this.FilelistView.DragEnter += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragEnter);
 			this.FilelistView.DragOver += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragOver);

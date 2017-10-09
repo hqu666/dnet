@@ -149,7 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
-    <Compile Include="ListViewSort .cs" />
     <Compile Include="ListViewItemComparer .cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
