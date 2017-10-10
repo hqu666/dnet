@@ -87,7 +87,9 @@ namespace file_tree_clock_web1
 		private const uint MIIM_ID = 0x00000002;
 
 		private const uint WM_SYSCOMMAND = 0x0112;
-		/////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
+
+		bool IsWriteSysMenu = false;    //システムメニューを追記した
+										/////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
 		Settings appSettings = new Settings();
 
 		string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
@@ -155,7 +157,8 @@ namespace file_tree_clock_web1
 		public Form1() {
 			string TAG = "[Form1]";
 			string dbMsg = TAG;
-			typeof(Form).GetField("defaultIcon",
+			try {
+				typeof(Form).GetField("defaultIcon",
 				System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).SetValue(
 				null, new System.Drawing.Icon("awcfb_icon.ico"));
 
@@ -186,61 +189,84 @@ namespace file_tree_clock_web1
 			ペーストToolStripMenuItem.Visible = false;
 			playListRedoroe.Visible = false;                //プレイリストへボタン非表示
 
-			MyLog(dbMsg);
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
+			}
 		}
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e) {
-			regkey.DeleteValue(process_name);
-			regkey.DeleteValue(process_dbg_name);
-			regkey.Close();
+			string TAG = "[Form1_FormClosing]";
+			string dbMsg = TAG;
+			try {
+				regkey.DeleteValue(process_name);
+				regkey.DeleteValue(process_dbg_name);
+				regkey.Close();
+				WriteSetting();
+				Application.ApplicationExit -= new EventHandler(Application_ApplicationExit);         //ApplicationExitイベントハンドラを削除
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
+			}
 		}
 
 		private void Form1_Load(object sender, EventArgs e) {
 			string TAG = "[Form1_Load]";
 			string dbMsg = TAG;
+			try {
+				fileTree.ImageList = this.imageList1;             //☆treeView1では設定できなかった
+				FilelistView.SmallImageList = this.imageList1;
+				AWSFileBroeser.Properties.Settings.Default.SettingChanging += new System.Configuration.SettingChangingEventHandler(Default_SettingChanging);//プリファレンスの変更イベント
+																																							//		playListWidth = splitContainer2.Width;
+																																							//dbMsg += "playListWidth" + playListWidth;
+				fileTree.AllowDrop = true;
+				fileTree.ItemDrag += new ItemDragEventHandler(FileTree_ItemDrag);      //イベントハンドラを追加する
+				fileTree.DragOver += new DragEventHandler(FileTree_DragOver);
+				fileTree.DragDrop += new DragEventHandler(FileTree_DragDrop);
+				this.ScrollControlIntoView(fileTree);
 
-			fileTree.ImageList = this.imageList1;             //☆treeView1では設定できなかった
-			FilelistView.SmallImageList = this.imageList1;
+				FilelistView.AllowDrop = true;
+				FilelistView.ItemDrag += new ItemDragEventHandler(FilelistView_ItemDrag);               //☆Dragの発生源をここだけに限定しないと二重発生する
+				FilelistView.DragOver += new DragEventHandler(FilelistView_DragOver);
+				FilelistView.DragDrop += new DragEventHandler(FilelistView_DragDrop);
+				FilelistView.View = View.Details;                                                       //詳細表示にする
+				FilelistView.ColumnClick += new ColumnClickEventHandler(FilelistView_ColumnClick);        //ColumnClickイベントハンドラの追加☆Form1.csと重複させない
+																										  /*
+																													  listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
 
-			MakeDriveList();
+																																													   listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
+																																														  {
+																																																		  ListViewItemComparer.ComparerMode.String,
+																																																		  ListViewItemComparer.ComparerMode.Integer,
+																																																		  ListViewItemComparer.ComparerMode.DateTime
+																																														  };
+																																														  FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
+																																														  */
+				playListBox.AllowDrop = true;
+				playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
+				playListBox.DragDrop += new DragEventHandler(PlayListBox_DragDrop);
 
-			AWSFileBroeser.Properties.Settings.Default.SettingChanging += new System.Configuration.SettingChangingEventHandler(Default_SettingChanging);//プリファレンスの変更イベント
-																																						//		playListWidth = splitContainer2.Width;
-																																						//dbMsg += "playListWidth" + playListWidth;
-			fileTree.AllowDrop = true;
-			fileTree.ItemDrag += new ItemDragEventHandler(FileTree_ItemDrag);      //イベントハンドラを追加する
-			fileTree.DragOver += new DragEventHandler(FileTree_DragOver);
-			fileTree.DragDrop += new DragEventHandler(FileTree_DragDrop);
-			this.ScrollControlIntoView(fileTree);
+				continuousPlayCheckBox.Checked = false;//連続再生ボタン
 
-			FilelistView.AllowDrop = true;
-			FilelistView.ItemDrag += new ItemDragEventHandler(FilelistView_ItemDrag);               //☆Dragの発生源をここだけに限定しないと二重発生する
-			FilelistView.DragOver += new DragEventHandler(FilelistView_DragOver);
-			FilelistView.DragDrop += new DragEventHandler(FilelistView_DragDrop);
-			FilelistView.View = View.Details;                                                       //詳細表示にする
-			FilelistView.ColumnClick += new ColumnClickEventHandler(FilelistView_ColumnClick);        //ColumnClickイベントハンドラの追加
-																									  /*
-																												  listViewItemSorter = new ListViewItemComparer();                //ListViewItemComparerの作成と設定
+				MakeDriveList();
 
-																																												   listViewItemSorter.ColumnModes = new ListViewItemComparer.ComparerMode[]
-																																													  {
-																																																	  ListViewItemComparer.ComparerMode.String,
-																																																	  ListViewItemComparer.ComparerMode.Integer,
-																																																	  ListViewItemComparer.ComparerMode.DateTime
-																																													  };
-																																													  FilelistView.ListViewItemSorter = listViewItemSorter;               //ListViewItemSorterを指定する
-																																													  */
-			playListBox.AllowDrop = true;
-			playListBox.DragEnter += new DragEventHandler(PlayListBox_DragEnter);
-			playListBox.DragDrop += new DragEventHandler(PlayListBox_DragDrop);
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
+			}
 
-			continuousPlayCheckBox.Checked = false;//連続再生ボタン
-			MyLog(dbMsg);
 		}
 
 		private void Application_ApplicationExit(object sender, EventArgs e) {
-			WriteSetting();
-			Application.ApplicationExit -= new EventHandler(Application_ApplicationExit);         //ApplicationExitイベントハンドラを削除
+			string TAG = "[Application_ApplicationExit]";
+			string dbMsg = TAG;
+			try {
+				WriteSetting();
+				Application.ApplicationExit -= new EventHandler(Application_ApplicationExit);         //ApplicationExitイベントハンドラを削除
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
+			}
 		}       //ApplicationExitイベントハンドラ
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////Formイベント/////
@@ -1093,7 +1119,6 @@ AddType video/MP2T .ts
 				dbMsg += ",***書き換わり発生*<<" + lsFullPathName + " ; " + fileName + ">>";
 				fileName = lsFullPathName;
 			}
-
 			if (extentionStr == ".webm" ||
 				extentionStr == ".ogv"
 				) {
@@ -1155,7 +1180,8 @@ AddType video/MP2T .ts
 				contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
 				contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
 												" src=" + '"' + playerUrl + '"' +            // "file://" + fileName
-												" width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +
+												"left=-10 width=auto height= auto" +            // '"' + webWidth + '"'
+											//	" width=" + '"' + webWidth + '"' + " height= " + '"' + webHeight + '"' +            // '"' + webWidth + '"'
 												" type=" + '"' + mineTypeStr + '"' +
 												" allowfullscreen=" + '"' + " true= " + '"' +
 												" flashvars=" + '"' + flashVvars + '"' +
@@ -1355,8 +1381,9 @@ AddType video/MP2T .ts
 				contlolPart += "\t\t\t\t<param name =" + '"' + "url" + '"' + "value = " + '"' + "file://" + fileName + '"' + "/>\n";
 				contlolPart += "\t\t\t\t<param name =" + '"' + "stretchToFit" + '"' + " value = true />\n";//右クリックして縮小/拡大で200％
 				contlolPart += "\t\t\t\t<param name =" + '"' + "autoStart" + '"' + " value = " + true + "/>\n";
+				contlolPart += "\t\t\t\t<param name =" + '"' + "Volume" + '"' + " value = " + appSettings.SoundVolume + "/>\n";
 				contlolPart += "\t\t\t</object>\n";
-				comentStr = souceName + " ; " + "Windows Media Player読み込めないファイルは対策検討中です。";
+				comentStr = souceName + " ; " + "Windows Media Playerで読み込めないファイルは対策検討中です。";
 				///参照 http://so-zou.jp/web-app/tech/html/sample/embed-video.htm/////
 				/////https://support.microsoft.com/ja-jp/help/316992/file-types-supported-by-windows-media-player
 			} else {
@@ -1366,7 +1393,7 @@ AddType video/MP2T .ts
 									"\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "停止" + '"' + " onclick=" + '"' + wiPlayerID + ".stop();" + wiPlayerID + " .CurrentPosition=0;" + '"' + ">\n" +
 									"\t\t\t<input type=" + '"' + "button" + '"' + " value=" + '"' + "一時停止" + '"' + " onclick=" + '"' + wiPlayerID + ".pause()" + '"' + ">\n";
 		*/
-			contlolPart += "\t\t\t<span id =" + '"' + "statediv" + '"' + ">" + '"' + souceName + '"' + "</span>\n";
+			contlolPart += "\t\t\t<div id =" + '"' + "statediv" + '"' + ">" +souceName +  "</div>\n";     //span	 '"' + 
 
 			MyLog(dbMsg);
 			return contlolPart;
@@ -1518,7 +1545,7 @@ AddType video/MP2T .ts
 				extentionStr == ".wms" ||        //ver9:Windows Media Player スキン  
 				extentionStr == ".wmz" ||     //ver9:Windows Media Player スキン  
 				extentionStr == ".wms" ||     //ver9:Windows Media Player スキン  
-				extentionStr == ".m3u" ||//MPEGだがrealPlayyerのプレイリスト
+				extentionStr == ".m3u" ||	//MPEGだがrealPlayyerのプレイリスト
 				extentionStr == ".wmd"     //ver9:Windows Media Download パッケージ   
 				) {
 				string clsId = "CLSID:6BF52A52-394A-11d3-B153-00C04F79FAA6";   //Windows Media Player9
@@ -1541,9 +1568,22 @@ AddType video/MP2T .ts
 			try {
 				dbMsg += ",fileName=" + fileName;
 				dbMsg += ",url=" + urlStr;
-				int webWidth = playerWebBrowser.Width - 28;
-				int webHeight = playerWebBrowser.Height - 60;
+				int webWidth = this.Width - 36;		// viewSplitContainer.Panel2.Width-16;                         //  playerWebBrowser.Width - 28;
+				int webHeight = viewSplitContainer.Panel2.Height-72;                         // playerWebBrowser.Height - 60;
 				dbMsg += ",web[" + webWidth + "×" + webHeight + "]";
+				dbMsg += ",this[" + this.Width + "×" + this.Height + "]";
+				dbMsg += ",ファイルブラウザ[" + FileBrowserSplitContainer.Width + "×" + FileBrowserSplitContainer.Height + "]";
+				dbMsg += ",Collapsed=" + baseSplitContainer.Panel1Collapsed;
+				if (! baseSplitContainer.Panel1Collapsed) {//ファイルブラウザopen
+					webWidth -= FileBrowserSplitContainer.Width;
+					dbMsg += ",ファイルブラウザ>" + webWidth;
+				}
+				dbMsg += ",プレイリスト[" + PlayListsplitContainer.Width + "×" + PlayListsplitContainer.Height + "]";
+				dbMsg += ",Collapsed=" + viewSplitContainer.Panel1Collapsed;
+				if (! viewSplitContainer.Panel1Collapsed) {
+					webWidth -= PlayListsplitContainer.Width;
+					dbMsg += ",プレイリスト>" + webWidth;
+				}
 				string[] extStrs = fileName.Split('.');
 				string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
 
@@ -1757,6 +1797,7 @@ AddType video/MP2T .ts
 					}
 				}
 				ToView(plaingItem);
+	//			WriteSetting();
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -2424,6 +2465,12 @@ AddType video/MP2T .ts
 					fiAttributes = fi.Attributes.ToString();
 				}
 
+				if (this.FormBorderStyle == FormBorderStyle.None && this.WindowState == FormWindowState.Maximized) {                //フルスクリーン
+					通常サイズに戻すToolStripMenuItem.Visible = true;
+				} else {            //	this.FormBorderStyle = FormBorderStyle.Sizable; //this.WindowState = FormWindowState.Normal;              //通常サイズに戻す
+					通常サイズに戻すToolStripMenuItem.Visible = false;
+				}
+
 				dbMsg += " , seieNodeName=" + seieNodeName;
 				if (e.Button == System.Windows.Forms.MouseButtons.Right && seieNodeName != "") {          // 右クリックされた？
 					titolToolStripMenuItem.Text = seieNodeName;
@@ -2582,6 +2629,7 @@ AddType video/MP2T .ts
 					} else if (e.KeyCode == Keys.N && e.Shift && e.Control && tv.SelectedNode != null) {
 						dbMsg += "；フォルダ作成";       //M:\\DL\DL\新しいフォルダになってる
 						MakeNewFolder(fullPath);
+					} else if (e.KeyCode == Keys.N && e.Shift && e.Control && tv.SelectedNode != null) {
 					} else {
 						FileBrowser_KeyUp(fileTree.Name, fullPath, e);
 					}
@@ -2693,6 +2741,15 @@ AddType video/MP2T .ts
 						dbMsg += ",選択；再生；" + selectFullName;
 						break;
 
+					case "通常サイズに戻す":
+						dbMsg += ",選択；通常サイズに戻す";
+						this.FormBorderStyle = FormBorderStyle.Sizable;                         //通常サイズに戻す
+						this.WindowState = FormWindowState.Normal;
+						if (! IsWriteSysMenu) {   //システムメニューを追記した
+							ReWriteSysMenu();
+						}
+						break;
+
 					default:
 						break;
 				}
@@ -2779,7 +2836,7 @@ AddType video/MP2T .ts
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void ContextMenuStrip_SubMenuClick(object sender, EventArgs e) {
-			string TAG = "[ContextMenuStrip1_ItemClicked]";
+			string TAG = "[ContextMenuStrip_SubMenuClick]";
 			string dbMsg = TAG;
 			try {
 				ToolStripMenuItem mi = (ToolStripMenuItem)sender;               // sender にはクリックされたメニューの ToolStripMenuItem が入ってきますので、 必要に応じて処理を行います
@@ -3509,36 +3566,36 @@ AddType video/MP2T .ts
 					dbMsg += ",Order=" + bOrder;
 					dbMsg += ".Mode=" + listViewItemSorter.Mode;
 					ListViewItemComparer.ComparerMode sMode = default(ListViewItemComparer.ComparerMode);
-						dbMsg += ">指定;" + tColumn + "列目";
-							listViewItemSorter.Column = tColumn;           //①クリックされた列を設定
-							lv.Sort();									    //②並び替える
-					//type2;ここでListViewItemComparerの作成と設定
-					/*									if (tColumn == bColumn) {
-																if (bOrder == SortOrder.Descending) {
-																	sOrder = SortOrder.Ascending;
-																} else if (bOrder == SortOrder.Ascending || bOrder == SortOrder.None) {
-																	sOrder = SortOrder.Descending;
-																}
-																dbMsg += ",Order=" + sOrder;
-																listViewItemSorter.Order = sOrder;
-																//		lv.Sorting = sOrder;
-															}
-*/
-					/*				switch (tColumn) {
-									case 0:
-										sMode = ListViewItemComparer.ComparerMode.String;
-										break;
-									case 1:
-										sMode = ListViewItemComparer.ComparerMode.Integer;
-										break;
-									case 2:
-										sMode = ListViewItemComparer.ComparerMode.DateTime;
-										break;
-								}
-								dbMsg += ",sMode=" + sMode;
-								listViewItemSorter.Mode = sMode;
-								FilelistView.ListViewItemSorter = new ListViewItemComparer(tColumn, sOrder, sMode);
-						*/        //				lv.Sort();              //②並び替える
+					dbMsg += ">指定;" + tColumn + "列目";
+					listViewItemSorter.Column = tColumn;           //①クリックされた列を設定
+					lv.Sort();                                      //②並び替える
+																	//type2;ここでListViewItemComparerの作成と設定
+																	/*									if (tColumn == bColumn) {
+																												if (bOrder == SortOrder.Descending) {
+																													sOrder = SortOrder.Ascending;
+																												} else if (bOrder == SortOrder.Ascending || bOrder == SortOrder.None) {
+																													sOrder = SortOrder.Descending;
+																												}
+																												dbMsg += ",Order=" + sOrder;
+																												listViewItemSorter.Order = sOrder;
+																												//		lv.Sorting = sOrder;
+																											}
+												*/
+																	/*				switch (tColumn) {
+																					case 0:
+																						sMode = ListViewItemComparer.ComparerMode.String;
+																						break;
+																					case 1:
+																						sMode = ListViewItemComparer.ComparerMode.Integer;
+																						break;
+																					case 2:
+																						sMode = ListViewItemComparer.ComparerMode.DateTime;
+																						break;
+																				}
+																				dbMsg += ",sMode=" + sMode;
+																				listViewItemSorter.Mode = sMode;
+																				FilelistView.ListViewItemSorter = new ListViewItemComparer(tColumn, sOrder, sMode);
+																		*/        //				lv.Sort();              //②並び替える
 				}
 				MyLog(dbMsg);
 			} catch (Exception er) {
@@ -3546,8 +3603,6 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
-
-
 
 		private void FileViewItemSelect(string selectItem, string senderName) {
 			string TAG = "[FileViewItemSelect]";
@@ -3676,6 +3731,14 @@ AddType video/MP2T .ts
 					appSettings.CurrentFile = lsFullPathName;               //ファイルが選択される度に書換
 					WriteSetting();
 				}
+
+
+				if (this.FormBorderStyle == FormBorderStyle.None && this.WindowState == FormWindowState.Maximized) {                //フルスクリーン
+					通常サイズに戻すToolStripMenuItem.Visible = true;
+				} else {            //	this.FormBorderStyle = FormBorderStyle.Sizable; //this.WindowState = FormWindowState.Normal;              //通常サイズに戻す
+					通常サイズに戻すToolStripMenuItem.Visible = false;
+				}
+
 				if (typeName.Text == "video" || typeName.Text == "audio") {
 					continuousPlayCheckBox.Visible = true;                 //連続再生中チェックボックス表示
 																		   //splitContainer2.Panel1Collapsed = false;                 //playlistPanelを開く
@@ -3713,6 +3776,10 @@ AddType video/MP2T .ts
 					}
 					dbMsg += ",selectItem=" + selectItem;
 				}
+
+
+
+
 				if (e.Button == System.Windows.Forms.MouseButtons.Right) {          // 右クリックでコンテキストメニュー表示
 					Point pos = lv.PointToScreen(e.Location);
 					dbMsg += ",pos=" + pos;
@@ -4514,7 +4581,7 @@ AddType video/MP2T .ts
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void UpDirListup() {
-			string TAG = "[upDirButton_Click]";
+			string TAG = "[UpDirListup]";
 			string dbMsg = TAG;
 			try {
 				string carrentDir = PlaylistComboBox.Items[0].ToString();           //listUpDir;             //プレイリストにリストアップするデレクトリ
@@ -4546,6 +4613,15 @@ AddType video/MP2T .ts
 				dbMsg += ">>" + clickedMenuItem;
 				ListContextMenuStrip.Close();                                           //☆ダイアログが出ている間、メニューが表示されっぱなしになるので強制的に閉じる
 				switch (clickedMenuItem) {                                           // クリックされた項目の Name を判定します。 
+					case "プレイリスト表示":
+						dbMsg += ",選択；プレイリスト表示";
+						dbMsg += ",viewSplitContainer=" + viewSplitContainer.Panel1Collapsed;
+						if (viewSplitContainer.Panel1Collapsed) {
+							viewSplitContainer.Panel1Collapsed = false;//リストエリアを開く
+						} else {
+							viewSplitContainer.Panel1Collapsed = true;//リストエリアを閉じる
+						}
+						break;
 					case "上の階層をリストアップ":
 						dbMsg += ",選択；上の階層をリストアップ";
 						UpDirListup();
@@ -4576,46 +4652,19 @@ AddType video/MP2T .ts
 						break;
 				}
 
-				MyLog(dbMsg);
+		//		MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 		}
-
-		/// <summary>
-		/// プレイリストのメニューボタンクリック
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void UpDirButton_Click(object sender, EventArgs e) {
-			string TAG = "[upDirButton_Click]";
-			string dbMsg = TAG;
-			try {
-				System.Drawing.Point p = System.Windows.Forms.Cursor.Position;              //コンテキストメニューを表示する座標
-				dbMsg += "(" + p.X + "," + p.Y + ")";
-				if (PlaylistComboBox.Text.Contains(".m3u")) {
-					上の階層をリストアップLCToolStripMenuItem.Visible = false;
-					読めないファイルを削除LCToolStripMenuItem.Visible = true;
-				} else {
-					上の階層をリストアップLCToolStripMenuItem.Visible = true;
-					読めないファイルを削除LCToolStripMenuItem.Visible = false;
-				}
-				this.ListContextMenuStrip.Show(p.X, p.Y);             //指定した画面上の座標位置にコンテキストメニューを表示する
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(dbMsg);
-			}
-		}
-
 		/// <summary>
 		/// プレイリストのコンテキストメニュ
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void PlayListContextMenuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e) {
-			string TAG = "[PlayListContext]";
+			string TAG = "[PlayListContextMenuStrip_ItemClicked]";
 			string dbMsg = TAG;
 			try {
 				dbMsg += ",ClickedItem=" + e.ClickedItem.Name;                             //e=		常にSystem.Windows.Forms.TreeViewEventArgs,
@@ -4672,9 +4721,7 @@ AddType video/MP2T .ts
 						/*もしくは　https://dobon.net/vb/dotnet/process/openfile.html
 						 	System.Diagnostics.Process p =System.Diagnostics.Process.Start(fi.FullName);
 							p.WaitForExit();
-
 						 */
-
 						break;
 
 					case "プレイリストに追加":
@@ -4685,6 +4732,15 @@ AddType video/MP2T .ts
 					case "プレイリストを作成":
 						dbMsg += ",選択；プレイリストを作成；" + plRightClickItemUrl;
 						//ここから他のメソッドを呼べない？？
+						break;
+
+					case "通常サイズに戻す":
+						dbMsg += ",選択；通常サイズに戻す";
+						this.FormBorderStyle = FormBorderStyle.Sizable;                         //通常サイズに戻す
+						this.WindowState = FormWindowState.Normal;
+						if (!IsWriteSysMenu) {   //システムメニューを追記した
+							ReWriteSysMenu();
+						}
 						break;
 
 					default:
@@ -5283,11 +5339,11 @@ AddType video/MP2T .ts
 								dbMsg += ",一行目=" + plaingItem;
 								*/
 				dbMsg += ",uriPath=" + uriPath;
-
+				addList = addList.Replace("\r\n\r\n", "\r\n");
 				if (toTop) {
-					addList = uriPath + addList;           // uriPath + "\r\n" + addList;
+					addList = uriPath + "\r\n" + addList;
 				} else {
-					addList = addList + uriPath;           //addList + "\r\n" + uriPath;
+					addList = addList + "\r\n" + uriPath;
 				}
 				MyLog(dbMsg);
 			} catch (Exception er) {
@@ -5297,6 +5353,13 @@ AddType video/MP2T .ts
 			return addList;
 		}
 
+		/// <summary>
+		/// プレイリスト追加の再帰部分
+		/// </summary>
+		/// <param name="addList"></param>
+		/// <param name="addFiles"></param>
+		/// <param name="toTop"></param>
+		/// <returns></returns>
 		private string AddOne2PlayListBody(string addList, string addFiles, bool toTop) {
 			string TAG = "[AddOne2PlayListBody]";
 			string dbMsg = TAG;
@@ -5306,7 +5369,7 @@ AddType video/MP2T .ts
 				string fileAttributes = fi.Attributes.ToString();
 				dbMsg += ",fileAttributes=" + fileAttributes;
 				if (fileAttributes.Contains("Directory")) {
-					System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(lsFullPathName);
+					System.IO.DirectoryInfo di = new System.IO.DirectoryInfo(addFiles);           //lsFullPathName
 					string[] files = Directory.GetFiles(addFiles);
 					foreach (string fileName in files) {
 						dbMsg += ",fileName=" + fileName;
@@ -5993,6 +6056,13 @@ AddType video/MP2T .ts
 					dbMsg += listSelectValue;
 				}
 
+
+				if (this.FormBorderStyle == FormBorderStyle.None || this.WindowState == FormWindowState.Maximized) {                //フルスクリーン
+					通常サイズに戻すplToolStripMenuItem.Visible = true;
+				} else {            //	this.FormBorderStyle = FormBorderStyle.Sizable; //this.WindowState = FormWindowState.Normal;              //通常サイズに戻す
+					通常サイズに戻すplToolStripMenuItem.Visible = false;
+				}
+
 				if (e.Button == System.Windows.Forms.MouseButtons.Right) {
 					dbMsg += "右ボタンを離した";
 					plIndex = playListBox.IndexFromPoint(e.Location);             //プレイリスト上のマウス座標から選択すべきアイテムのインデックスを取得
@@ -6334,7 +6404,7 @@ AddType video/MP2T .ts
 							AppendMenu(hMenu, MF_SEPARATOR, 0, string.Empty);           // セパレータとメニューを追加
 							AppendMenu(hMenu, MF_STRING, MF_BYCOMMAND, "バージョン情報");
 							*/
-
+				 IsWriteSysMenu = true;    //システムメニューを追記した
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -6364,34 +6434,62 @@ AddType video/MP2T .ts
 								baseSplitContainer.Panel1Collapsed = false;//ファイルブラウザを開く
 							} else {
 								baseSplitContainer.Panel1Collapsed = true;//ファイルブラウザを閉じる
-
 							}
 							break;
 						case MENU_ID_60:
-							dbMsg += ",viewSplitContainer=" + viewSplitContainer.Panel1Collapsed;
-							if (viewSplitContainer.Panel1Collapsed) {
-								viewSplitContainer.Panel1Collapsed = false;//リストエリアを開く
+							System.Drawing.Point p = System.Windows.Forms.Cursor.Position;              //コンテキストメニューを表示する座標
+							dbMsg += "(" + p.X + "," + p.Y + ")";
+							if (PlaylistComboBox.Text.Contains(".m3u")) {
+								上の階層をリストアップLCToolStripMenuItem.Visible = false;
+								読めないファイルを削除LCToolStripMenuItem.Visible = true;
 							} else {
-								viewSplitContainer.Panel1Collapsed = true;//リストエリアを閉じる
-
+								上の階層をリストアップLCToolStripMenuItem.Visible = true;
+								読めないファイルを削除LCToolStripMenuItem.Visible = false;
 							}
+							dbMsg += ",viewSplitContainer=" + viewSplitContainer.Panel1Collapsed;
+							if (viewSplitContainer.Panel1Collapsed) {                   //既に開いていたら
+								プレイリスト表示LCToolStripMenuItem.Text = "プレイリスト表示"; 
+							} else {
+								プレイリスト表示LCToolStripMenuItem.Text = "プレイリストを閉じる";
+							}
+							this.ListContextMenuStrip.Show(p.X, p.Y);             //指定した画面上の座標位置にコンテキストメニューを表示する
 							break;
 						case MENU_ID_99:
-							System.Diagnostics.FileVersionInfo ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(
-								System.Reflection.Assembly.GetExecutingAssembly().Location);
-							dbMsg += ",ver=" + ver.ToString();
-							MessageBox.Show(ver.ProductVersion.ToString(),                 //H:\develop\dnet\AWCFilebrowser\Properties\AssemblyInfo.cs の[assembly: AssemblyFileVersion( "1.2.0.4" )]
+							string ver = Application.ProductVersion;
+							//	System.Version ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+							//		System.Diagnostics.FileVersionInfo ver = System.Diagnostics.FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);         //1.2.0.4"
+							dbMsg += ",ver=" + ver.ToString();      //ver.ProductVersion.ToString()
+							MessageBox.Show(ver.ToString(),                 //H:\develop\dnet\AWCFilebrowser\Properties\AssemblyInfo.cs の[assembly: AssemblyFileVersion( "1.2.0.4" )]
 							"バージョン情報", MessageBoxButtons.OK,
 							MessageBoxIcon.Information);
 							break;
 					}
 				}
-				//		MyLog(dbMsg);
+	//					MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 		}
+
+			private void Form1_KeyUp(object sender, KeyEventArgs e) {
+			string TAG = "[Form1_KeyUp]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += ", e.KeyCode=" + e.KeyCode;
+				switch (e.KeyCode) {
+					case Keys.Escape:
+						this.FormBorderStyle = FormBorderStyle.Sizable;                         //通常サイズに戻す
+						this.WindowState = FormWindowState.Normal;
+						break;
+				}
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
 		//設定///////////////////////////////////////////////////////////システムメニュー//
 		//		https://dobon.net/vb/dotnet/programing/storeappsettings.html
 		/// <summary>
@@ -6432,6 +6530,22 @@ AddType video/MP2T .ts
 				dbMsg += " , CurrentFile=" + appSettings.CurrentFile;
 				dbMsg += " , CurrentList=" + appSettings.CurrentList;
 				dbMsg += " , PlayLists=" + appSettings.PlayLists.Length + "件";
+				dbMsg += " , FormBorderStyle=" + this.FormBorderStyle;
+				dbMsg += " , FormBorderStyle=" + this.WindowState;
+				if (this.FormBorderStyle == FormBorderStyle.None && this.WindowState == FormWindowState.Maximized) {                //フルスクリーン
+					appSettings.IsFullScreene = true;
+				} else {            //	this.FormBorderStyle = FormBorderStyle.Sizable; //this.WindowState = FormWindowState.Normal;              //通常サイズに戻す
+					appSettings.IsFullScreene = false;
+				}
+				appSettings.FormWidth = this.Width;
+				dbMsg += " ,[FormWidth=" + appSettings.FormWidth;
+				appSettings.FormHight = this.Height;
+				dbMsg += "×" + appSettings.FormHight + "]";
+				dbMsg += " , FileBrowserVisible=" + baseSplitContainer.Panel1Collapsed; //ファイルブラウザを開くfalse	閉じるtrue
+				appSettings.FileBrowserVisible = baseSplitContainer.Panel1Collapsed;
+				dbMsg += ",playListVisible=" + viewSplitContainer.Panel1Collapsed;
+				appSettings.PlayListVisible=viewSplitContainer.Panel1Collapsed;        //リストエリアを開くファイルブラウザを開くfalse	閉じる閉じるtrue
+				dbMsg += " , SoundVolume=" + appSettings.SoundVolume;
 
 				//＜XMLファイルに書き込む＞
 				System.Xml.Serialization.XmlSerializer serializer1 = new System.Xml.Serialization.XmlSerializer(typeof(Settings));       //XmlSerializerオブジェクトを作成
@@ -6498,6 +6612,42 @@ AddType video/MP2T .ts
 									}*/
 					}
 
+					dbMsg += " , FormWidth=" + appSettings.FormWidth;
+					if (-1 < appSettings.FormWidth) {
+						this.Width = appSettings.FormWidth;
+					}
+					dbMsg += " , FormHight=" + appSettings.FormHight;
+					if (-1 < appSettings.FormHight) {
+						this.Height = appSettings.FormHight;
+					}
+					dbMsg += " , IsFullScreene=" + appSettings.IsFullScreene;
+					if (appSettings.IsFullScreene) {                           //フルスクリーンにする
+						this.FormBorderStyle = FormBorderStyle.None; //タイトルバーが消されて元サイズに戻せなくなる
+						this.WindowState = FormWindowState.Maximized;
+					} else {
+						this.FormBorderStyle = FormBorderStyle.Sizable;							//通常サイズに戻す
+						this.WindowState = FormWindowState.Normal;
+					}
+
+					dbMsg += " , FileBrowserVisible=" + appSettings.FileBrowserVisible;
+					if (appSettings.FileBrowserVisible) {
+						baseSplitContainer.Panel1Collapsed = false;//ファイルブラウザを開く
+					} else {
+						baseSplitContainer.Panel1Collapsed = true;//ファイルブラウザを閉じる
+					}
+
+					dbMsg += ",playListVisible=" + appSettings.PlayListVisible;
+					if (appSettings.PlayListVisible) {
+						viewSplitContainer.Panel1Collapsed = false;//リストエリアを開く
+					} else {
+						viewSplitContainer.Panel1Collapsed = true;//リストエリアを閉じる
+					}
+
+					dbMsg += " , SoundVolume=" + appSettings.SoundVolume;
+					if (-1 < appSettings.SoundVolume) {
+					}
+
+
 				} else {
 					appSettings = new Settings();
 				}
@@ -6529,9 +6679,16 @@ AddType video/MP2T .ts
 		/// </summary>
 		public class Settings
 		{
-			private string currentFile;
-			private string currentList;
-			private string[] playLists;
+			public string currentFile;							//再生していたファイル
+			public string currentList;							//再生していたリスト
+			public string[] playLists;							//利用可能なプレイリスト
+			public bool isFullScreene = false;                  //フルスクリーン表示
+			public int formWidth = 1560;						//表示幅
+			public int formHight = 750;							//表示高さ
+			public bool fileBrowserVisible = true;				//ファイルブラウザ表示
+			public bool playListVisible = true;                 //プレイリスト表示
+			public long soundVolume = 50;                       //音量設定　0 to 100.
+
 
 			public string CurrentFile
 			{
@@ -6553,6 +6710,43 @@ AddType video/MP2T .ts
 				currentFile = @"C:\Users";
 				playLists = new string[1] { "*.m3u" }; ;
 			}
+
+			public bool IsFullScreene
+			{
+				get { return isFullScreene; }
+				set { isFullScreene = value; }
+			}
+
+			public int FormWidth
+			{
+				get { return formWidth; }
+				set { formWidth = value; }
+			}
+
+			public int FormHight
+			{
+				get { return formHight; }
+				set { formHight = value; }
+			}
+
+			public bool FileBrowserVisible
+			{
+				get { return fileBrowserVisible; }
+				set { fileBrowserVisible = value; }
+			}
+
+			public bool PlayListVisible
+			{
+				get { return playListVisible; }
+				set { playListVisible = value; }
+			}
+
+			public long SoundVolume
+			{
+				get { return soundVolume; }
+				set { soundVolume = value; }
+			}
+
 		}
 
 		//その他///////////////////////////////////////////////////////////設定//
@@ -6600,6 +6794,7 @@ AddType video/MP2T .ts
 				Console.WriteLine(msg);
 			}
 		}
+
 		//http://www.usefullcode.net/2016/03/index.html
 	}
 }

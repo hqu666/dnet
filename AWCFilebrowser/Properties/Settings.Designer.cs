@@ -58,5 +58,77 @@ namespace AWSFileBroeser.Properties {
                 this["currentList"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public long soundVolume {
+            get {
+                return ((long)(this["soundVolume"]));
+            }
+            set {
+                this["soundVolume"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1560")]
+        public int formWidth {
+            get {
+                return ((int)(this["formWidth"]));
+            }
+            set {
+                this["formWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("750")]
+        public int formHight {
+            get {
+                return ((int)(this["formHight"]));
+            }
+            set {
+                this["formHight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool fileBrowserVisible {
+            get {
+                return ((bool)(this["fileBrowserVisible"]));
+            }
+            set {
+                this["fileBrowserVisible"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool playListVisible {
+            get {
+                return ((bool)(this["playListVisible"]));
+            }
+            set {
+                this["playListVisible"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool isFullScreene {
+            get {
+                return ((bool)(this["isFullScreene"]));
+            }
+            set {
+                this["isFullScreene"] = value;
+            }
+        }
     }
 }
