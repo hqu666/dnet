@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -544,10 +544,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup1.Header = "ListViewGroup";
-			listViewGroup1.Name = "listViewGroup1";
+			listViewGroup2.Header = "ListViewGroup";
+			listViewGroup2.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
+            listViewGroup2});
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
 			this.FilelistView.Location = new System.Drawing.Point(0, 0);
@@ -970,7 +970,8 @@
             this.他のリストに結合LCToolStripMenuItem,
             this.リストファイル選択LCToolStripMenuItem});
 			this.ListContextMenuStrip.Name = "ListContextMenuStrip";
-			this.ListContextMenuStrip.Size = new System.Drawing.Size(184, 114);
+			this.ListContextMenuStrip.Size = new System.Drawing.Size(184, 136);
+			this.ListContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.ListContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ListContextMenuStrip_ItemClicked);
 			// 
 			// プレイリスト表示LCToolStripMenuItem
@@ -1003,13 +1004,13 @@
 			// 先頭に挿入LCToolStripMenuItem
 			// 
 			this.先頭に挿入LCToolStripMenuItem.Name = "先頭に挿入LCToolStripMenuItem";
-			this.先頭に挿入LCToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+			this.先頭に挿入LCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.先頭に挿入LCToolStripMenuItem.Text = "先頭";
 			// 
 			// 末尾に追加LCToolStripMenuItem
 			// 
 			this.末尾に追加LCToolStripMenuItem.Name = "末尾に追加LCToolStripMenuItem";
-			this.末尾に追加LCToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+			this.末尾に追加LCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.末尾に追加LCToolStripMenuItem.Text = "末尾";
 			// 
 			// リストファイル選択LCToolStripMenuItem
