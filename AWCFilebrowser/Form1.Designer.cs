@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -150,9 +150,6 @@
 			this.fileTree.Name = "fileTree";
 			this.fileTree.Size = new System.Drawing.Size(199, 575);
 			this.fileTree.TabIndex = 7;
-			this.fileTree.DragDrop += new System.Windows.Forms.DragEventHandler(this.FileTree_DragDrop);
-			this.fileTree.DragEnter += new System.Windows.Forms.DragEventHandler(this.FileTree_DragEnter);
-			this.fileTree.DragOver += new System.Windows.Forms.DragEventHandler(this.FileTree_DragOver);
 			this.fileTree.DoubleClick += new System.EventHandler(this.FileTree_DoubleClick);
 			this.fileTree.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FileTree_KeyUp);
 			this.fileTree.MouseUp += new System.Windows.Forms.MouseEventHandler(this.FilelistBoxMouseUp);
@@ -544,10 +541,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup2.Header = "ListViewGroup";
-			listViewGroup2.Name = "listViewGroup1";
+			listViewGroup1.Header = "ListViewGroup";
+			listViewGroup1.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup2});
+            listViewGroup1});
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
 			this.FilelistView.Location = new System.Drawing.Point(0, 0);
@@ -558,9 +555,6 @@
 			this.FilelistView.UseCompatibleStateImageBehavior = false;
 			this.FilelistView.View = System.Windows.Forms.View.Details;
 			this.FilelistView.BeforeLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.FilelistView_BeforeLabelEdit);
-			this.FilelistView.DragDrop += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragDrop);
-			this.FilelistView.DragEnter += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragEnter);
-			this.FilelistView.DragOver += new System.Windows.Forms.DragEventHandler(this.FilelistView_DragOver);
 			this.FilelistView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.FilelistView_QueryContinueDrag);
 			this.FilelistView.DoubleClick += new System.EventHandler(this.FilelistView_DoubleClick);
 			this.FilelistView.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FilelistView_KeyUp);
@@ -743,6 +737,7 @@
 			this.playListBox.DragLeave += new System.EventHandler(this.PlayListBox_DragLeave);
 			this.playListBox.DoubleClick += new System.EventHandler(this.PlayListBox_Select);
 			this.playListBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PlayListBox_KeyDown);
+			this.playListBox.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PlayListBox_KeyUp);
 			this.playListBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PlayListBox_MouseDown);
 			this.playListBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PlayListBox_MouseMove);
 			this.playListBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PlaylistBoxMouseUp);
@@ -970,7 +965,7 @@
             this.他のリストに結合LCToolStripMenuItem,
             this.リストファイル選択LCToolStripMenuItem});
 			this.ListContextMenuStrip.Name = "ListContextMenuStrip";
-			this.ListContextMenuStrip.Size = new System.Drawing.Size(184, 136);
+			this.ListContextMenuStrip.Size = new System.Drawing.Size(184, 114);
 			this.ListContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.ListContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.ListContextMenuStrip_ItemClicked);
 			// 
@@ -1004,13 +999,13 @@
 			// 先頭に挿入LCToolStripMenuItem
 			// 
 			this.先頭に挿入LCToolStripMenuItem.Name = "先頭に挿入LCToolStripMenuItem";
-			this.先頭に挿入LCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.先頭に挿入LCToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
 			this.先頭に挿入LCToolStripMenuItem.Text = "先頭";
 			// 
 			// 末尾に追加LCToolStripMenuItem
 			// 
 			this.末尾に追加LCToolStripMenuItem.Name = "末尾に追加LCToolStripMenuItem";
-			this.末尾に追加LCToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.末尾に追加LCToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
 			this.末尾に追加LCToolStripMenuItem.Text = "末尾";
 			// 
 			// リストファイル選択LCToolStripMenuItem
