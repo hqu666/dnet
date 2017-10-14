@@ -5054,8 +5054,6 @@ AddType video/MP2T .ts
 		}
 
 
-
-
 		/// <summary>
 		/// 使用中のリストのソースを読込み、実在しないファイルを削除して再読込み
 		/// </summary>
@@ -6968,7 +6966,7 @@ AddType video/MP2T .ts
 
 
 		//デバッグツール///////////////////////////////////////////////////////////その他//
-		Boolean debug_now = true;
+		Boolean debug_now = false;
 		public void MyLog(string msg) {
 			if (debug_now) {
 				Console.WriteLine(msg);

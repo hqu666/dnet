@@ -923,7 +923,7 @@
             this.エクスプローラーで開くplToolStripMenuItem,
             this.通常サイズに戻すplToolStripMenuItem});
 			this.PlayListContextMenuStrip.Name = "PlayListContextMenuStrip";
-			this.PlayListContextMenuStrip.Size = new System.Drawing.Size(195, 136);
+			this.PlayListContextMenuStrip.Size = new System.Drawing.Size(195, 114);
 			this.PlayListContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.PlayListContextMenuStrip_ItemClicked);
 			// 
 			// ファイルブラウザで選択plToolStripMenuItem
@@ -1026,7 +1026,7 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(1055, 39);
 			this.Name = "Form1";
-			this.Text = "After watching the contents(中身を見てから)";
+			this.Text = "After watching the contents(中身を見てから消すか残すか決められる)File browser";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
 			this.Load += new System.EventHandler(this.Form1_Load);
 			this.fileTreeContextMenuStrip.ResumeLayout(false);
