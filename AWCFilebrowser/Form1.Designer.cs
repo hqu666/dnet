@@ -923,7 +923,7 @@
             this.エクスプローラーで開くplToolStripMenuItem,
             this.通常サイズに戻すplToolStripMenuItem});
 			this.PlayListContextMenuStrip.Name = "PlayListContextMenuStrip";
-			this.PlayListContextMenuStrip.Size = new System.Drawing.Size(195, 114);
+			this.PlayListContextMenuStrip.Size = new System.Drawing.Size(195, 136);
 			this.PlayListContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.PlayListContextMenuStrip_ItemClicked);
 			// 
 			// ファイルブラウザで選択plToolStripMenuItem
@@ -935,6 +935,8 @@
 			// 削除plToolStripMenuItem
 			// 
 			this.削除plToolStripMenuItem.Name = "削除plToolStripMenuItem";
+			this.削除plToolStripMenuItem.ShortcutKeyDisplayString = "Delete";
+			this.削除plToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
 			this.削除plToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
 			this.削除plToolStripMenuItem.Text = "削除";
 			// 

@@ -2188,7 +2188,6 @@ AddType video/MP2T .ts
 				dirs = System.IO.Directory.GetFiles(destName, "*", System.IO.SearchOption.AllDirectories);
 				dbMsg += ">>" + dirs.Length + "件";
 				di.Delete(true);                                                  //フォルダ"C:\TEST\SUB"を根こそぎ削除する☆trueにしないと中身が有った場合にエラー発生
-																				  //	DelFiles(DragURLs, false);
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "でエラー発生" + er.Message;
@@ -5023,6 +5022,40 @@ AddType video/MP2T .ts
 			}
 		}
 
+		private void MakePlayListSelectItems(string senderName) {
+			string TAG = "[MakePlayListSelectItems]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += senderName + "から";
+				DragURLs = new List<string>();
+				if (senderName == FilelistView.Name) {
+					for (int i = 0; i < FilelistView.SelectedItems.Count; ++i) {
+						dbMsg += "(" + i + ")";
+						ListViewItem itemxs = FilelistView.SelectedItems[i];
+						string SelectedItems = FilelistView.SelectedItems[i].Name;     //(dragSouc;0)Url;M:\\sample\123.flv
+						dbMsg += SelectedItems;
+						DragURLs.Add(SelectedItems);
+					}
+					dbMsg += ">>" + DragURLs.Count + "件";
+				} else if (senderName == fileTree.Name) {
+					TreeNode selectNode = fileTree.SelectedNode;
+					dbMsg += ".selectNode=" + selectNode.FullPath;
+					DragURLs.Add(selectNode.FullPath);
+				} else {
+					dbMsg += ".flRightClickItemUrl=" + flRightClickItemUrl;
+					DragURLs.Add(flRightClickItemUrl);
+				}
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+				throw new NotImplementedException();//要求されたメソッドまたは操作が実装されない場合にスローされる例外。
+			}
+		}
+
+
+
+
 		/// <summary>
 		/// 使用中のリストのソースを読込み、実在しないファイルを削除して再読込み
 		/// </summary>
@@ -5300,11 +5333,8 @@ AddType video/MP2T .ts
 			string dbMsg = TAG;
 			try {
 				string uriPath = addRecord;
-				Uri urlObj = new Uri(addRecord);                    //  http://dobon.net/vb/dotnet/file/uritofilepath.html
-				if (urlObj.IsFile) {                     //変換するURIがファイルを表していることを確認する
-					uriPath = urlObj.AbsoluteUri;
-					uriPath = uriPath.Replace("://", ":/");
-				}
+				uriPath = uriPath.Replace(Path.DirectorySeparatorChar, '/');
+				uriPath = "file://" + uriPath;				//	urlObj.AbsoluteUrでは文字化け発生
 				dbMsg += ",uriPath=" + uriPath;
 				dbMsg += ",stringList=" + stringList.Count + "件";
 				stringList.Insert(insarPosition, uriPath);
@@ -6454,21 +6484,32 @@ AddType video/MP2T .ts
 		*/
 		}
 
-
 		private void PlayListBox_KeyUp(object sender, KeyEventArgs e) {
 			string TAG = "[playListBox_KeyUp]";
 			string dbMsg = TAG;
 			try {
-				ListBox lb = (ListBox)sender;
 				dbMsg += "KeyCode=" + e.KeyCode;
-				if (lb.SelectedItems != null) {
+				ListBox lb = (ListBox)sender;
+				ListBox.SelectedObjectCollection SelectedItems = lb.SelectedItems;
+				if (SelectedItems != null) {
+					dbMsg += "SelectedItems=" + SelectedItems.Count + "件";
+					dbMsg += "SelectedIndices=" + lb.SelectedIndices.Count + "件";
 					string fullPath = lb.SelectedValue.ToString();
 					dbMsg += ";" + fullPath;
 					 if (e.KeyCode == Keys.Delete) {
-						dbMsg += "を削除";
-						plIndex = playListBox.SelectedIndex;             //プレイリスト上のマウス座標から選択すべきアイテムのインデックスを取得
-						dbMsg += ";plIndex=" + plIndex;
-						DelFromPlayList(PlaylistComboBox.Text, plIndex);
+						foreach (int plIndex in lb.SelectedIndices) {
+							dbMsg += ";plIndex=" + plIndex;
+							DelFromPlayList(PlaylistComboBox.Text, plIndex);
+						}
+
+						/*						foreach (PlayListItems sitem in SelectedItems) {
+													fullPath = sitem.FullPathStr;
+													dbMsg += "を削除";
+													plIndex = playListBox.Items.IndexOf(fullPath);
+												//	plIndex = playListBox.SelectedIndex;             //プレイリスト上のマウス座標から選択すべきアイテムのインデックスを取得
+													dbMsg += ";plIndex=" + plIndex;
+													DelFromPlayList(PlaylistComboBox.Text, plIndex);
+												}*/
 					}
 				} else {
 					dbMsg += ";FocusedItem無し";
@@ -6480,7 +6521,6 @@ AddType video/MP2T .ts
 				throw new NotImplementedException();//要求されたメソッドまたは操作が実装されない場合にスローされる例外。
 			}
 		}
-
 
 		/*
 		<M3U／WPL共通＞
