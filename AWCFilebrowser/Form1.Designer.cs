@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -61,7 +61,6 @@
 			this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
 			this.baseSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FileBrowserSplitContainer = new System.Windows.Forms.SplitContainer();
-			this.playListRedoroe = new System.Windows.Forms.Button();
 			this.FileBrowserCenterSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FileViewBodySplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FilelistView = new System.Windows.Forms.ListView();
@@ -108,6 +107,7 @@
 			this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.このファイルを再生ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -166,13 +166,14 @@
             this.ペーストToolStripMenuItem,
             this.削除ToolStripMenuItem,
             this.元に戻す,
+            this.このファイルを再生ToolStripMenuItem,
             this.他のアプリケーションで開くToolStripMenuItem,
             this.再生ToolStripMenuItem,
             this.プレイリストに追加ToolStripMenuItem,
             this.プレイリストを作成ToolStripMenuItem,
             this.通常サイズに戻すToolStripMenuItem});
 			this.fileTreeContextMenuStrip.Name = "contextMenuStrip1";
-			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 290);
+			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 334);
 			this.fileTreeContextMenuStrip.Text = "Titol";
 			this.fileTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.fileTreeContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.FileTreeContextMenuStrip_ItemClicked);
@@ -457,7 +458,6 @@
 			// 
 			// FileBrowserSplitContainer.Panel1
 			// 
-			this.FileBrowserSplitContainer.Panel1.Controls.Add(this.playListRedoroe);
 			this.FileBrowserSplitContainer.Panel1.Controls.Add(this.fileNameLabel);
 			this.FileBrowserSplitContainer.Panel1.Controls.Add(this.passNameLabel);
 			// 
@@ -467,17 +467,6 @@
 			this.FileBrowserSplitContainer.Size = new System.Drawing.Size(472, 712);
 			this.FileBrowserSplitContainer.SplitterDistance = 47;
 			this.FileBrowserSplitContainer.TabIndex = 0;
-			// 
-			// playListRedoroe
-			// 
-			this.playListRedoroe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.playListRedoroe.Location = new System.Drawing.Point(349, 25);
-			this.playListRedoroe.Name = "playListRedoroe";
-			this.playListRedoroe.Size = new System.Drawing.Size(123, 23);
-			this.playListRedoroe.TabIndex = 27;
-			this.playListRedoroe.Text = "選択したファイルを再生";
-			this.playListRedoroe.UseVisualStyleBackColor = true;
-			this.playListRedoroe.Click += new System.EventHandler(this.PlayListRedoroe_Click);
 			// 
 			// FileBrowserCenterSplitContainer
 			// 
@@ -541,10 +530,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup1.Header = "ListViewGroup";
-			listViewGroup1.Name = "listViewGroup1";
+			listViewGroup3.Header = "ListViewGroup";
+			listViewGroup3.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
+            listViewGroup3});
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
 			this.FilelistView.Location = new System.Drawing.Point(0, 0);
@@ -707,7 +696,7 @@
 			this.PlaylistComboBox.Name = "PlaylistComboBox";
 			this.PlaylistComboBox.Size = new System.Drawing.Size(235, 20);
 			this.PlaylistComboBox.TabIndex = 1;
-			this.PlaylistComboBox.TextChanged += new System.EventHandler(this.PlaylistComboBox_TextChanged);
+			this.PlaylistComboBox.SelectedIndexChanged += new System.EventHandler(this.PlaylistComboBox_SelectedIndexChanged);
 			// 
 			// label10
 			// 
@@ -1016,6 +1005,12 @@
 			this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
 			this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
 			// 
+			// このファイルを再生ToolStripMenuItem
+			// 
+			this.このファイルを再生ToolStripMenuItem.Name = "このファイルを再生ToolStripMenuItem";
+			this.このファイルを再生ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+			this.このファイルを再生ToolStripMenuItem.Text = "このファイルを再生";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1107,7 +1102,6 @@
 		public System.Windows.Forms.WebBrowser playerWebBrowser;
 		private System.Windows.Forms.SplitContainer PlayListsplitContainer;
 		private System.Windows.Forms.ToolStripMenuItem 再生ToolStripMenuItem;
-		private System.Windows.Forms.Button playListRedoroe;
 		private System.Windows.Forms.Panel progresPanel;
 		private System.Windows.Forms.ProgressBar progressBar1;
 		private System.Windows.Forms.Label ProgressTitolLabel;
@@ -1151,6 +1145,7 @@
 		private System.Windows.Forms.ToolStripMenuItem 通常サイズに戻すToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem 通常サイズに戻すplToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem プレイリスト表示LCToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem このファイルを再生ToolStripMenuItem;
 	}
 }
 
