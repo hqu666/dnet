@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
 			this.fileTree = new System.Windows.Forms.TreeView();
 			this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -38,6 +38,7 @@
 			this.ペーストToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.削除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.元に戻す = new System.Windows.Forms.ToolStripMenuItem();
+			this.このファイルを再生ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.他のアプリケーションで開くToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.再生ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.プレイリストに追加ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -107,7 +108,6 @@
 			this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.このファイルを再生ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -173,7 +173,7 @@
             this.プレイリストを作成ToolStripMenuItem,
             this.通常サイズに戻すToolStripMenuItem});
 			this.fileTreeContextMenuStrip.Name = "contextMenuStrip1";
-			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 334);
+			this.fileTreeContextMenuStrip.Size = new System.Drawing.Size(208, 312);
 			this.fileTreeContextMenuStrip.Text = "Titol";
 			this.fileTreeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.PlaylistAddMenuStrip_Opening);
 			this.fileTreeContextMenuStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.FileTreeContextMenuStrip_ItemClicked);
@@ -238,6 +238,12 @@
 			this.元に戻す.Size = new System.Drawing.Size(207, 22);
 			this.元に戻す.Text = "元に戻す";
 			this.元に戻す.Visible = false;
+			// 
+			// このファイルを再生ToolStripMenuItem
+			// 
+			this.このファイルを再生ToolStripMenuItem.Name = "このファイルを再生ToolStripMenuItem";
+			this.このファイルを再生ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+			this.このファイルを再生ToolStripMenuItem.Text = "このファイルを再生";
 			// 
 			// 他のアプリケーションで開くToolStripMenuItem
 			// 
@@ -530,10 +536,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
 			this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-			listViewGroup3.Header = "ListViewGroup";
-			listViewGroup3.Name = "listViewGroup1";
+			listViewGroup2.Header = "ListViewGroup";
+			listViewGroup2.Name = "listViewGroup1";
 			this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup3});
+            listViewGroup2});
 			this.FilelistView.HideSelection = false;
 			this.FilelistView.LabelEdit = true;
 			this.FilelistView.Location = new System.Drawing.Point(0, 0);
@@ -815,7 +821,7 @@
 			this.progresPanel.Controls.Add(this.progCountLabel);
 			this.progresPanel.Controls.Add(this.ProgressTitolLabel);
 			this.progresPanel.Controls.Add(this.progressBar1);
-			this.progresPanel.Location = new System.Drawing.Point(15, 135);
+			this.progresPanel.Location = new System.Drawing.Point(3, 106);
 			this.progresPanel.Name = "progresPanel";
 			this.progresPanel.Size = new System.Drawing.Size(621, 79);
 			this.progresPanel.TabIndex = 4;
@@ -1004,12 +1010,6 @@
 			this.リストファイル選択LCToolStripMenuItem.Name = "リストファイル選択LCToolStripMenuItem";
 			this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
 			this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
-			// 
-			// このファイルを再生ToolStripMenuItem
-			// 
-			this.このファイルを再生ToolStripMenuItem.Name = "このファイルを再生ToolStripMenuItem";
-			this.このファイルを再生ToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-			this.このファイルを再生ToolStripMenuItem.Text = "このファイルを再生";
 			// 
 			// Form1
 			// 
