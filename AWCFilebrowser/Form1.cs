@@ -1,28 +1,16 @@
-﻿using Microsoft.Win32;          ///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
+﻿///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
 using System;
-using System.Text.RegularExpressions;         ///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
+///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
 using System.IO;
 using System.Collections.Generic;       //playList
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;      //playList
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Management;    // 参照設定に追加を忘れずに
-
-//using System.MarshalByRefObject;
-//using System.ComponentModel.Component;
-//using System.Management.ManagementBaseObject;
-//using System.Management.ManagementObject;
 using Microsoft.VisualBasic.FileIO; //DelFiles,MoveFolderのFileSystem
-using System.Diagnostics;
-using AWSFileBroeser;
 using System.Runtime.InteropServices;
-
 ///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
-using Microsoft.WindowsAPICodePack;                                     //WindowsAPICodePack-Core 1.1.2で追加
 using Microsoft.WindowsAPICodePack.Dialogs;                             //'Windows7APICodePack-Core.1.1.0で追加
 using Microsoft.WindowsAPICodePack.Dialogs.Controls;                    //	☆WindowsAPICodePack-Shell 1.1.1では呼べない関数が発生
 																		///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
@@ -91,6 +79,8 @@ namespace file_tree_clock_web1
 		bool IsWriteSysMenu = false;    //システムメニューを追記した
 										/////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
 		Settings appSettings = new Settings();
+		public System.Windows.Forms.WebBrowser playerWebBrowser;
+		WMPLib.WindowsMediaPlayer mediaPlayer;
 
 		string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
 												".inf",  ".inf", ".ini", ".lsi", ".iso",  ".lst", ".jar",  ".log", ".lock",".mis",
@@ -1542,6 +1532,54 @@ AddType video/MP2T .ts
 			return contlolPart;
 		}  //アプリケーション用のタグを作成
 
+		private void MakeWMP() {
+			string TAG = "[MakeWMP]";
+			string dbMsg = TAG;
+			try {
+				if (this.mediaPlayer == null) {
+
+					this.mediaPlayer = new WMPLib.WindowsMediaPlayer();
+			//		this.viewSplitContainer.Panel2.Controls.Add(mediaPlayer);
+				}
+
+				//		MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
+		/// <summary>
+		/// System.Windows.Forms.WebBrowser()でWebBrowserを生成する
+		/// </summary>
+		private void MakeWebPlayer() {
+			string TAG = "[MakeWebPlayer]";
+			string dbMsg = TAG;
+			try {
+				if (this.playerWebBrowser == null) {
+					this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
+
+					this.viewSplitContainer.Panel2.Controls.Add(this.playerWebBrowser);
+
+					this.playerWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+					this.playerWebBrowser.Location = new System.Drawing.Point(0, 0);
+					this.playerWebBrowser.Margin = new System.Windows.Forms.Padding(0);
+					this.playerWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
+					this.playerWebBrowser.Name = "playerWebBrowser";
+					this.playerWebBrowser.ScrollBarsEnabled = false;
+					this.playerWebBrowser.Size = new System.Drawing.Size(829, 712);
+					this.playerWebBrowser.TabIndex = 25;
+					this.playerWebBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.WebBrowser1_DocumentCompleted);
+					this.playerWebBrowser.Resize += new System.EventHandler(this.ReSizeViews);
+				}
+
+				//		MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
 		private void MakeWebSouceBody(string fileName, string urlStr) {
 			string TAG = "[MakeWebSouceBody]";
 			string dbMsg = TAG;
@@ -1621,7 +1659,8 @@ AddType video/MP2T .ts
 				Uri nextUri = new Uri("file://" + urlStr);
 				dbMsg += ",nextUri=" + nextUri;
 				try {
-					playerWebBrowser.Navigate(nextUri);
+					MakeWebPlayer();
+						playerWebBrowser.Navigate(nextUri);
 				} catch (System.UriFormatException er) {
 					dbMsg += "<<playerWebBrowser.Navigateでエラー発生>>" + er.Message;
 				}
@@ -1666,6 +1705,7 @@ AddType video/MP2T .ts
 							Uri nextUri = new Uri("file://" + urlStr);
 							dbMsg += ",nextUri=" + nextUri;
 							try {
+								MakeWebPlayer();
 								playerWebBrowser.ScriptErrorsSuppressed = true;      //
 								playerWebBrowser.Navigate(nextUri);
 							} catch (Exception e) {
@@ -7027,7 +7067,7 @@ AddType video/MP2T .ts
 
 
 		//デバッグツール///////////////////////////////////////////////////////////その他//
-		Boolean debug_now = false;
+		Boolean debug_now = true;
 		public void MyLog(string msg) {
 			if (debug_now) {
 				Console.WriteLine(msg);

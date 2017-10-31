@@ -59,7 +59,7 @@
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
 			this.passNameLabel = new System.Windows.Forms.Label();
 			this.fileNameLabel = new System.Windows.Forms.Label();
-			this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
+	//		this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
 			this.baseSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FileBrowserSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FileBrowserCenterSplitContainer = new System.Windows.Forms.SplitContainer();
@@ -423,7 +423,7 @@
 			this.fileNameLabel.Text = "未選択";
 			// 
 			// playerWebBrowser
-			// 
+/*			// 
 			this.playerWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.playerWebBrowser.Location = new System.Drawing.Point(0, 0);
 			this.playerWebBrowser.Margin = new System.Windows.Forms.Padding(0);
@@ -434,7 +434,7 @@
 			this.playerWebBrowser.TabIndex = 25;
 			this.playerWebBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.WebBrowser1_DocumentCompleted);
 			this.playerWebBrowser.Resize += new System.EventHandler(this.ReSizeViews);
-			// 
+			// */
 			// baseSplitContainer
 			// 
 			this.baseSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -637,7 +637,7 @@
 			this.viewSplitContainer.Panel2.AllowDrop = true;
 			this.viewSplitContainer.Panel2.AutoScroll = true;
 			this.viewSplitContainer.Panel2.Controls.Add(this.progresPanel);
-			this.viewSplitContainer.Panel2.Controls.Add(this.playerWebBrowser);
+	//		this.viewSplitContainer.Panel2.Controls.Add(this.playerWebBrowser);
 			this.viewSplitContainer.Size = new System.Drawing.Size(1068, 712);
 			this.viewSplitContainer.SplitterDistance = 235;
 			this.viewSplitContainer.TabIndex = 26;
@@ -1099,7 +1099,7 @@
 		private System.Windows.Forms.CheckBox continuousPlayCheckBox;
 		private System.Windows.Forms.SplitContainer viewSplitContainer;
 		private System.Windows.Forms.ListBox playListBox;
-		public System.Windows.Forms.WebBrowser playerWebBrowser;
+//		public System.Windows.Forms.WebBrowser playerWebBrowser;
 		private System.Windows.Forms.SplitContainer PlayListsplitContainer;
 		private System.Windows.Forms.ToolStripMenuItem 再生ToolStripMenuItem;
 		private System.Windows.Forms.Panel progresPanel;
