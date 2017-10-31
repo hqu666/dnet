@@ -1965,6 +1965,7 @@ AddType video/MP2T .ts
 							AddPlaylistComboBox(fi.Directory.FullName);
 						}
 						このファイルを再生ToolStripMenuItem.Visible = true;                     //プレイリストへボタン表示
+						PlaylistComboBox.Items[0] = fi.DirectoryName;
 					}
 					//		appSettings.CurrentFile = passNameStr;               //ファイルが選択される度に書換
 					//		WriteSetting();
@@ -3084,8 +3085,6 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
-
-
 
 		/// <summary>
 		/// 指定したフォルダ内のアイテムをfileTreeにリストアップする
@@ -7028,7 +7027,7 @@ AddType video/MP2T .ts
 
 
 		//デバッグツール///////////////////////////////////////////////////////////その他//
-		Boolean debug_now = true;
+		Boolean debug_now = false;
 		public void MyLog(string msg) {
 			if (debug_now) {
 				Console.WriteLine(msg);
