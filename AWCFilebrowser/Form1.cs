@@ -79,8 +79,10 @@ namespace file_tree_clock_web1
 		bool IsWriteSysMenu = false;    //システムメニューを追記した
 										/////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
 		Settings appSettings = new Settings();
+
+	//	public SplitContainer MediaPlayerSplitter;
 		public System.Windows.Forms.WebBrowser playerWebBrowser;
-		WMPLib.WindowsMediaPlayer mediaPlayer;
+		public WMPLib.WindowsMediaPlayer mediaPlayer;
 
 		string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
 												".inf",  ".inf", ".ini", ".lsi", ".iso",  ".lst", ".jar",  ".log", ".lock",".mis",
@@ -159,6 +161,7 @@ namespace file_tree_clock_web1
 				//							Application.CompanyName + "\\" + Application.ProductName +"\\" + Application.ProductName + ".config");
 				configFileName = assemblyPath.Replace(".exe", ".config");
 				dbMsg += ",configFileName=" + configFileName;
+	//			SplitContainer MediaPlayerSplitter = this.splitContainer1;
 				ReadSetting();
 
 				///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更//http://blog.livedoor.jp/tkarasuma/archives/1036522520.html
@@ -1532,17 +1535,17 @@ AddType video/MP2T .ts
 			return contlolPart;
 		}  //アプリケーション用のタグを作成
 
-		private void MakeWMP() {
-			string TAG = "[MakeWMP]";
+		private void MakeWMP(string fileName) {
+			string TAG = "[MakeWMP]"+ fileName;
 			string dbMsg = TAG;
 			try {
 				if (this.mediaPlayer == null) {
-
 					this.mediaPlayer = new WMPLib.WindowsMediaPlayer();
-			//		this.viewSplitContainer.Panel2.Controls.Add(mediaPlayer);
+					this.MediaPlayerPanel.Controls.Add((Form)this.mediaPlayer);
+					this.MediaControlPanel.Visible = true;
 				}
-
-				//		MyLog(dbMsg);
+				this.mediaPlayer.URL = fileName;
+				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
@@ -1558,16 +1561,16 @@ AddType video/MP2T .ts
 			try {
 				if (this.playerWebBrowser == null) {
 					this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
-
-					this.viewSplitContainer.Panel2.Controls.Add(this.playerWebBrowser);
+					this.MediaPlayerPanel.Controls.Add(this.playerWebBrowser);
+					this.MediaControlPanel.Visible = false;
 
 					this.playerWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
 					this.playerWebBrowser.Location = new System.Drawing.Point(0, 0);
 					this.playerWebBrowser.Margin = new System.Windows.Forms.Padding(0);
 					this.playerWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-					this.playerWebBrowser.Name = "playerWebBrowser";
+			//		this.playerWebBrowser.Name = "playerWebBrowser";
 					this.playerWebBrowser.ScrollBarsEnabled = false;
-					this.playerWebBrowser.Size = new System.Drawing.Size(829, 712);
+			//		this.playerWebBrowser.Size = new System.Drawing.Size(829, 627);
 					this.playerWebBrowser.TabIndex = 25;
 					this.playerWebBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.WebBrowser1_DocumentCompleted);
 					this.playerWebBrowser.Resize += new System.EventHandler(this.ReSizeViews);
@@ -1586,8 +1589,8 @@ AddType video/MP2T .ts
 			try {
 				dbMsg += ",fileName=" + fileName;
 				dbMsg += ",url=" + urlStr;
-				int webWidth = this.Width - 36;     // viewSplitContainer.Panel2.Width-16;                         //  playerWebBrowser.Width - 28;
-				int webHeight = viewSplitContainer.Panel2.Height - 72;                         // playerWebBrowser.Height - 60;
+				int webWidth =  this.Width - 44;     // viewSplitContainer.Panel2.Width-16;                 //  playerWebBrowser.Width - 28;
+				int webHeight = this.MediaPlayerPanel.Height - 72;                         // playerWebBrowser.Height - 60;
 				dbMsg += ",web[" + webWidth + "×" + webHeight + "]";
 				dbMsg += ",this[" + this.Width + "×" + this.Height + "]";
 				dbMsg += ",ファイルブラウザ[" + FileBrowserSplitContainer.Width + "×" + FileBrowserSplitContainer.Height + "]";
@@ -7073,6 +7076,7 @@ AddType video/MP2T .ts
 				Console.WriteLine(msg);
 			}
 		}
+
 		//http://www.usefullcode.net/2016/03/index.html
 	}
 }
