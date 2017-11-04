@@ -63,15 +63,6 @@
 			this.FileBrowserSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FileBrowserCenterSplitContainer = new System.Windows.Forms.SplitContainer();
 			this.FileViewBodySplitContainer = new System.Windows.Forms.SplitContainer();
-			this.progresPanel = new System.Windows.Forms.Panel();
-			this.prgMessageLabel = new System.Windows.Forms.Label();
-			this.ProgressMaxLabel = new System.Windows.Forms.Label();
-			this.label1 = new System.Windows.Forms.Label();
-			this.targetCountLabel = new System.Windows.Forms.Label();
-			this.label9 = new System.Windows.Forms.Label();
-			this.progCountLabel = new System.Windows.Forms.Label();
-			this.ProgressTitolLabel = new System.Windows.Forms.Label();
-			this.progressBar1 = new System.Windows.Forms.ProgressBar();
 			this.FilelistView = new System.Windows.Forms.ListView();
 			this.NameColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.SizeColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -87,15 +78,31 @@
 			this.PlaylistComboBox = new System.Windows.Forms.ComboBox();
 			this.label10 = new System.Windows.Forms.Label();
 			this.playListBox = new System.Windows.Forms.ListBox();
-			this.plRewButton = new System.Windows.Forms.Button();
-			this.plNextBbutton = new System.Windows.Forms.Button();
 			this.grarnPathLabel = new System.Windows.Forms.TextBox();
 			this.parentPathLabel = new System.Windows.Forms.TextBox();
 			this.plTotalLabel = new System.Windows.Forms.Label();
 			this.plPosisionLabel = new System.Windows.Forms.Label();
-			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+			this.MediaPlayerSplitContainer = new System.Windows.Forms.SplitContainer();
+			this.MediaPlayerPanel = new System.Windows.Forms.Panel();
+			this.progresPanel = new System.Windows.Forms.Panel();
+			this.prgMessageLabel = new System.Windows.Forms.Label();
+			this.ProgressMaxLabel = new System.Windows.Forms.Label();
+			this.label1 = new System.Windows.Forms.Label();
+			this.targetCountLabel = new System.Windows.Forms.Label();
+			this.label9 = new System.Windows.Forms.Label();
+			this.progCountLabel = new System.Windows.Forms.Label();
+			this.ProgressTitolLabel = new System.Windows.Forms.Label();
+			this.progressBar1 = new System.Windows.Forms.ProgressBar();
 			this.MediaControlPanel = new System.Windows.Forms.Panel();
+			this.plNextBbutton = new System.Windows.Forms.Button();
+			this.plRewButton = new System.Windows.Forms.Button();
 			this.PlayPouseButton = new System.Windows.Forms.Button();
+			this.VolLabel = new System.Windows.Forms.Label();
+			this.EndTime = new System.Windows.Forms.Label();
+			this.CarentTime = new System.Windows.Forms.Label();
+			this.PlayTitolLabel = new System.Windows.Forms.Label();
+			this.VolBar = new System.Windows.Forms.TrackBar();
+			this.trackBar1 = new System.Windows.Forms.TrackBar();
 			this.PlayListContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.ファイルブラウザで選択plToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.削除plToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -110,8 +117,6 @@
 			this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.MediaPlayerPanel = new System.Windows.Forms.Panel();
-			this.trackBar1 = new System.Windows.Forms.TrackBar();
 			this.fileTreeContextMenuStrip.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
 			this.baseSplitContainer.Panel1.SuspendLayout();
@@ -129,7 +134,6 @@
 			this.FileViewBodySplitContainer.Panel1.SuspendLayout();
 			this.FileViewBodySplitContainer.Panel2.SuspendLayout();
 			this.FileViewBodySplitContainer.SuspendLayout();
-			this.progresPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.viewSplitContainer)).BeginInit();
 			this.viewSplitContainer.Panel1.SuspendLayout();
 			this.viewSplitContainer.Panel2.SuspendLayout();
@@ -142,14 +146,17 @@
 			this.PlayListTopSplitContainer.Panel1.SuspendLayout();
 			this.PlayListTopSplitContainer.Panel2.SuspendLayout();
 			this.PlayListTopSplitContainer.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-			this.splitContainer1.Panel1.SuspendLayout();
-			this.splitContainer1.Panel2.SuspendLayout();
-			this.splitContainer1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.MediaPlayerSplitContainer)).BeginInit();
+			this.MediaPlayerSplitContainer.Panel1.SuspendLayout();
+			this.MediaPlayerSplitContainer.Panel2.SuspendLayout();
+			this.MediaPlayerSplitContainer.SuspendLayout();
+			this.MediaPlayerPanel.SuspendLayout();
+			this.progresPanel.SuspendLayout();
 			this.MediaControlPanel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.VolBar)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
 			this.PlayListContextMenuStrip.SuspendLayout();
 			this.ListContextMenuStrip.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// fileTree
@@ -524,106 +531,6 @@
 			this.FileViewBodySplitContainer.SplitterDistance = 199;
 			this.FileViewBodySplitContainer.TabIndex = 8;
 			// 
-			// progresPanel
-			// 
-			this.progresPanel.BackColor = System.Drawing.SystemColors.Window;
-			this.progresPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-			this.progresPanel.Controls.Add(this.prgMessageLabel);
-			this.progresPanel.Controls.Add(this.ProgressMaxLabel);
-			this.progresPanel.Controls.Add(this.label1);
-			this.progresPanel.Controls.Add(this.targetCountLabel);
-			this.progresPanel.Controls.Add(this.label9);
-			this.progresPanel.Controls.Add(this.progCountLabel);
-			this.progresPanel.Controls.Add(this.ProgressTitolLabel);
-			this.progresPanel.Controls.Add(this.progressBar1);
-			this.progresPanel.Location = new System.Drawing.Point(113, 25);
-			this.progresPanel.Name = "progresPanel";
-			this.progresPanel.Size = new System.Drawing.Size(621, 79);
-			this.progresPanel.TabIndex = 4;
-			this.progresPanel.Visible = false;
-			// 
-			// prgMessageLabel
-			// 
-			this.prgMessageLabel.AutoSize = true;
-			this.prgMessageLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.prgMessageLabel.Location = new System.Drawing.Point(4, 61);
-			this.prgMessageLabel.Name = "prgMessageLabel";
-			this.prgMessageLabel.Size = new System.Drawing.Size(66, 12);
-			this.prgMessageLabel.TabIndex = 18;
-			this.prgMessageLabel.Text = "リストアップ中";
-			// 
-			// ProgressMaxLabel
-			// 
-			this.ProgressMaxLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.ProgressMaxLabel.AutoSize = true;
-			this.ProgressMaxLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.ProgressMaxLabel.Location = new System.Drawing.Point(555, 39);
-			this.ProgressMaxLabel.Name = "ProgressMaxLabel";
-			this.ProgressMaxLabel.Size = new System.Drawing.Size(59, 12);
-			this.ProgressMaxLabel.TabIndex = 17;
-			this.ProgressMaxLabel.Text = "000000000";
-			// 
-			// label1
-			// 
-			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.label1.AutoSize = true;
-			this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.label1.Location = new System.Drawing.Point(538, 39);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(11, 12);
-			this.label1.TabIndex = 16;
-			this.label1.Text = "/";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-			// 
-			// targetCountLabel
-			// 
-			this.targetCountLabel.AutoSize = true;
-			this.targetCountLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.targetCountLabel.Location = new System.Drawing.Point(236, 39);
-			this.targetCountLabel.Name = "targetCountLabel";
-			this.targetCountLabel.Size = new System.Drawing.Size(59, 12);
-			this.targetCountLabel.TabIndex = 15;
-			this.targetCountLabel.Text = "000000000";
-			// 
-			// label9
-			// 
-			this.label9.AutoSize = true;
-			this.label9.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.label9.Location = new System.Drawing.Point(116, 39);
-			this.label9.Name = "label9";
-			this.label9.Size = new System.Drawing.Size(41, 12);
-			this.label9.TabIndex = 14;
-			this.label9.Text = ">対象>";
-			this.label9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-			// 
-			// progCountLabel
-			// 
-			this.progCountLabel.AutoSize = true;
-			this.progCountLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.progCountLabel.Location = new System.Drawing.Point(4, 39);
-			this.progCountLabel.Name = "progCountLabel";
-			this.progCountLabel.Size = new System.Drawing.Size(59, 12);
-			this.progCountLabel.TabIndex = 13;
-			this.progCountLabel.Text = "000000000";
-			this.progCountLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// ProgressTitolLabel
-			// 
-			this.ProgressTitolLabel.AutoSize = true;
-			this.ProgressTitolLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-			this.ProgressTitolLabel.Location = new System.Drawing.Point(5, 4);
-			this.ProgressTitolLabel.Name = "ProgressTitolLabel";
-			this.ProgressTitolLabel.Size = new System.Drawing.Size(73, 12);
-			this.ProgressTitolLabel.TabIndex = 4;
-			this.ProgressTitolLabel.Text = "ProgressTitol";
-			// 
-			// progressBar1
-			// 
-			this.progressBar1.Location = new System.Drawing.Point(3, 19);
-			this.progressBar1.Name = "progressBar1";
-			this.progressBar1.Size = new System.Drawing.Size(611, 17);
-			this.progressBar1.TabIndex = 3;
-			// 
 			// FilelistView
 			// 
 			this.FilelistView.AccessibleRole = System.Windows.Forms.AccessibleRole.ListItem;
@@ -733,7 +640,7 @@
 			// 
 			this.viewSplitContainer.Panel2.AllowDrop = true;
 			this.viewSplitContainer.Panel2.AutoScroll = true;
-			this.viewSplitContainer.Panel2.Controls.Add(this.splitContainer1);
+			this.viewSplitContainer.Panel2.Controls.Add(this.MediaPlayerSplitContainer);
 			this.viewSplitContainer.Size = new System.Drawing.Size(1068, 712);
 			this.viewSplitContainer.SplitterDistance = 235;
 			this.viewSplitContainer.TabIndex = 26;
@@ -757,8 +664,6 @@
 			// 
 			// PlayListsplitContainer.Panel2
 			// 
-			this.PlayListsplitContainer.Panel2.Controls.Add(this.plRewButton);
-			this.PlayListsplitContainer.Panel2.Controls.Add(this.plNextBbutton);
 			this.PlayListsplitContainer.Panel2.Controls.Add(this.grarnPathLabel);
 			this.PlayListsplitContainer.Panel2.Controls.Add(this.parentPathLabel);
 			this.PlayListsplitContainer.Panel2.Controls.Add(this.plTotalLabel);
@@ -784,7 +689,6 @@
 			// 
 			// PlayListTopSplitContainer.Panel2
 			// 
-			this.PlayListTopSplitContainer.Panel2.Controls.Add(this.progresPanel);
 			this.PlayListTopSplitContainer.Panel2.Controls.Add(this.playListBox);
 			this.PlayListTopSplitContainer.Panel2.Padding = new System.Windows.Forms.Padding(3);
 			this.PlayListTopSplitContainer.Size = new System.Drawing.Size(235, 626);
@@ -834,36 +738,6 @@
 			this.playListBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PlayListBox_MouseMove);
 			this.playListBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PlaylistBoxMouseUp);
 			// 
-			// plRewButton
-			// 
-			this.plRewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.plRewButton.BackColor = System.Drawing.Color.Transparent;
-			this.plRewButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("plRewButton.BackgroundImage")));
-			this.plRewButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-			this.plRewButton.Location = new System.Drawing.Point(154, 3);
-			this.plRewButton.Name = "plRewButton";
-			this.plRewButton.Size = new System.Drawing.Size(30, 31);
-			this.plRewButton.TabIndex = 32;
-			this.plRewButton.UseVisualStyleBackColor = false;
-			this.plRewButton.Click += new System.EventHandler(this.PlRewButton_Click);
-			// 
-			// plNextBbutton
-			// 
-			this.plNextBbutton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.plNextBbutton.AutoSize = true;
-			this.plNextBbutton.BackColor = System.Drawing.Color.Transparent;
-			this.plNextBbutton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("plNextBbutton.BackgroundImage")));
-			this.plNextBbutton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-			this.plNextBbutton.Font = new System.Drawing.Font("MS UI Gothic", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-			this.plNextBbutton.Location = new System.Drawing.Point(187, 2);
-			this.plNextBbutton.Margin = new System.Windows.Forms.Padding(0);
-			this.plNextBbutton.Name = "plNextBbutton";
-			this.plNextBbutton.Size = new System.Drawing.Size(46, 46);
-			this.plNextBbutton.TabIndex = 31;
-			this.plNextBbutton.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-			this.plNextBbutton.UseVisualStyleBackColor = false;
-			this.plNextBbutton.Click += new System.EventHandler(this.PlNextBbutton_Click);
-			// 
 			// grarnPathLabel
 			// 
 			this.grarnPathLabel.BackColor = System.Drawing.SystemColors.Control;
@@ -872,7 +746,7 @@
 			this.grarnPathLabel.Multiline = true;
 			this.grarnPathLabel.Name = "grarnPathLabel";
 			this.grarnPathLabel.ReadOnly = true;
-			this.grarnPathLabel.Size = new System.Drawing.Size(180, 28);
+			this.grarnPathLabel.Size = new System.Drawing.Size(230, 28);
 			this.grarnPathLabel.TabIndex = 36;
 			this.grarnPathLabel.Text = "grarnPath";
 			// 
@@ -906,48 +780,285 @@
 			this.plPosisionLabel.TabIndex = 28;
 			this.plPosisionLabel.Text = "posision/total";
 			// 
-			// splitContainer1
+			// MediaPlayerSplitContainer
 			// 
-			this.splitContainer1.BackColor = System.Drawing.SystemColors.WindowText;
-			this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-			this.splitContainer1.Name = "splitContainer1";
-			this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+			this.MediaPlayerSplitContainer.BackColor = System.Drawing.Color.Black;
+			this.MediaPlayerSplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MediaPlayerSplitContainer.ForeColor = System.Drawing.Color.Black;
+			this.MediaPlayerSplitContainer.Location = new System.Drawing.Point(0, 0);
+			this.MediaPlayerSplitContainer.Name = "MediaPlayerSplitContainer";
+			this.MediaPlayerSplitContainer.Orientation = System.Windows.Forms.Orientation.Horizontal;
 			// 
-			// splitContainer1.Panel1
+			// MediaPlayerSplitContainer.Panel1
 			// 
-			this.splitContainer1.Panel1.AccessibleName = "";
-			this.splitContainer1.Panel1.Controls.Add(this.MediaPlayerPanel);
+			this.MediaPlayerSplitContainer.Panel1.AccessibleName = "";
+			this.MediaPlayerSplitContainer.Panel1.Controls.Add(this.MediaPlayerPanel);
 			// 
-			// splitContainer1.Panel2
+			// MediaPlayerSplitContainer.Panel2
 			// 
-			this.splitContainer1.Panel2.Controls.Add(this.MediaControlPanel);
-			this.splitContainer1.Size = new System.Drawing.Size(829, 712);
-			this.splitContainer1.SplitterDistance = 613;
-			this.splitContainer1.TabIndex = 0;
+			this.MediaPlayerSplitContainer.Panel2.Controls.Add(this.MediaControlPanel);
+			this.MediaPlayerSplitContainer.Size = new System.Drawing.Size(829, 712);
+			this.MediaPlayerSplitContainer.SplitterDistance = 625;
+			this.MediaPlayerSplitContainer.TabIndex = 0;
+			// 
+			// MediaPlayerPanel
+			// 
+			this.MediaPlayerPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.MediaPlayerPanel.BackColor = System.Drawing.SystemColors.Control;
+			this.MediaPlayerPanel.Controls.Add(this.progresPanel);
+			this.MediaPlayerPanel.Location = new System.Drawing.Point(0, 0);
+			this.MediaPlayerPanel.Name = "MediaPlayerPanel";
+			this.MediaPlayerPanel.Size = new System.Drawing.Size(829, 625);
+			this.MediaPlayerPanel.TabIndex = 0;
+			// 
+			// progresPanel
+			// 
+			this.progresPanel.BackColor = System.Drawing.SystemColors.Window;
+			this.progresPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+			this.progresPanel.Controls.Add(this.prgMessageLabel);
+			this.progresPanel.Controls.Add(this.ProgressMaxLabel);
+			this.progresPanel.Controls.Add(this.label1);
+			this.progresPanel.Controls.Add(this.targetCountLabel);
+			this.progresPanel.Controls.Add(this.label9);
+			this.progresPanel.Controls.Add(this.progCountLabel);
+			this.progresPanel.Controls.Add(this.ProgressTitolLabel);
+			this.progresPanel.Controls.Add(this.progressBar1);
+			this.progresPanel.Location = new System.Drawing.Point(21, 67);
+			this.progresPanel.Name = "progresPanel";
+			this.progresPanel.Size = new System.Drawing.Size(796, 79);
+			this.progresPanel.TabIndex = 4;
+			this.progresPanel.Visible = false;
+			// 
+			// prgMessageLabel
+			// 
+			this.prgMessageLabel.AutoSize = true;
+			this.prgMessageLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.prgMessageLabel.Location = new System.Drawing.Point(4, 61);
+			this.prgMessageLabel.Name = "prgMessageLabel";
+			this.prgMessageLabel.Size = new System.Drawing.Size(66, 12);
+			this.prgMessageLabel.TabIndex = 18;
+			this.prgMessageLabel.Text = "リストアップ中";
+			// 
+			// ProgressMaxLabel
+			// 
+			this.ProgressMaxLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.ProgressMaxLabel.AutoSize = true;
+			this.ProgressMaxLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.ProgressMaxLabel.Location = new System.Drawing.Point(730, 39);
+			this.ProgressMaxLabel.Name = "ProgressMaxLabel";
+			this.ProgressMaxLabel.Size = new System.Drawing.Size(59, 12);
+			this.ProgressMaxLabel.TabIndex = 17;
+			this.ProgressMaxLabel.Text = "000000000";
+			// 
+			// label1
+			// 
+			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label1.AutoSize = true;
+			this.label1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.label1.Location = new System.Drawing.Point(1105, 39);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(11, 12);
+			this.label1.TabIndex = 16;
+			this.label1.Text = "/";
+			this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			// 
+			// targetCountLabel
+			// 
+			this.targetCountLabel.AutoSize = true;
+			this.targetCountLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.targetCountLabel.Location = new System.Drawing.Point(236, 39);
+			this.targetCountLabel.Name = "targetCountLabel";
+			this.targetCountLabel.Size = new System.Drawing.Size(59, 12);
+			this.targetCountLabel.TabIndex = 15;
+			this.targetCountLabel.Text = "000000000";
+			// 
+			// label9
+			// 
+			this.label9.AutoSize = true;
+			this.label9.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.label9.Location = new System.Drawing.Point(116, 39);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(41, 12);
+			this.label9.TabIndex = 14;
+			this.label9.Text = ">対象>";
+			this.label9.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+			// 
+			// progCountLabel
+			// 
+			this.progCountLabel.AutoSize = true;
+			this.progCountLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.progCountLabel.Location = new System.Drawing.Point(4, 39);
+			this.progCountLabel.Name = "progCountLabel";
+			this.progCountLabel.Size = new System.Drawing.Size(59, 12);
+			this.progCountLabel.TabIndex = 13;
+			this.progCountLabel.Text = "000000000";
+			this.progCountLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// ProgressTitolLabel
+			// 
+			this.ProgressTitolLabel.AutoSize = true;
+			this.ProgressTitolLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
+			this.ProgressTitolLabel.Location = new System.Drawing.Point(5, 4);
+			this.ProgressTitolLabel.Name = "ProgressTitolLabel";
+			this.ProgressTitolLabel.Size = new System.Drawing.Size(73, 12);
+			this.ProgressTitolLabel.TabIndex = 4;
+			this.ProgressTitolLabel.Text = "ProgressTitol";
+			// 
+			// progressBar1
+			// 
+			this.progressBar1.Location = new System.Drawing.Point(3, 19);
+			this.progressBar1.Name = "progressBar1";
+			this.progressBar1.Size = new System.Drawing.Size(786, 17);
+			this.progressBar1.TabIndex = 3;
 			// 
 			// MediaControlPanel
 			// 
-			this.MediaControlPanel.BackColor = System.Drawing.SystemColors.ControlLight;
-			this.MediaControlPanel.Controls.Add(this.trackBar1);
+			this.MediaControlPanel.BackColor = System.Drawing.Color.Black;
+			this.MediaControlPanel.Controls.Add(this.plNextBbutton);
+			this.MediaControlPanel.Controls.Add(this.plRewButton);
 			this.MediaControlPanel.Controls.Add(this.PlayPouseButton);
-			this.MediaControlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.MediaControlPanel.Controls.Add(this.VolLabel);
+			this.MediaControlPanel.Controls.Add(this.EndTime);
+			this.MediaControlPanel.Controls.Add(this.CarentTime);
+			this.MediaControlPanel.Controls.Add(this.PlayTitolLabel);
+			this.MediaControlPanel.Controls.Add(this.VolBar);
+			this.MediaControlPanel.Controls.Add(this.trackBar1);
+			this.MediaControlPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.MediaControlPanel.Location = new System.Drawing.Point(0, 0);
 			this.MediaControlPanel.Name = "MediaControlPanel";
-			this.MediaControlPanel.Size = new System.Drawing.Size(829, 95);
+			this.MediaControlPanel.Size = new System.Drawing.Size(829, 83);
 			this.MediaControlPanel.TabIndex = 0;
+			// 
+			// plNextBbutton
+			// 
+			this.plNextBbutton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.plNextBbutton.BackColor = System.Drawing.Color.Transparent;
+			this.plNextBbutton.BackgroundImage = global::AWSFileBroeser.Properties.Resources.ffbtn;
+			this.plNextBbutton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+			this.plNextBbutton.FlatAppearance.BorderSize = 0;
+			this.plNextBbutton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+			this.plNextBbutton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+			this.plNextBbutton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.plNextBbutton.Location = new System.Drawing.Point(619, 41);
+			this.plNextBbutton.Margin = new System.Windows.Forms.Padding(0);
+			this.plNextBbutton.Name = "plNextBbutton";
+			this.plNextBbutton.Size = new System.Drawing.Size(40, 40);
+			this.plNextBbutton.TabIndex = 40;
+			this.plNextBbutton.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			this.plNextBbutton.UseVisualStyleBackColor = false;
+			this.plNextBbutton.Click += new System.EventHandler(this.PlNextBbutton_Click);
+			// 
+			// plRewButton
+			// 
+			this.plRewButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.plRewButton.BackColor = System.Drawing.Color.Transparent;
+			this.plRewButton.BackgroundImage = global::AWSFileBroeser.Properties.Resources.rewbtn;
+			this.plRewButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+			this.plRewButton.FlatAppearance.BorderSize = 0;
+			this.plRewButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+			this.plRewButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+			this.plRewButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.plRewButton.Location = new System.Drawing.Point(190, 48);
+			this.plRewButton.Margin = new System.Windows.Forms.Padding(0);
+			this.plRewButton.Name = "plRewButton";
+			this.plRewButton.Size = new System.Drawing.Size(30, 30);
+			this.plRewButton.TabIndex = 39;
+			this.plRewButton.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			this.plRewButton.UseVisualStyleBackColor = false;
+			this.plRewButton.Click += new System.EventHandler(this.PlRewButton_Click);
 			// 
 			// PlayPouseButton
 			// 
 			this.PlayPouseButton.BackColor = System.Drawing.Color.Transparent;
-			this.PlayPouseButton.Image = ((System.Drawing.Image)(resources.GetObject("PlayPouseButton.Image")));
-			this.PlayPouseButton.Location = new System.Drawing.Point(0, -1);
-			this.PlayPouseButton.Margin = new System.Windows.Forms.Padding(0);
+			this.PlayPouseButton.BackgroundImage = global::AWSFileBroeser.Properties.Resources.pl_r_btn;
+			this.PlayPouseButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+			this.PlayPouseButton.FlatAppearance.BorderSize = 0;
+			this.PlayPouseButton.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
+			this.PlayPouseButton.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
+			this.PlayPouseButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+			this.PlayPouseButton.Location = new System.Drawing.Point(0, 0);
+			this.PlayPouseButton.Margin = new System.Windows.Forms.Padding(1);
 			this.PlayPouseButton.Name = "PlayPouseButton";
-			this.PlayPouseButton.Size = new System.Drawing.Size(96, 96);
-			this.PlayPouseButton.TabIndex = 0;
-			this.PlayPouseButton.UseCompatibleTextRendering = true;
+			this.PlayPouseButton.Size = new System.Drawing.Size(80, 80);
+			this.PlayPouseButton.TabIndex = 38;
+			this.PlayPouseButton.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			this.PlayPouseButton.UseVisualStyleBackColor = false;
+			this.PlayPouseButton.Click += new System.EventHandler(this.PlayPouseButton_Click);
+			// 
+			// VolLabel
+			// 
+			this.VolLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.VolLabel.AutoSize = true;
+			this.VolLabel.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.VolLabel.ForeColor = System.Drawing.Color.White;
+			this.VolLabel.Location = new System.Drawing.Point(772, 53);
+			this.VolLabel.Name = "VolLabel";
+			this.VolLabel.Size = new System.Drawing.Size(24, 16);
+			this.VolLabel.TabIndex = 36;
+			this.VolLabel.Text = "10";
+			this.VolLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// EndTime
+			// 
+			this.EndTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.EndTime.AutoSize = true;
+			this.EndTime.Font = new System.Drawing.Font("MS UI Gothic", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.EndTime.ForeColor = System.Drawing.Color.White;
+			this.EndTime.Location = new System.Drawing.Point(662, 47);
+			this.EndTime.Name = "EndTime";
+			this.EndTime.Size = new System.Drawing.Size(104, 24);
+			this.EndTime.TabIndex = 35;
+			this.EndTime.Text = "000:00:00";
+			this.EndTime.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// CarentTime
+			// 
+			this.CarentTime.AutoSize = true;
+			this.CarentTime.Font = new System.Drawing.Font("MS UI Gothic", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.CarentTime.ForeColor = System.Drawing.Color.White;
+			this.CarentTime.Location = new System.Drawing.Point(83, 46);
+			this.CarentTime.Name = "CarentTime";
+			this.CarentTime.Size = new System.Drawing.Size(104, 24);
+			this.CarentTime.TabIndex = 34;
+			this.CarentTime.Text = "000:00:00";
+			// 
+			// PlayTitolLabel
+			// 
+			this.PlayTitolLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.PlayTitolLabel.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+			this.PlayTitolLabel.ForeColor = System.Drawing.Color.White;
+			this.PlayTitolLabel.Location = new System.Drawing.Point(221, 47);
+			this.PlayTitolLabel.Margin = new System.Windows.Forms.Padding(0);
+			this.PlayTitolLabel.Name = "PlayTitolLabel";
+			this.PlayTitolLabel.Size = new System.Drawing.Size(398, 33);
+			this.PlayTitolLabel.TabIndex = 33;
+			this.PlayTitolLabel.Text = "PlayTitol\r\nLabel";
+			// 
+			// VolBar
+			// 
+			this.VolBar.Dock = System.Windows.Forms.DockStyle.Right;
+			this.VolBar.Location = new System.Drawing.Point(784, 0);
+			this.VolBar.Name = "VolBar";
+			this.VolBar.Orientation = System.Windows.Forms.Orientation.Vertical;
+			this.VolBar.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.VolBar.RightToLeftLayout = true;
+			this.VolBar.Size = new System.Drawing.Size(45, 83);
+			this.VolBar.TabIndex = 3;
+			// 
+			// trackBar1
+			// 
+			this.trackBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.trackBar1.BackColor = System.Drawing.Color.Black;
+			this.trackBar1.Location = new System.Drawing.Point(81, 2);
+			this.trackBar1.Maximum = 100;
+			this.trackBar1.Name = "trackBar1";
+			this.trackBar1.Size = new System.Drawing.Size(697, 45);
+			this.trackBar1.TabIndex = 1;
 			// 
 			// PlayListContextMenuStrip
 			// 
@@ -1051,22 +1162,6 @@
 			this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
 			this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
 			// 
-			// MediaPlayerPanel
-			// 
-			this.MediaPlayerPanel.BackColor = System.Drawing.SystemColors.Control;
-			this.MediaPlayerPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.MediaPlayerPanel.Location = new System.Drawing.Point(0, 0);
-			this.MediaPlayerPanel.Name = "MediaPlayerPanel";
-			this.MediaPlayerPanel.Size = new System.Drawing.Size(829, 613);
-			this.MediaPlayerPanel.TabIndex = 0;
-			// 
-			// trackBar1
-			// 
-			this.trackBar1.Location = new System.Drawing.Point(99, 0);
-			this.trackBar1.Name = "trackBar1";
-			this.trackBar1.Size = new System.Drawing.Size(727, 45);
-			this.trackBar1.TabIndex = 1;
-			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1099,8 +1194,6 @@
 			this.FileViewBodySplitContainer.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.FileViewBodySplitContainer)).EndInit();
 			this.FileViewBodySplitContainer.ResumeLayout(false);
-			this.progresPanel.ResumeLayout(false);
-			this.progresPanel.PerformLayout();
 			this.viewSplitContainer.Panel1.ResumeLayout(false);
 			this.viewSplitContainer.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.viewSplitContainer)).EndInit();
@@ -1115,15 +1208,19 @@
 			this.PlayListTopSplitContainer.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.PlayListTopSplitContainer)).EndInit();
 			this.PlayListTopSplitContainer.ResumeLayout(false);
-			this.splitContainer1.Panel1.ResumeLayout(false);
-			this.splitContainer1.Panel2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-			this.splitContainer1.ResumeLayout(false);
+			this.MediaPlayerSplitContainer.Panel1.ResumeLayout(false);
+			this.MediaPlayerSplitContainer.Panel2.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.MediaPlayerSplitContainer)).EndInit();
+			this.MediaPlayerSplitContainer.ResumeLayout(false);
+			this.MediaPlayerPanel.ResumeLayout(false);
+			this.progresPanel.ResumeLayout(false);
+			this.progresPanel.PerformLayout();
 			this.MediaControlPanel.ResumeLayout(false);
 			this.MediaControlPanel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.VolBar)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
 			this.PlayListContextMenuStrip.ResumeLayout(false);
 			this.ListContextMenuStrip.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
 			this.ResumeLayout(false);
 
 		}
@@ -1176,8 +1273,6 @@
 		private System.Windows.Forms.Label prgMessageLabel;
 		private System.Windows.Forms.Label plTotalLabel;
 		private System.Windows.Forms.Label plPosisionLabel;
-		private System.Windows.Forms.Button plNextBbutton;
-		private System.Windows.Forms.Button plRewButton;
 		private System.Windows.Forms.ContextMenuStrip PlayListContextMenuStrip;
 		private System.Windows.Forms.ToolStripMenuItem ファイルブラウザで選択plToolStripMenuItem;
 		private System.Windows.Forms.TextBox parentPathLabel;
@@ -1209,11 +1304,18 @@
 		private System.Windows.Forms.ToolStripMenuItem 通常サイズに戻すplToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem プレイリスト表示LCToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem このファイルを再生ToolStripMenuItem;
-		private System.Windows.Forms.SplitContainer splitContainer1;
+		private System.Windows.Forms.SplitContainer MediaPlayerSplitContainer;
 		private System.Windows.Forms.Panel MediaControlPanel;
-		private System.Windows.Forms.Button PlayPouseButton;
 		private System.Windows.Forms.Panel MediaPlayerPanel;
 		private System.Windows.Forms.TrackBar trackBar1;
+		private System.Windows.Forms.TrackBar VolBar;
+		private System.Windows.Forms.Label CarentTime;
+		private System.Windows.Forms.Label PlayTitolLabel;
+		private System.Windows.Forms.Label EndTime;
+		private System.Windows.Forms.Label VolLabel;
+		private System.Windows.Forms.Button PlayPouseButton;
+		private System.Windows.Forms.Button plRewButton;
+		private System.Windows.Forms.Button plNextBbutton;
 	}
 }
 

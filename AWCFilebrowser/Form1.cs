@@ -1,5 +1,6 @@
 ﻿///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
 using System;
+using System.Net;
 ///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
 using System.IO;
 using System.Collections.Generic;       //playList
@@ -7,13 +8,17 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;      //playList
 using System.Text;
+//using System.Windows;だとDragDropEffectsでエラー発生
 using System.Windows.Forms;
 using Microsoft.VisualBasic.FileIO; //DelFiles,MoveFolderのFileSystem
 using System.Runtime.InteropServices;
 ///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
 using Microsoft.WindowsAPICodePack.Dialogs;                             //'Windows7APICodePack-Core.1.1.0で追加
 using Microsoft.WindowsAPICodePack.Dialogs.Controls;                    //	☆WindowsAPICodePack-Shell 1.1.1では呼べない関数が発生
-																		///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
+//WMP//////////////////////////////////////
+using WMPLib;					
+using System.Media;
+///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
 
 namespace file_tree_clock_web1
 {
@@ -80,17 +85,20 @@ namespace file_tree_clock_web1
 										/////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
 		Settings appSettings = new Settings();
 
-	//	public SplitContainer MediaPlayerSplitter;
+		//	public SplitContainer MediaPlayerSplitter;
 		public System.Windows.Forms.WebBrowser playerWebBrowser;
-		public WMPLib.WindowsMediaPlayer mediaPlayer;
+		public WindowsMediaPlayer mediaPlayer;
 
 		string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
 												".inf",  ".inf", ".ini", ".lsi", ".iso",  ".lst", ".jar",  ".log", ".lock",".mis",
 												".mni",".MARKER",  ".mbr", ".manifest","swapfile",
 											  ".properties",".pnf" ,  ".prx", ".scr", ".settings",  ".so",  ".sys",  ".xml", ".exe"};
-		string[] videoFiles = new string[] { ".mov", ".qt", ".mpg",".mpeg",  ".mp4",  ".m1v", ".mp2", ".mpa",".mpe",".webm",  ".ogv",
-												".3gp",  ".3g2",  ".asf",  ".asx",
+		string[] mpFiles = new string[] { ".mov", ".qt", ".mpg",".mpeg",  ".mp4",  ".m1v", ".mp2", ".mpa",".mpe",".3gp",  ".3g2",  ".asf",  ".asx",
 												".m2ts",".ts",".dvr-ms",".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz",
+												".adt",  ".adts", ".aif",  ".aifc", ".aiff", ".au", ".snd", ".cda",
+												".mp3", ".m4a", ".aac",  ".mid", ".midi", ".flac", ".wax", ".wma", ".wav"};
+		string[] videoFiles = new string[] {  ".mpa",".mpe",".webm",  ".ogv",".3gp",  ".3g2",  ".asf",  ".asx",
+												".dvr-ms",".ivf",".wax",".wmv", ".wvx",  ".wm",  ".wmx",  ".wmz",
 												".swf", ".flv", ".f4v",".rm" };
 		string[] imageFiles = new string[] { ".jpg", ".jpeg", ".gif", ".png", ".tif", ".ico", ".bmp" };
 		string[] audioFiles = new string[] { ".adt",  ".adts", ".aif",  ".aifc", ".aiff", ".au", ".snd", ".cda",
@@ -145,6 +153,7 @@ namespace file_tree_clock_web1
 		//	int playListWidth = 234;            //プレイリストの幅
 		//	ProgressDialog pDialog;
 		List<String> PlayListFileNames = new List<String>();
+		bool isPlay = true;
 
 		public Form1() {
 			string TAG = "[Form1]";
@@ -161,9 +170,8 @@ namespace file_tree_clock_web1
 				//							Application.CompanyName + "\\" + Application.ProductName +"\\" + Application.ProductName + ".config");
 				configFileName = assemblyPath.Replace(".exe", ".config");
 				dbMsg += ",configFileName=" + configFileName;
-	//			SplitContainer MediaPlayerSplitter = this.splitContainer1;
+				//			SplitContainer MediaPlayerSplitter = this.splitContainer1;
 				ReadSetting();
-
 				///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更//http://blog.livedoor.jp/tkarasuma/archives/1036522520.html
 				regkey.SetValue(process_name, 11001, Microsoft.Win32.RegistryValueKind.DWord);
 				regkey.SetValue(process_dbg_name, 11001, Microsoft.Win32.RegistryValueKind.DWord);
@@ -262,7 +270,7 @@ namespace file_tree_clock_web1
 		}       //ApplicationExitイベントハンドラ
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////Formイベント/////
-	
+
 		/// <summary>
 		/// 連続再生時、再生対象をファイルリストで選択しているファイルに切り替える
 		/// プレイリストファイルを選択した場合の読込み
@@ -879,7 +887,7 @@ AddType video/MP2T .ts
 			string dbMsg = TAG;
 			List<string> retItems = new List<string>();
 			try {
-				dbMsg += "sarchDir=" + sarchDir; 
+				dbMsg += "sarchDir=" + sarchDir;
 				IEnumerable<string> files = Directory.EnumerateFiles(sarchDir, "*"); // サブ・ディレクトも含める	, System.IO.SearchOption.AllDirectories
 				foreach (string fileName in files) {
 					dbMsg += "(" + retItems.Count + ")" + fileName;
@@ -1535,23 +1543,6 @@ AddType video/MP2T .ts
 			return contlolPart;
 		}  //アプリケーション用のタグを作成
 
-		private void MakeWMP(string fileName) {
-			string TAG = "[MakeWMP]"+ fileName;
-			string dbMsg = TAG;
-			try {
-				if (this.mediaPlayer == null) {
-					this.mediaPlayer = new WMPLib.WindowsMediaPlayer();
-					this.MediaPlayerPanel.Controls.Add((Form)this.mediaPlayer);
-					this.MediaControlPanel.Visible = true;
-				}
-				this.mediaPlayer.URL = fileName;
-				MyLog(dbMsg);
-			} catch (Exception er) {
-				dbMsg += "<<以降でエラー発生>>" + er.Message;
-				MyLog(dbMsg);
-			}
-		}
-
 		/// <summary>
 		/// System.Windows.Forms.WebBrowser()でWebBrowserを生成する
 		/// </summary>
@@ -1562,15 +1553,23 @@ AddType video/MP2T .ts
 				if (this.playerWebBrowser == null) {
 					this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
 					this.MediaPlayerPanel.Controls.Add(this.playerWebBrowser);
-					this.MediaControlPanel.Visible = false;
+					//			this.MediaControlPanel.Visible = false;
 
 					this.playerWebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
 					this.playerWebBrowser.Location = new System.Drawing.Point(0, 0);
 					this.playerWebBrowser.Margin = new System.Windows.Forms.Padding(0);
-					this.playerWebBrowser.MinimumSize = new System.Drawing.Size(20, 20);
-			//		this.playerWebBrowser.Name = "playerWebBrowser";
+					this.playerWebBrowser.MinimumSize = new System.Drawing.Size(MediaPlayerPanel.Width, MediaPlayerPanel.Height);
+					//		this.playerWebBrowser.Name = "playerWebBrowser";
 					this.playerWebBrowser.ScrollBarsEnabled = false;
-			//		this.playerWebBrowser.Size = new System.Drawing.Size(829, 627);
+					/*		this.playerWebBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)(
+																(System.Windows.Forms.AnchorStyles.Top |
+																System.Windows.Forms.AnchorStyles.Left |
+																System.Windows.Forms.AnchorStyles.Right |
+																System.Windows.Forms.AnchorStyles.Bottom)));
+
+							 MediaPlayerSplitContainer
+							 */
+					//		this.playerWebBrowser.Size = new System.Drawing.Size(829, 627);
 					this.playerWebBrowser.TabIndex = 25;
 					this.playerWebBrowser.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.WebBrowser1_DocumentCompleted);
 					this.playerWebBrowser.Resize += new System.EventHandler(this.ReSizeViews);
@@ -1589,22 +1588,23 @@ AddType video/MP2T .ts
 			try {
 				dbMsg += ",fileName=" + fileName;
 				dbMsg += ",url=" + urlStr;
-				int webWidth =  this.Width - 44;     // viewSplitContainer.Panel2.Width-16;                 //  playerWebBrowser.Width - 28;
-				int webHeight = this.MediaPlayerPanel.Height - 72;                         // playerWebBrowser.Height - 60;
-				dbMsg += ",web[" + webWidth + "×" + webHeight + "]";
-				dbMsg += ",this[" + this.Width + "×" + this.Height + "]";
-				dbMsg += ",ファイルブラウザ[" + FileBrowserSplitContainer.Width + "×" + FileBrowserSplitContainer.Height + "]";
+				dbMsg += ",this[" + this.Width + "×" + this.Height + "]";       //this[1936×751]
+				dbMsg += ",ファイルブラウザ[" + FileBrowserSplitContainer.Width + "×" + FileBrowserSplitContainer.Height + "]";     //ファイルブラウザ[586×712],Collapsed=False
 				dbMsg += ",Collapsed=" + baseSplitContainer.Panel1Collapsed;
-				if (!baseSplitContainer.Panel1Collapsed) {//ファイルブラウザopen
-					webWidth -= FileBrowserSplitContainer.Width;
-					dbMsg += ",ファイルブラウザ>" + webWidth;
-				}
-				dbMsg += ",プレイリスト[" + PlayListsplitContainer.Width + "×" + PlayListsplitContainer.Height + "]";
+				/*	if (!baseSplitContainer.Panel1Collapsed) {//ファイルブラウザopen
+						webWidth -= FileBrowserSplitContainer.Width;
+						dbMsg += ",ファイルブラウザ>" + webWidth;
+					}*/
+				dbMsg += ",プレイリスト[" + PlayListsplitContainer.Width + "×" + PlayListsplitContainer.Height + "]";//,プレイリスト[235×712],
 				dbMsg += ",Collapsed=" + viewSplitContainer.Panel1Collapsed;
-				if (!viewSplitContainer.Panel1Collapsed) {
-					webWidth -= PlayListsplitContainer.Width;
-					dbMsg += ",プレイリスト>" + webWidth;
-				}
+				/*	if (!viewSplitContainer.Panel1Collapsed) {
+					//	webWidth -= PlayListsplitContainer.Width;
+						dbMsg += ",プレイリスト>" + PlayListsplitContainer.Width;
+					}*/
+				dbMsg += ",MediaPlayerPanel[" + this.MediaPlayerPanel.Width + "×" + this.MediaPlayerPanel.Height + "]"; //MediaPlayerPanel[1091×625]
+				int webWidth = this.MediaPlayerPanel.Width - 18;     //this.Width - 44;   //  playerWebBrowser.Width - 28;
+				int webHeight = this.MediaPlayerPanel.Height - 72;   // playerWebBrowser.Height - 60;
+				dbMsg += ",web[" + webWidth + "×" + webHeight + "]";													//web[1057×553]
 				string[] extStrs = fileName.Split('.');
 				string extentionStr = "." + extStrs[extStrs.Length - 1].ToLower();
 
@@ -1663,7 +1663,7 @@ AddType video/MP2T .ts
 				dbMsg += ",nextUri=" + nextUri;
 				try {
 					MakeWebPlayer();
-						playerWebBrowser.Navigate(nextUri);
+					playerWebBrowser.Navigate(nextUri);
 				} catch (System.UriFormatException er) {
 					dbMsg += "<<playerWebBrowser.Navigateでエラー発生>>" + er.Message;
 				}
@@ -1739,7 +1739,89 @@ AddType video/MP2T .ts
 		 /*		http://html5-css3.jp/tips/youtube-html5video-window.html
 		  *		http://dobon.net/vb/dotnet/string/getencodingobject.html
 		  */
+		 //windows media Player/////////////////////////////////////////////////////////////////////////////web//
+		 /// <summary>
+		 /// windows media Playerを生成
+		 /// </summary>
+		 /// <param name="fileName"></param>
+		private void MakeWMP(string fileName) {
+			string TAG = "[MakeWMP]" + fileName;
+			string dbMsg = TAG;
+			try {
+				if (this.playerWebBrowser != null) {
+					this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
+					this.playerWebBrowser = null;
+				}
+				Uri uri = new Uri(fileName, UriKind.RelativeOrAbsolute);
+				if (this.mediaPlayer == null) {
+			//		object axWindowsMediaPlayer1 = null;
+			//		axWindowsMediaPlayer1.URL =@"http://go.microsoft.com/fwlink/?LinkId=95772";
+					this.mediaPlayer = new WindowsMediaPlayer();
+				//	this.MediaPlayerPanel.Container.Add(this.mediaPlayer);
 
+
+				/*	RotateTransform transform = new RotateTransform(20, 200, 150);
+
+					MediaElement media = new MediaElement();
+					media.RenderTransform = transform;
+					media.Source = uri;
+
+					Window wnd = new Window();
+					wnd.Content = media;
+
+					Application app = new Application();
+					app.Run(wnd);*/
+
+					//	this.mediaPlayer.controls.previous();// = this.MediaPlayerPanel.Left;
+					//.SetWindowPosition(this.MediaPlayerPanel.Left, this.MediaPlayerPanel.Top, this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
+
+					//	this.mediaPlayer.openPlayer.
+					this.MediaPlayerPanel.Controls.Add((Control)this.mediaPlayer);
+					//型 'System.__ComObject' の COM オブジェクトをクラス型 'System.Windows.Forms.Control' にキャストできません。
+					//COM コンポーネントを表す型のインターフェイスを COM コンポーネントを表さない型にキャストすることはできません。
+					//ただし、基になる COM コンポーネントがインターフェイスの IID の QueryInterface 呼び出しをサポートする場合は、インターフェイスにキャストすることができます。
+					//-		Dynamic View	Expanding the Dynamic View will get the dynamic members for the object	
+
+					//			this.MediaControlPanel.Visible = true;
+				}
+				this.mediaPlayer.URL = fileName;
+				EndTime.Text = this.mediaPlayer.controls.currentItem.ToString();
+				CarentTime.Text = this.mediaPlayer.controls.currentPositionString.ToString();
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				this.mediaPlayer = null;
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+		//プレイヤーコントロール///////////////////////////////////////////////////////////////プレイヤー作成///		
+
+		private void PlayPouseButton_Click(object sender, EventArgs e) {
+			string TAG = "[PlayPouseButton_Click]";
+			string dbMsg = TAG;
+			try {
+				if (isPlay) {
+					isPlay = false;
+					PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pousebtn;    //pouse
+					if (this.mediaPlayer != null) {
+						this.mediaPlayer.controls.pause();                                                        //再生する
+					}
+				} else {
+					isPlay = true;
+					PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pl_r_btn;     //play		
+					if (this.mediaPlayer != null) {
+						this.mediaPlayer.controls.play();                                                        //再生する
+					}
+				}
+				MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+
+		}
+
+		/////////////////////////////////////////////////プレイヤーコントロール/////windows media Player//
 		/// <summary>
 		/// 各再生動作に入る前のファイル有無チェックとプレイヤーの振り分け
 		/// プレイリストは読み込み動作へ
@@ -1750,20 +1832,30 @@ AddType video/MP2T .ts
 			string TAG = "[ToView]";
 			string dbMsg = TAG;
 			try {
-				fileName=checKLocalFile(fileName);
+				fileName = checKLocalFile(fileName);
 				dbMsg += ",fileName=" + fileName;
+				System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
+
 				if (fileName.Contains(".m3u")) {
 					dbMsg += ">プレイリスト";
 					ReadPlayList(fileName);
 					AddPlaylistComboBox(fileName);
 					int selectIndex = PlaylistComboBox.Items.IndexOf(fileName); //PlaylistComboBox.Items.IndexOf(fileName);     //PlaylistComboBox.Items.Count;
-					dbMsg += ",selectIndex="+ selectIndex;
+					dbMsg += ",selectIndex=" + selectIndex;
 					PlaylistComboBox.SelectedIndex = selectIndex;
 					appSettings.CurrentList = fileName;
 				} else if (fileName != "") {
 					dbMsg += ">ファイル再生";
 					CheckDelPlayListItem(fileName, true);
-					MakeWebSouce(fileName);
+
+		//			this.mediaPlayer = null;
+		//			this.playerWebBrowser = null;
+					PlayTitolLabel.Text = fi.Name;
+					if (-1 < Array.IndexOf(mpFiles, fi.Extension)) {        //windows media Player
+						MakeWMP(fileName);
+					} else {
+						MakeWebSouce(fileName);
+					}
 					appSettings.CurrentFile = fileName;
 					//			WriteSetting();
 				}
@@ -1789,7 +1881,10 @@ AddType video/MP2T .ts
 				MyLog(dbMsg);
 			}
 		}
-
+		/// <summary>
+		///リサイズ時の再描画 ////////////////////////////////////////////////////////////////////////////////
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnPaint(PaintEventArgs e) {
 			string TAG = "[OnPaint]";
 			string dbMsg = TAG;
@@ -1838,13 +1933,15 @@ AddType video/MP2T .ts
 				plaingItem = checKLocalFile(plaingItem);
 				ToView(plaingItem);
 				//			WriteSetting();
+				this.MediaControlPanel.Width = this.MediaPlayerSplitContainer.Width;
+				dbMsg += ",MediaControlPanel=" + this.MediaControlPanel.Width;
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 		}//表示サイズ変更
-
+	
 		/// <summary>
 		/// フルパス名で順次Nodeを開き,指定されたフルパス名に該当するNodeを返す
 		/// </summary>
@@ -1899,7 +1996,7 @@ AddType video/MP2T .ts
 			return retNode;
 		}
 
-			//ファイルTree・ファイルリスト共通//////////////////////////////////////////////////////////////////
+		//ファイルTree・ファイルリスト共通//////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// ファイルもしくはフォルダが選択された時の処理
 		/// </summary>
@@ -2013,7 +2110,7 @@ AddType video/MP2T .ts
 					//		appSettings.CurrentFile = passNameStr;               //ファイルが選択される度に書換
 					//		WriteSetting();
 				}
-		//		ReExpandNode(passNameStr);
+				//		ReExpandNode(passNameStr);
 				FileListVewDrow(passNameStr);
 				if (typeName.Text == "video" || typeName.Text == "audio") {
 					continuousPlayCheckBox.Visible = true;                 //連続再生中チェックボックス表示
@@ -2771,7 +2868,7 @@ AddType video/MP2T .ts
 
 				dbMsg += ",ClickedItem=" + e.ClickedItem.Name;                             //e=		常にSystem.Windows.Forms.TreeViewEventArgs,
 				string clickedMenuItem = e.ClickedItem.Name.Replace("ToolStripMenuItem", "");
-				dbMsg += ">>" + clickedMenuItem; 
+				dbMsg += ">>" + clickedMenuItem;
 				dbMsg += " , selectItem=" + selectItem;
 				if (selectItem == "") {
 					if (selectItem != passNameLabel.Text) {
@@ -2790,7 +2887,7 @@ AddType video/MP2T .ts
 
 					case "名称変更":
 						dbMsg += ",選択；名称変更=" + selectItem;
-						TargetReName(selectItem); 
+						TargetReName(selectItem);
 						break;
 
 					case "カット":
@@ -3864,7 +3961,7 @@ AddType video/MP2T .ts
 				dbMsg += ",Attributes=" + fileAttributes;
 				if (fileAttributes.Contains("Directory")) {
 					dbMsg += ",Directoryを選択";
-			//		ReExpandNode(fullName);
+					//		ReExpandNode(fullName);
 					//			FileListVewDrow(fullName);
 				} else {
 					このファイルを再生ToolStripMenuItem.Visible = true;                     //プレイリストへボタン表示
@@ -4285,7 +4382,7 @@ AddType video/MP2T .ts
 					if (di.Name != di.Root.Name) {      //ドライブルートでなければ
 						string passNameStr = di.Parent.FullName;
 						dbMsg += ",ParentName=" + passNameStr;
-				//		ReExpandNode(passNameStr);
+						//		ReExpandNode(passNameStr);
 						FileListVewDrow(passNameStr);
 						passNameLabel.Text = passNameStr;
 						PlaylistComboBox.Items[0] = passNameStr;
