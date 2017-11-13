@@ -1,6 +1,5 @@
 ﻿///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
 using System;
-using System.Net;
 ///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更///
 using System.IO;
 using System.Collections.Generic;       //playList
@@ -16,13 +15,13 @@ using System.Runtime.InteropServices;
 using Microsoft.WindowsAPICodePack.Dialogs;                             //'Windows7APICodePack-Core.1.1.0で追加
 using Microsoft.WindowsAPICodePack.Dialogs.Controls;                    //	☆WindowsAPICodePack-Shell 1.1.1では呼べない関数が発生
 //WMP//////////////////////////////////////
-using WMPLib;					
-using System.Media;
+//using WMPLib;
+//using System.Windows.Controls.MediaElement;
 ///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
 
 namespace file_tree_clock_web1
 {
-	public partial class Form1 : Form
+    public partial class Form1 : Form
 	{
 		Microsoft.Win32.RegistryKey regkey = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(FEATURE_BROWSER_EMULATION);
 		const string FEATURE_BROWSER_EMULATION = @"Software\Microsoft\Internet Explorer\Main\FeatureControl\FEATURE_BROWSER_EMULATION";
@@ -87,7 +86,9 @@ namespace file_tree_clock_web1
 
 		//	public SplitContainer MediaPlayerSplitter;
 		public System.Windows.Forms.WebBrowser playerWebBrowser;
-		public WindowsMediaPlayer mediaPlayer;
+	//	public WindowsMediaPlayer mediaPlayer;
+			public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;			//AxWMPLib
+		public System.Windows.Forms.PictureBox PlayerPictureBox;
 
 		string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
 												".inf",  ".inf", ".ini", ".lsi", ".iso",  ".lst", ".jar",  ".log", ".lock",".mis",
@@ -115,6 +116,7 @@ namespace file_tree_clock_web1
 		string configFileName;      //設定ファイル名 
 		string assemblyName = "";       //実行ファイル名
 		string playerUrl = "";
+		int SettingsVolum = 50;		//this.mediaPlayer.settings.volume;
 		string lsFullPathName = ""; //リストで選択されたアイテムのフルパス
 		string plaingItem = "";             //再生中アイテムのフルパス;連続再生スタート時、自動送り、プレイリストからのアイテムクリックで更新
 		string listUpDir = "";             //プレイリストにリストアップするデレクトリ
@@ -1744,6 +1746,7 @@ AddType video/MP2T .ts
 		 /// windows media Playerを生成
 		 /// </summary>
 		 /// <param name="fileName"></param>
+		private System.Windows.Forms.Integration.ElementHost elementHost1;  //WPFコントロールをホストするElementHostコントロール	https://dobon.net/vb/dotnet/control/elementhost.html
 		private void MakeWMP(string fileName) {
 			string TAG = "[MakeWMP]" + fileName;
 			string dbMsg = TAG;
@@ -1752,42 +1755,39 @@ AddType video/MP2T .ts
 					this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
 					this.playerWebBrowser = null;
 				}
-				Uri uri = new Uri(fileName, UriKind.RelativeOrAbsolute);
 				if (this.mediaPlayer == null) {
-			//		object axWindowsMediaPlayer1 = null;
-			//		axWindowsMediaPlayer1.URL =@"http://go.microsoft.com/fwlink/?LinkId=95772";
-					this.mediaPlayer = new WindowsMediaPlayer();
-				//	this.MediaPlayerPanel.Container.Add(this.mediaPlayer);
-
-
-				/*	RotateTransform transform = new RotateTransform(20, 200, 150);
-
-					MediaElement media = new MediaElement();
-					media.RenderTransform = transform;
-					media.Source = uri;
-
-					Window wnd = new Window();
-					wnd.Content = media;
-
-					Application app = new Application();
-					app.Run(wnd);*/
-
-					//	this.mediaPlayer.controls.previous();// = this.MediaPlayerPanel.Left;
-					//.SetWindowPosition(this.MediaPlayerPanel.Left, this.MediaPlayerPanel.Top, this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
-
-					//	this.mediaPlayer.openPlayer.
-					this.MediaPlayerPanel.Controls.Add((Control)this.mediaPlayer);
-					//型 'System.__ComObject' の COM オブジェクトをクラス型 'System.Windows.Forms.Control' にキャストできません。
-					//COM コンポーネントを表す型のインターフェイスを COM コンポーネントを表さない型にキャストすることはできません。
-					//ただし、基になる COM コンポーネントがインターフェイスの IID の QueryInterface 呼び出しをサポートする場合は、インターフェイスにキャストすることができます。
-					//-		Dynamic View	Expanding the Dynamic View will get the dynamic members for the object	
-
-					//			this.MediaControlPanel.Visible = true;
+                    this.mediaPlayer = new AxWMPLib.AxWindowsMediaPlayer();  
+                    ((System.ComponentModel.ISupportInitialize)(this.mediaPlayer)).BeginInit();
+                    //this.SuspendLayout();
+                    //this.MediaPlayerPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top
+                    //                                                                     | System.Windows.Forms.AnchorStyles.Bottom)
+                    //                                                                     | System.Windows.Forms.AnchorStyles.Left)
+                    //                                                                     | System.Windows.Forms.AnchorStyles.Right)));
+                    //this.MediaPlayerPanel.BackColor = System.Drawing.SystemColors.Control;
+                    this.MediaPlayerPanel.Controls.Add(this.mediaPlayer);
+                    //this.MediaPlayerPanel.Controls.Add(this.progresPanel);
+                    //this.MediaPlayerPanel.Location = new System.Drawing.Point(0, 0);
+                    //this.MediaPlayerPanel.Name = "MediaPlayerPanel";
+                    //this.MediaPlayerPanel.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
+                    //this.MediaPlayerPanel.TabIndex = 0;
+                  this.mediaPlayer.uiMode = "none";
+                    this.mediaPlayer.Enabled = true;
+                    this.mediaPlayer.Location = new System.Drawing.Point(0, 0);
+                    this.mediaPlayer.Name = "mediaPlayer";
+                    System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+                    this.mediaPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer.OcxState")));
+                    this.mediaPlayer.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
+                    this.mediaPlayer.TabIndex = 5;
+                    ((System.ComponentModel.ISupportInitialize)(this.mediaPlayer)).EndInit();
+                    this.ResumeLayout(false);
+                    VolBar.Maximum = 100;
 				}
 				this.mediaPlayer.URL = fileName;
-				EndTime.Text = this.mediaPlayer.controls.currentItem.ToString();
-				CarentTime.Text = this.mediaPlayer.controls.currentPositionString.ToString();
-				MyLog(dbMsg);
+                SettingsVolum = this.mediaPlayer.settings.volume;
+                VolBar.Value = SettingsVolum;
+                VolLabel.Text = VolBar.Value.ToString();
+                PlayTitolLabel.Text = this.mediaPlayer.status + "[" + this.mediaPlayer.ClientSize.Width + "×" + this.mediaPlayer.ClientSize.Height+"]";
+                MyLog(dbMsg);
 			} catch (Exception er) {
 				this.mediaPlayer = null;
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
@@ -1800,25 +1800,74 @@ AddType video/MP2T .ts
 			string TAG = "[PlayPouseButton_Click]";
 			string dbMsg = TAG;
 			try {
-				if (isPlay) {
-					isPlay = false;
-					PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pousebtn;    //pouse
+				dbMsg += "status=" + this.mediaPlayer.status;
+
+				if (this.mediaPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                { 
+                    isPlay = false;
+					PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pl_r_btn;    //pouse
 					if (this.mediaPlayer != null) {
-						this.mediaPlayer.controls.pause();                                                        //再生する
+						this.mediaPlayer.Ctlcontrols.pause();               //.controls.pause();      //AxWMPLib       Ctlcontrols                                           //再生する
 					}
-				} else {
+				} else {																			//2
 					isPlay = true;
-					PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pl_r_btn;     //play		
+					PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pousebtn;     //play	pl_r_btn	
 					if (this.mediaPlayer != null) {
-						this.mediaPlayer.controls.play();                                                        //再生する
+						this.mediaPlayer.Ctlcontrols.play();                //AxWMPLib     Ctlcontrols                                   //再生する
 					}
-				}
+                    dbMsg += ",duration=" + this.mediaPlayer.currentMedia.duration;
+                    dbMsg += ",/60=" + this.mediaPlayer.currentMedia.duration/60;
+                    dbMsg += ",%60=" + this.mediaPlayer.currentMedia.duration % 60;
+                    TimeSpan ts = new TimeSpan(0,(int)this.mediaPlayer.currentMedia.duration/60, (int)this.mediaPlayer.currentMedia.duration %60);
+
+                    EndTime.Text = ts.ToString();                                       //DateTime.ParseExact(mediaPlayer.currentMedia.duration.ToString(), "HH:mm:ss", null).ToString();       //"HHmmss"
+                    CarentTime.Text = this.mediaPlayer.Ctlcontrols.currentPositionString.ToString();      //AxWMPLib
+                }
+                PlayTitolLabel.Text = this.mediaPlayer.status;
 				MyLog(dbMsg);
 			} catch (Exception er) {
 				dbMsg += "<<以降でエラー発生>>" + er.Message;
 				MyLog(dbMsg);
 			}
 
+		}
+
+		private void VolBar_Scroll(object sender, EventArgs e) {
+			string TAG = "[VolBar_Scroll]";
+			string dbMsg = TAG;
+			try {
+				TrackBar tb = (TrackBar)sender;
+		//		SettingsVolum = tb.Value;
+				dbMsg += ",Value=" + tb.Value;
+				this.mediaPlayer.settings.volume = tb.Value;
+				VolLabel.Text = tb.Value.ToString();
+						MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
+		}
+
+		private void VolLabel_Click(object sender, EventArgs e) {
+			string TAG = "[VolLabel_Click]";
+			string dbMsg = TAG;
+			try {
+				dbMsg += ",SettingsVolum=" + SettingsVolum;
+				dbMsg += ",mediaPlayer=" + this.mediaPlayer.settings.volume;
+				if (0< this.mediaPlayer.settings.volume) {
+					SettingsVolum = this.mediaPlayer.settings.volume;
+					this.mediaPlayer.settings.volume=0;
+				} else {
+					this.mediaPlayer.settings.volume = SettingsVolum;
+				}
+				VolBar.Value = this.mediaPlayer.settings.volume;
+				dbMsg += ",Value=" + VolBar.Value;
+				VolLabel.Text = VolBar.Value.ToString();
+					MyLog(dbMsg);
+			} catch (Exception er) {
+				dbMsg += "<<以降でエラー発生>>" + er.Message;
+				MyLog(dbMsg);
+			}
 		}
 
 		/////////////////////////////////////////////////プレイヤーコントロール/////windows media Player//
@@ -1851,8 +1900,14 @@ AddType video/MP2T .ts
 		//			this.mediaPlayer = null;
 		//			this.playerWebBrowser = null;
 					PlayTitolLabel.Text = fi.Name;
+					dbMsg += ",Extension=" + fi.Extension;
+
 					if (-1 < Array.IndexOf(mpFiles, fi.Extension)) {        //windows media Player
 						MakeWMP(fileName);
+						//ファイルまたはアセンブリ 'AxInterop.WMPLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'、
+						//またはその依存関係の 1 つが読み込めませんでした。
+						//厳密な名前付きのアセンブリが必要です。 (HRESULT からの例外:0x80131044)
+
 					} else {
 						MakeWebSouce(fileName);
 					}
@@ -6876,7 +6931,7 @@ AddType video/MP2T .ts
 					}*/
 				dbMsg += " , FormBorderStyle=" + this.FormBorderStyle;
 				dbMsg += " , FormBorderStyle=" + this.WindowState;
-				if (this.FormBorderStyle == FormBorderStyle.None && this.WindowState == FormWindowState.Maximized) {                //フルスクリーン
+				if (this.FormBorderStyle == FormBorderStyle.None || this.WindowState == FormWindowState.Maximized) {                //フルスクリーン
 					appSettings.IsFullScreene = true;
 				} else {            //	this.FormBorderStyle = FormBorderStyle.Sizable; //this.WindowState = FormWindowState.Normal;              //通常サイズに戻す
 					appSettings.IsFullScreene = false;
