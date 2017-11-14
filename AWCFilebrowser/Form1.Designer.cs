@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
             this.fileTree = new System.Windows.Forms.TreeView();
             this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -102,7 +102,7 @@
             this.CarentTime = new System.Windows.Forms.Label();
             this.PlayTitolLabel = new System.Windows.Forms.Label();
             this.VolBar = new System.Windows.Forms.TrackBar();
-            this.trackBar1 = new System.Windows.Forms.TrackBar();
+            this.MediaPositionTrackBar = new System.Windows.Forms.TrackBar();
             this.PlayListContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ファイルブラウザで選択plToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.削除plToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -117,6 +117,7 @@
             this.先頭に挿入LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.末尾に追加LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.リストファイル選択LCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CurrentPositionTimer = new System.Windows.Forms.Timer(this.components);
             this.fileTreeContextMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.baseSplitContainer)).BeginInit();
             this.baseSplitContainer.Panel1.SuspendLayout();
@@ -154,7 +155,7 @@
             this.progresPanel.SuspendLayout();
             this.MediaControlPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.VolBar)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MediaPositionTrackBar)).BeginInit();
             this.PlayListContextMenuStrip.SuspendLayout();
             this.ListContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -540,10 +541,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
             this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-            listViewGroup1.Header = "ListViewGroup";
-            listViewGroup1.Name = "listViewGroup1";
+            listViewGroup7.Header = "ListViewGroup";
+            listViewGroup7.Name = "listViewGroup1";
             this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
+            listViewGroup7});
             this.FilelistView.HideSelection = false;
             this.FilelistView.LabelEdit = true;
             this.FilelistView.Location = new System.Drawing.Point(0, 0);
@@ -924,7 +925,7 @@
             this.MediaControlPanel.Controls.Add(this.CarentTime);
             this.MediaControlPanel.Controls.Add(this.PlayTitolLabel);
             this.MediaControlPanel.Controls.Add(this.VolBar);
-            this.MediaControlPanel.Controls.Add(this.trackBar1);
+            this.MediaControlPanel.Controls.Add(this.MediaPositionTrackBar);
             this.MediaControlPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.MediaControlPanel.Location = new System.Drawing.Point(0, 0);
             this.MediaControlPanel.Name = "MediaControlPanel";
@@ -1054,16 +1055,18 @@
             this.VolBar.TickStyle = System.Windows.Forms.TickStyle.Both;
             this.VolBar.Scroll += new System.EventHandler(this.VolBar_Scroll);
             // 
-            // trackBar1
+            // MediaPositionTrackBar
             // 
-            this.trackBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.MediaPositionTrackBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.trackBar1.BackColor = System.Drawing.Color.Black;
-            this.trackBar1.Location = new System.Drawing.Point(81, 2);
-            this.trackBar1.Maximum = 100;
-            this.trackBar1.Name = "trackBar1";
-            this.trackBar1.Size = new System.Drawing.Size(697, 45);
-            this.trackBar1.TabIndex = 1;
+            this.MediaPositionTrackBar.BackColor = System.Drawing.Color.Black;
+            this.MediaPositionTrackBar.Location = new System.Drawing.Point(81, 2);
+            this.MediaPositionTrackBar.Maximum = 100;
+            this.MediaPositionTrackBar.Name = "MediaPositionTrackBar";
+            this.MediaPositionTrackBar.Size = new System.Drawing.Size(697, 45);
+            this.MediaPositionTrackBar.TabIndex = 1;
+            this.MediaPositionTrackBar.TickFrequency = 10;
+            this.MediaPositionTrackBar.Scroll += new System.EventHandler(this.MediaPositionTrackBar_Scroll);
             // 
             // PlayListContextMenuStrip
             // 
@@ -1167,6 +1170,10 @@
             this.リストファイル選択LCToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.リストファイル選択LCToolStripMenuItem.Text = "リストファイル選択";
             // 
+            // CurrentPositionTimer
+            // 
+            this.CurrentPositionTimer.Tick += new System.EventHandler(this.CurrentPositionTimer_Tick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1223,7 +1230,7 @@
             this.MediaControlPanel.ResumeLayout(false);
             this.MediaControlPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.VolBar)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.MediaPositionTrackBar)).EndInit();
             this.PlayListContextMenuStrip.ResumeLayout(false);
             this.ListContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -1312,7 +1319,7 @@
 		private System.Windows.Forms.SplitContainer MediaPlayerSplitContainer;
 		private System.Windows.Forms.Panel MediaControlPanel;
 		private System.Windows.Forms.Panel MediaPlayerPanel;
-		private System.Windows.Forms.TrackBar trackBar1;
+		private System.Windows.Forms.TrackBar MediaPositionTrackBar;
 		private System.Windows.Forms.TrackBar VolBar;
 		private System.Windows.Forms.Label CarentTime;
 		private System.Windows.Forms.Label PlayTitolLabel;
@@ -1321,6 +1328,7 @@
 		private System.Windows.Forms.Button PlayPouseButton;
 		private System.Windows.Forms.Button plRewButton;
 		private System.Windows.Forms.Button plNextBbutton;
+        private System.Windows.Forms.Timer CurrentPositionTimer;
         //		private System.Windows.Forms.PictureBox PlayerPictureBox;
     }
 }
