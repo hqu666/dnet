@@ -2129,20 +2129,18 @@ AddType video/MP2T .ts
                     this.mediaPlayer.TabIndex = 5;
                     ((System.ComponentModel.ISupportInitialize)(this.mediaPlayer)).EndInit();
                     this.ResumeLayout(false);
-                    this.mediaPlayer.settings.autoStart = false;                    //ファイル読込後の自動再生
-                                                                                    //     this.mediaPlayer.
+                         this.mediaPlayer.settings.autoStart = false;                    //ファイル読込後の自動再生
                     VolBar.Maximum = 100;
-
-                    this.mediaPlayer.OpenStateChange += new AxWMPLib._WMPOCXEvents_OpenStateChangeEventHandler(this.axWindowsMediaPlayer1_OpenStateChange);
-                    this.mediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.axWindowsMediaPlayer1_PlayStateChange);
-
+                    this.mediaPlayer.OpenStateChange += new AxWMPLib._WMPOCXEvents_OpenStateChangeEventHandler(this.WMP_OpenStateChange);
+                    this.mediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.WMP_PlayStateChange);   //再生イベントリスナー
                 }
                 CurrentPosition = 0;
                 this.mediaPlayer.URL = fileName;
                 SettingsVolum = this.mediaPlayer.settings.volume;
                 VolBar.Value = SettingsVolum;
                 VolLabel.Text = VolBar.Value.ToString();
-                 MyLog(dbMsg);
+                PlayPouseButton.PerformClick();
+                MyLog(dbMsg);
             }
             catch (Exception er)
             {
@@ -2180,7 +2178,7 @@ AddType video/MP2T .ts
                     {
                         this.mediaPlayer.Ctlcontrols.play();                //AxWMPLib     Ctlcontrols                                   //再生する
                     }
-                   CurrentPositionTimer.Start();
+                    CurrentPositionTimer.Start();
                 }
                 PlayTitolLabel.Text = this.mediaPlayer.status;
                 MyLog(dbMsg);
@@ -2240,12 +2238,12 @@ AddType video/MP2T .ts
                     TimeSpan ts = new TimeSpan(0, (int)CurrentMediaDuration / 60, (int)CurrentMediaDuration % 60);
                     EndTime.Text = ts.ToString();                                       //DateTime.ParseExact(mediaPlayer.currentMedia.duration.ToString(), "HH:mm:ss", null).ToString();       //"HHmmss"
                     MediaPositionTrackBar.Maximum = (int)CurrentMediaDuration;          //最大値と
-                    MediaPositionTrackBar.TickFrequency = (int)CurrentMediaDuration/10; //目盛間隔
+                    MediaPositionTrackBar.TickFrequency = (int)CurrentMediaDuration / 10; //目盛間隔
                 }
 
                 double NowPosition = mediaPlayer.Ctlcontrols.currentPosition;
                 dbMsg += ",Player=" + NowPosition;
-                if (CurrentPosition< (int)NowPosition)
+                if (CurrentPosition < (int)NowPosition)
                 {
                     CurrentPosition = NowPosition;
                     CarentTime.Text = this.mediaPlayer.Ctlcontrols.currentPositionString.ToString();      //AxWMPLib
@@ -2256,7 +2254,7 @@ AddType video/MP2T .ts
                     dbMsg += "/" + CurrentMediaDuration;
                     PlayTitolLabel.Text = this.mediaPlayer.status + "[" + this.mediaPlayer.ClientSize.Width + "×" + this.mediaPlayer.ClientSize.Height + "]";
                 }
-                MyLog(dbMsg);
+        //        MyLog(dbMsg);
             }
             catch (Exception er)
             {
@@ -2264,8 +2262,6 @@ AddType video/MP2T .ts
                 MyLog(dbMsg);
             }
         }
-
-
 
         private void VolBar_Scroll(object sender, EventArgs e)
         {
@@ -2317,26 +2313,71 @@ AddType video/MP2T .ts
         }
 
         /// <summary>
-        /// 
+        /// 再生状況で発生するイベント
+        /// 自動送りに使用
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// https://msdn.microsoft.com/ja-jp/library/cc411009.aspx
-        private void axWindowsMediaPlayer1_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
+        private void WMP_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
         {
-            /*
-             0	Undefined	Windows Media Player の状態が定義されません。
-1	Stopped	現在のメディア クリップの再生が停止されています。
-2	Paused	現在のメディア クリップの再生が一時停止されています。メディアを一時停止した場合は、再生が同じ位置から再開されます。
-3	Playing	現在のメディア クリップは再生中です。
-4	ScanForward	現在のメディア クリップは早送り中です。
-5	ScanReverse	現在のメディア クリップは巻き戻し中です。
-6	Buffering	現在のメディア クリップはサーバーからの追加情報を取得中です。
-7	Waiting	接続は確立されましたが、サーバーがビットを送信していません。セッションの開始を待機中です。
-8	MediaEnded	メディアの再生が完了し、最後の位置にあります。
-9	Transitioning	新しいメディアを準備中です。
-10	Ready	再生を開始する準備ができています。
-             */
+            string TAG = "[WMP_PlayStateChange]";
+            string dbMsg = TAG;
+            try
+            {
+                string rStr = PlayTitolLabel.Text + "\n";
+                dbMsg += e.newState + ";";
+                switch (e.newState)
+                {
+                    case 0:
+                        //          rStr += "Undefined;Windows Media Player の状態が定義されません。"; 
+                        dbMsg += "Undefined;Windows Media Player の状態が定義されません。";
+                        break;
+                    case 1:
+                        dbMsg += "Stopped;現在のメディア クリップの再生が停止されています。";
+                        break;
+                    case 2:
+                        dbMsg += "Paused;現在のメディア クリップの再生が一時停止されています。メディアを一時停止した場合は、再生が同じ位置から再開されます。";
+                        break;
+                    case 3:
+                        dbMsg += "Playing;現在のメディア クリップは再生中です。";
+                        break;
+                    case 4:
+                        dbMsg += "ScanForward;現在のメディア クリップは早送り中です";
+                        break;
+                    case 5:
+                        dbMsg += "ScanReverse;現在のメディア クリップは巻き戻し中です。";
+                        break;
+                    case 6:
+                        dbMsg += "Buffering;現在のメディア クリップはサーバーからの追加情報を取得中です。";
+                        break;
+                    case 7:
+                        dbMsg += "Waiting;接続は確立されましたが、サーバーがビットを送信していません。セッションの開始を待機中です。";
+                        break;
+                    case 8:
+                        dbMsg += "MediaEnded;メディアの再生が完了し、最後の位置にあります。";
+                        PlayPouseButton.PerformClick();
+                        plNextBbutton.PerformClick();
+                         break;
+                    case 9:
+                        dbMsg += "Transitioning;新しいメディアを準備中です。";
+                        break;
+                    case 10:
+                        dbMsg += "Ready;再生を開始する準備ができています。";
+                        if (this.mediaPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying)
+                        {
+                            PlayPouseButton.PerformClick();
+                        }
+                        break;
+                }
+                //      PlayTitolLabel.Text = (rStr);
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
         }
 
         /// <summary>
@@ -2346,63 +2387,92 @@ AddType video/MP2T .ts
         /// <param name="e"></param>
         /// http://blog.code-life.net/blog/2011/09/05/how-to-use-windows-media-player-activex-controll-3/
         /// https://msdn.microsoft.com/ja-jp/library/cc411001.aspx
-        private void axWindowsMediaPlayer1_OpenStateChange(object sender, AxWMPLib._WMPOCXEvents_OpenStateChangeEvent e)
+        private void WMP_OpenStateChange(object sender, AxWMPLib._WMPOCXEvents_OpenStateChangeEvent e)
         {
-            switch (e.newState)
+            string TAG = "[WMP_OpenStateChange]";
+            string dbMsg = TAG;
+            try
             {
-                case 0:
-                    PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません"); 
-                    break;
-                /*
-1	PlaylistChanging	新しい再生リストが読み込まれようとしています。
-2	PlaylistLocating	Windows Media Player が再生リストを探しています。再生リストは、ローカル (データベースまたはテキスト ファイル) でも、リモートでもかまいません。
-3	PlaylistConnecting	再生リストに接続中です。
-4	PlaylistLoading	再生リストが検出され、現在取り込んでいます。
-5	PlaylistOpening	再生リストは取得済みで、現在解析され、読み込み中です。
-*/
-                case 6:
-                    PlayTitolLabel.Text = ("PlaylistOpenNoMedia;再生リストは開いています"); 
-                    break;
-                /*
-7	PlaylistChanged	新しい再生リストが currentPlaylist に割り当てられました。
-8	MediaChanging	新しいメディアが読み込まれようとしています。
-9	MediaLocating	Windows Media Player がメディア ファイルを検索中です。ファイルは、ローカルでもリモートでもかまいません。
-10	MediaConnecting	メディアを保持しているサーバーに接続中です。
-11	MediaLoading	メディアが検出され、現在取得中です。
-*/
-
-                case 12:
-                    PlayTitolLabel.Text = ("MediaOpening;メディアは取得済みで、現在開いているところです。"); 
-                    break;
-
-                case 13:
-                    PlayTitolLabel.Text = ("MediaOpen;メディアは現在開いています");
-                    break;
-
-                case 14:
-                    PlayTitolLabel.Text = ("BeginCodecAcquistion;コーデックの取得を開始してす"); 
-                    break;
-
-                case 15:
-                    PlayTitolLabel.Text = ("EndCodecAcquisition;コーデックの取得が完了しました。");
-                    break;
-                /*
-16	BeginLicenseAcquisition	DRM 保護付きのコンテンツを再生するライセンスを取得中です。
-17	EndLicenseAcquisition	DRM 保護付きのコンテンツを再生するライセンスを取得しました。
-18	BeginIndividualization	DRM 個別化を開始しました。
-19	EndIndividualization	DRM 個別化は完了しました。
-*/
-
-                case 20:
-                    PlayTitolLabel.Text = ("MediaWaiting;メディアを待機中です。"); 
-                    break;
-
-                case 21:
-                    PlayTitolLabel.Text = ("OpeningUnknownURL;不明な種類の URL を開いています。");
-                    break;
-
-                default:
-                    break;
+                dbMsg += e.newState + ";";
+                switch (e.newState)
+                {
+                    case 0:
+                        dbMsg += "Undefined;WindowsMediaPlayerの状態が定義されていません。";
+            //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                        break;
+                    case 1:
+                        dbMsg += "PlaylistChanging;新しい再生リストが読み込まれようとしています。";
+                        break;
+                    case 2:
+                        dbMsg += "PlaylistLocating;Windows Media Player が再生リストを探しています。再生リストは、ローカル (データベースまたはテキスト ファイル) でも、リモートでもかまいません。";
+                        break;
+                    case 3:
+                        dbMsg += "PlaylistConnecting;再生リストに接続中です。";
+                        break;
+                    case 4:
+                        dbMsg += "PlaylistLoading;再生リストが検出され、現在取り込んでいます";
+                        break;
+                    case 5:
+                        dbMsg += "PlaylistOpening;再生リストは取得済みで、現在解析され、読み込み中です。";
+                        break;
+                    case 6:
+                        dbMsg += "PlaylistOpenNoMedia;再生リストは開いています";
+                        break;
+                    case 7:
+                        dbMsg += "PlaylistChanged;新しい再生リストが currentPlaylist に割り当てられました。";
+                        break;
+                    case 8:
+                        dbMsg += "MediaChanging;新しいメディアが読み込まれようとしています。";
+                        break;
+                    case 9:
+                        dbMsg += "MediaLocating;Windows Media Player がメディア ファイルを検索中です。ファイルは、ローカルでもリモートでもかまいません。";
+                        break;
+                    case 10:
+                        dbMsg += "MediaConnecting;メディアを保持しているサーバーに接続中です。";
+                        break;
+                    case 11:
+                        dbMsg += "MediaLoading;メディアが検出され、現在取得中です。";
+                        break;
+                    case 12:
+                        dbMsg += "MediaOpening;メディアは取得済みで、現在開いているところです。";
+                        break;
+                    case 13:
+                        dbMsg += "MediaOpen;メディアは現在開いています";
+                        break;
+                    case 14:
+                        dbMsg += "BeginCodecAcquistion;コーデックの取得を開始してす";
+                        break;
+                    case 15:
+                        dbMsg +="EndCodecAcquisition;コーデックの取得が完了しました。";
+                        break;
+                    case 16:
+                        dbMsg += "BeginLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得中です。";
+                        break;
+                    case 17:
+                        dbMsg += "EndLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得しました。";
+                        break;
+                    case 18:
+                        dbMsg += "BeginIndividualization;DRM 個別化を開始しました。";
+                        break;
+                    case 19:
+                        dbMsg += "EndIndividualization;DRM 個別化は完了しました。";
+                        break;
+                     case 20:
+                        dbMsg += "MediaWaiting;メディアを待機中です。";
+                        break;
+                    case 21:
+                        dbMsg += "OpeningUnknownURL;不明な種類の URL を開いています。";
+                         break;
+                    default:
+                        break;
+                }
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
             }
         }
 
@@ -4197,8 +4267,7 @@ AddType video/MP2T .ts
                 Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
             }
         }       //フォルダの中身をリストアップ
-
-
+        
         ///fileTreeの操作////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// FileTreeItemのクリック/セレクト動作
