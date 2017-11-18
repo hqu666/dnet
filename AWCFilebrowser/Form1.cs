@@ -17,6 +17,8 @@ using Microsoft.WindowsAPICodePack.Dialogs.Controls;                    //	☆Wi
 //WMP//////////////////////////////////////
 //using WMPLib;
 //using System.Windows.Controls.MediaElement;
+using System.Xml;                       //flv
+using AxShockwaveFlashObjects;          //flv
 ///FileOpenDialogのカスタマイズ//////////////////////////////////////////////////////////////////////
 
 namespace file_tree_clock_web1
@@ -2124,6 +2126,7 @@ AddType video/MP2T .ts
 		  *		http://dobon.net/vb/dotnet/string/getencodingobject.html
 		  */
          //Flash/////////////////////////////////////////////////////////////////////////////web//
+        #region FlashPlay
         private void MakeFlash(string fileName)
         {
             string TAG = "[MakeFlash]" + fileName;
@@ -2133,26 +2136,31 @@ AddType video/MP2T .ts
                 InitPlayerPane("FLP");
                 if (this.SFPlayer == null)
                 {
-                    this.SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
-                    ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).BeginInit();
-            //        this.SuspendLayout();
-                    this.MediaPlayerPanel.Controls.Add(this.SFPlayer);
-                    this.SFPlayer.Enabled = true;
-                    this.SFPlayer.Location = new System.Drawing.Point(0, 0);
-                    this.SFPlayer.Name = "SFPlayer";
-                    this.SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("SFPlayer.OcxState")));
-                    this.SFPlayer.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
-                    this.SFPlayer.TabIndex = 5;
-                    this.SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
-                    this.SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
-                    this.SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
-                }
+                    InitializeFLComponent();
+                 }
                 dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
                 dbMsg += ",playerUrl=" + playerUrl;
-                playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "EmbedFlash.swf");       //fladance.swf    ☆デバッグ用を\bin\Debugにコピーしておく
+                playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく "EmbedFlash.swf"
                 dbMsg += ">>" + playerUrl;
 
-                this.SFPlayer.LoadMovie(0, playerUrl);      //System.Windows.Forms.AxHost+InvalidActiveXStateException
+                try
+                {
+                   // this.SFPlayer.LoadMovie(0, playerUrl);        //axShockwaveFlash1.LoadMovie(0, Application.StartupPath + "\\test.swf");
+                    this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                    this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
+                    //            this.SFPlayer.Movie = fileName;
+                    //         this.SFPlayer.MovieData = fileName;
+                    //             LoadFLV(fileName);
+                    //         this.SFPlayer.Validating = fileName;
+                    //        this.SFPlayer.Visible = true;ではtrueにならない
+                    this.SFPlayer.Play();
+                }
+                catch
+                {
+                    MessageBox.Show("Flashがインストールされていないようです");
+                }
+
+
                 MyLog(dbMsg);
             }
             catch (Exception er)
@@ -2162,7 +2170,218 @@ AddType video/MP2T .ts
                 MyLog(dbMsg);
             }
         }
+        //C#でFLVファイルをお手軽再生   http://zecl.hatenablog.com/entry/20081119/p1///////////////////////////////
+        private void SFPlayer_FlashCall(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
+        {
+            string TAG = "[InitializeFLComponent]";
+            string dbMsg = TAG;
+            try
+            {
+                var document = new XmlDocument();
+                document.LoadXml(e.request);
 
+                XmlNodeList list = document.GetElementsByTagName("arguments");
+                //ResizePlayer(Convert.ToInt32(list[0].FirstChild.InnerText), Convert.ToInt32(list[0].ChildNodes[1].InnerText));
+
+                var width = int.Parse(list[0].ChildNodes[0].InnerText);
+                var height = int.Parse(list[0].ChildNodes[1].InnerText);
+
+                this.ClientSize = new System.Drawing.Size(width, height);
+                this.SFPlayer.ClientSize = this.SFPlayer.Size;
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        ///// <summary>
+        ///// DragDrop
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private void Form1_DragDrop(object sender, DragEventArgs e)
+        //{
+        //    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        //    LoadFLV(files[0]);
+        //}
+
+        ///// <summary>
+        ///// DragEnter
+        ///// </summary>
+        ///// <param name="sender"></param>
+        ///// <param name="e"></param>
+        //private void Form1_DragEnter(object sender, DragEventArgs e)
+        //{
+        //    if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+        //    {
+        //        e.Effect = DragDropEffects.All;
+        //    }
+        //}
+        private void InitializeFLComponent()
+        {
+            string TAG = "[InitializeFLComponent]";
+            string dbMsg = TAG;
+            try
+            {
+                System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
+                this.SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
+                ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).BeginInit();
+                this.SuspendLayout();           //必要？
+
+                // 
+                // this.SFPlayer
+                // 
+                this.SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
+                this.SFPlayer.Enabled = true;
+                this.SFPlayer.Location = new System.Drawing.Point(0, 0);
+                this.SFPlayer.Name = "SFPlayer";
+                this.SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
+                this.SFPlayer.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
+                this.SFPlayer.TabIndex = 0;
+                 this.MediaPlayerPanel.Controls.Add(this.SFPlayer);
+
+                // 
+                // Form1
+                // 
+          //      this.AllowDrop = true;
+         //       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+         //       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+         //       this.ClientSize = new System.Drawing.Size(394, 312);
+           //     this.Controls.Add(this.SFPlayer);
+         //       this.MaximizeBox = false;
+        //        this.Name = "Form1";
+         //       this.Text = "Form1";
+         //       this.Load += new System.EventHandler(this.Form1_Load);
+                ////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+                ////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
+                this.SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
+                this.SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
+                this.SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
+                ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();
+                this.ResumeLayout(false);
+                InitAxShockwaveFlash();
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+
+        }
+
+        /// <summary>
+        /// AxShockwaveFlashの設定
+        /// </summary>
+        private void InitAxShockwaveFlash()
+        {
+            string TAG = "[InitAxShockwaveFlash]";
+            string dbMsg = TAG;
+            try
+            {
+                this.SFPlayer.AllowFullScreen = "false";
+                this.SFPlayer.BGColor = "000000";
+                this.SFPlayer.AllowNetworking = "all";
+
+                this.SFPlayer.CtlScale = "NoScale";
+                //this.SFPlayer.CtlScale = "NoBorder ";
+                //this.SFPlayer.CtlScale = "ExactFit";
+                //this.SFPlayer.CtlScale = "ShowAll";
+
+                this.SFPlayer.DeviceFont = false;
+                this.SFPlayer.EmbedMovie = true;
+
+                this.SFPlayer.FrameNum = -1;
+                this.SFPlayer.Loop = true;
+                this.SFPlayer.Playing = true;
+                this.SFPlayer.Profile = true;
+                this.SFPlayer.Quality2 = "High";
+                this.SFPlayer.SAlign = "LT";
+                this.SFPlayer.WMode = "Window";
+                this.SFPlayer.Dock = DockStyle.Fill;
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        /// <summary>
+        /// FLVファイルのロード
+        /// </summary>
+        /// <param name="videoPath"></param>
+        private void LoadFLV(string fileName)
+        {
+            string TAG = "[LoadFLV]"+ fileName;
+            string dbMsg = TAG;
+            try
+            {
+                /*
+
+                                string mineTypeStr = mineType.Text;//	"video/x-ms-asf";     //.asf
+                                dbMsg += ",mineTypeStr=" + mineTypeStr;
+                                string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                                string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
+                                                                                                    //								"link_url ="+ nextMove + "&" +
+                                         "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                                string contlolPart ="";
+                                //contlolPart += "\t</head>\n";
+                                //contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
+                                //contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                                //                    " classid=" + '"' + clsId + '"' +
+                                //                " codebase=" + '"' + codeBase + '"' +
+                                //                " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                //                 ">\n";
+                                contlolPart += "<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>";                        //常にバーを表示する
+                                contlolPart += "<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>";
+                                contlolPart += "<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>";
+                                contlolPart += "<embed name=" + '"' + wiPlayerID + '"' +
+                                                                " src=" + '"' + fileName + '"' +  
+                                                                " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +            // '"' + webWidth + '"'
+                                                                " type=" + '"' + mineTypeStr + '"' +
+                                                                " allowfullscreen=" + '"' + " true= " + '"' +
+                                                                " flashvars=" + '"' + flashVvars + '"' +
+                                                                " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                                " pluginspage=" + '"' + pluginspage + '"' + "/>";
+                                dbMsg += ",contlolPart=" + contlolPart;
+                                this.SFPlayer.CallFunction(contlolPart);
+                                */
+                //SFPlayerのプロパティ		MovieData	""	string
+
+
+                //         this.SFPlayer.CallFunction("<invoke name=\"loadAndPlayVideo\" returntype=\"xml\"><arguments><string>" + fileName + "</string></arguments></invoke>");
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+
+        }
+
+        //#region Dispose
+        ///// <summary>
+        ///// 使用中のリソースをすべてクリーンアップします。
+        ///// </summary>
+        ///// <param name="disposing">マネージ リソースが破棄される場合 true、破棄されない場合は false です。</param>
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing && (components != null))
+        //    {
+        //        components.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
+        //#endregion
+
+        /// 
+        /// 
 
         private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e)
         {
@@ -2235,6 +2454,7 @@ AddType video/MP2T .ts
                 MyLog(dbMsg);
             }
         }
+        #endregion
 
         //windows media Player////////////////////////////////////////////////////////////Flash//
         /// <summary>
@@ -2676,7 +2896,8 @@ AddType video/MP2T .ts
                         //またはその依存関係の 1 つが読み込めませんでした。
                         //厳密な名前付きのアセンブリが必要です。 (HRESULT からの例外:0x80131044)
 
-                    }else if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".swf"))
+                    }
+                    else if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".swf"))
                     {
                         MakeFlash(fileName);
                     }
