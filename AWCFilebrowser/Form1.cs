@@ -83,12 +83,12 @@ namespace file_tree_clock_web1
         bool IsWriteSysMenu = false;    //システムメニューを追記した
                                         /////////////////////////////////////////////////////////////////////////////////////////////システムメニューのカスタマイズ///
         Settings appSettings = new Settings();
-
+        public System.ComponentModel.ComponentResourceManager resources;
         //	public SplitContainer MediaPlayerSplitter;
         public System.Windows.Forms.WebBrowser playerWebBrowser;
         //	public WindowsMediaPlayer mediaPlayer;
         public AxWMPLib.AxWindowsMediaPlayer mediaPlayer;           //AxWMPLib
-        public System.Windows.Forms.PictureBox PlayerPictureBox;
+        public AxShockwaveFlashObjects.AxShockwaveFlash SFPlayer;
 
         string[] systemFiles = new string[] { "RECYCLE", ".bak", ".bdmv", ".blf", ".BIN", ".cab",  ".cfg",  ".cmd",".css",  ".dat",".dll",
                                                 ".inf",  ".inf", ".ini", ".lsi", ".iso",  ".lst", ".jar",  ".log", ".lock",".mis",
@@ -178,6 +178,7 @@ namespace file_tree_clock_web1
                 configFileName = assemblyPath.Replace(".exe", ".config");
                 dbMsg += ",configFileName=" + configFileName;
                 //			SplitContainer MediaPlayerSplitter = this.splitContainer1;
+                this.resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
                 ReadSetting();
                 ///WebBrowserコントロールを配置すると、IEのバージョン 7をIE11の Edgeモードに変更//http://blog.livedoor.jp/tkarasuma/archives/1036522520.html
                 regkey.SetValue(process_name, 11001, Microsoft.Win32.RegistryValueKind.DWord);
@@ -1290,6 +1291,40 @@ AddType video/MP2T .ts
 
         ////各プレイヤーの生成/////////////////////////////////////////////////////////////////ファイル操作///
         ////web/////////////////////////////////////////////////////////////////ファイル操作///
+        private void InitPlayerPane(string contPlayer)
+        {
+            string TAG = "[InitPlayerPane]" + contPlayer;
+            string dbMsg = TAG;
+            try
+            {
+                if (this.playerWebBrowser != null && !contPlayer.Equals("web"))
+                {
+                    this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
+                    this.playerWebBrowser = null;
+                    dbMsg += ">webを削除";
+                }
+                if (this.mediaPlayer != null && !contPlayer.Equals("WMP"))
+                {
+                    this.MediaPlayerPanel.Controls.Remove(this.mediaPlayer);
+                    this.mediaPlayer = null;
+                    dbMsg += ">WMPを削除";
+                }
+                if (this.SFPlayer != null && !contPlayer.Equals("FLP"))
+                {
+                    this.MediaPlayerPanel.Controls.Remove(this.SFPlayer);
+                    this.SFPlayer = null;
+                    dbMsg += ">FLPを削除";
+                }
+
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
 
         /*		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
 				{
@@ -1853,6 +1888,8 @@ AddType video/MP2T .ts
             string dbMsg = TAG;
             try
             {
+                InitPlayerPane("web");
+
                 if (this.playerWebBrowser == null)
                 {
                     this.playerWebBrowser = new System.Windows.Forms.WebBrowser();
@@ -2086,23 +2123,136 @@ AddType video/MP2T .ts
          /*		http://html5-css3.jp/tips/youtube-html5video-window.html
 		  *		http://dobon.net/vb/dotnet/string/getencodingobject.html
 		  */
-         //windows media Player/////////////////////////////////////////////////////////////////////////////web//
-         /// <summary>
-         /// windows media Playerを生成
-         /// </summary>
-         /// <param name="fileName"></param>
-        private System.Windows.Forms.Integration.ElementHost elementHost1;  //WPFコントロールをホストするElementHostコントロール	https://dobon.net/vb/dotnet/control/elementhost.html
+         //Flash/////////////////////////////////////////////////////////////////////////////web//
+        private void MakeFlash(string fileName)
+        {
+            string TAG = "[MakeFlash]" + fileName;
+            string dbMsg = TAG;
+            try
+            {
+                InitPlayerPane("FLP");
+                if (this.SFPlayer == null)
+                {
+                    this.SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
+                    ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).BeginInit();
+            //        this.SuspendLayout();
+                    this.MediaPlayerPanel.Controls.Add(this.SFPlayer);
+                    this.SFPlayer.Enabled = true;
+                    this.SFPlayer.Location = new System.Drawing.Point(0, 0);
+                    this.SFPlayer.Name = "SFPlayer";
+                    this.SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("SFPlayer.OcxState")));
+                    this.SFPlayer.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
+                    this.SFPlayer.TabIndex = 5;
+                    this.SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
+                    this.SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
+                    this.SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
+                }
+                dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
+                dbMsg += ",playerUrl=" + playerUrl;
+                playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "EmbedFlash.swf");       //fladance.swf    ☆デバッグ用を\bin\Debugにコピーしておく
+                dbMsg += ">>" + playerUrl;
+
+                this.SFPlayer.LoadMovie(0, playerUrl);      //System.Windows.Forms.AxHost+InvalidActiveXStateException
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+
+        private void SFPlayer_FSCommand(object sender, AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEvent e)
+        {
+            string TAG = "[SFPlayer_FSCommand]";
+            string dbMsg = TAG;
+            try
+            {
+                dbMsg += e.command + ";";
+                //switch (e.command)
+                //{
+                //    case 0:
+                //        dbMsg += "1";
+                //        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                //        break;
+                //}
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        private void SFPlayer_Move(object sender, EventArgs e)
+        {
+            string TAG = "[SFPlayer_Move]";
+            string dbMsg = TAG;
+            try
+            {
+                dbMsg += e.ToString() + ";";
+                //switch (e.command)
+                //{
+                //    case 0:
+                //        dbMsg += "1";
+                //        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                //        break;
+                //}
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        private void SFPlayer_RegionChanged(object sender, EventArgs e)
+        {
+            string TAG = "[SFPlayer_RegionChanged]";
+            string dbMsg = TAG;
+            try
+            {
+                dbMsg += e.ToString() + ";";
+                //switch (e.command)
+                //{
+                //    case 0:
+                //        dbMsg += "1";
+                //        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                //        break;
+                //}
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        //windows media Player////////////////////////////////////////////////////////////Flash//
+        /// <summary>
+        /// windows media Playerを生成
+        /// </summary>
+        /// <param name="fileName"></param>
         private void MakeWMP(string fileName)
         {
             string TAG = "[MakeWMP]" + fileName;
             string dbMsg = TAG;
             try
             {
-                if (this.playerWebBrowser != null)
-                {
-                    this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
-                    this.playerWebBrowser = null;
-                }
+                InitPlayerPane("WMP");
+                //if (this.playerWebBrowser != null)
+                //{
+                //    this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
+                //    this.playerWebBrowser = null;
+                //}
                 if (this.mediaPlayer == null)
                 {
                     this.mediaPlayer = new AxWMPLib.AxWindowsMediaPlayer();
@@ -2123,13 +2273,12 @@ AddType video/MP2T .ts
                     this.mediaPlayer.Enabled = true;
                     this.mediaPlayer.Location = new System.Drawing.Point(0, 0);
                     this.mediaPlayer.Name = "mediaPlayer";
-                    System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
                     this.mediaPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer.OcxState")));
                     this.mediaPlayer.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
                     this.mediaPlayer.TabIndex = 5;
                     ((System.ComponentModel.ISupportInitialize)(this.mediaPlayer)).EndInit();
                     this.ResumeLayout(false);
-                         this.mediaPlayer.settings.autoStart = false;                    //ファイル読込後の自動再生
+                    this.mediaPlayer.settings.autoStart = false;                    //ファイル読込後の自動再生
                     VolBar.Maximum = 100;
                     this.mediaPlayer.OpenStateChange += new AxWMPLib._WMPOCXEvents_OpenStateChangeEventHandler(this.WMP_OpenStateChange);
                     this.mediaPlayer.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.WMP_PlayStateChange);   //再生イベントリスナー
@@ -2151,36 +2300,42 @@ AddType video/MP2T .ts
         }
         //AxWindowsMediaPlayer  https://so-zou.jp/software/tech/programming/c-sharp/media/video/ax-windows-media-player/
         //プレイヤーコントロール///////////////////////////////////////////////////////////////プレイヤー作成///		
-
+        /// <summary>
+        /// 再生/一時停止ボタンのクリック
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PlayPouseButton_Click(object sender, EventArgs e)
         {
             string TAG = "[PlayPouseButton_Click]";
             string dbMsg = TAG;
             try
             {
-                dbMsg += "status=" + this.mediaPlayer.status;
-
-                if (this.mediaPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                if (this.mediaPlayer != null)
                 {
-                    isPlay = false;
-                    PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pl_r_btn;    //pouse
-                    if (this.mediaPlayer != null)
+                    dbMsg += "status=" + this.mediaPlayer.status;
+                    if (this.mediaPlayer.playState == WMPLib.WMPPlayState.wmppsPlaying)
                     {
-                        this.mediaPlayer.Ctlcontrols.pause();               //.controls.pause();      //AxWMPLib       Ctlcontrols                                           //再生する
+                        isPlay = false;
+                        PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pl_r_btn;    //pouse
+                        if (this.mediaPlayer != null)
+                        {
+                            this.mediaPlayer.Ctlcontrols.pause();               //.controls.pause();      //AxWMPLib       Ctlcontrols                                           //再生する
+                        }
+                        CurrentPositionTimer.Stop();
                     }
-                    CurrentPositionTimer.Stop();
-                }
-                else
-                {                                                                           //2
-                    isPlay = true;
-                    PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pousebtn;     //play	pl_r_btn	
-                    if (this.mediaPlayer != null)
-                    {
-                        this.mediaPlayer.Ctlcontrols.play();                //AxWMPLib     Ctlcontrols                                   //再生する
+                    else
+                    {                                                                           //2
+                        isPlay = true;
+                        PlayPouseButton.BackgroundImage = AWSFileBroeser.Properties.Resources.pousebtn;     //play	pl_r_btn	
+                        if (this.mediaPlayer != null)
+                        {
+                            this.mediaPlayer.Ctlcontrols.play();                //AxWMPLib     Ctlcontrols                                   //再生する
+                        }
+                        CurrentPositionTimer.Start();
                     }
-                    CurrentPositionTimer.Start();
+                    PlayTitolLabel.Text = this.mediaPlayer.status;
                 }
-                PlayTitolLabel.Text = this.mediaPlayer.status;
                 MyLog(dbMsg);
             }
             catch (Exception er)
@@ -2254,7 +2409,7 @@ AddType video/MP2T .ts
                     dbMsg += "/" + CurrentMediaDuration;
                     PlayTitolLabel.Text = this.mediaPlayer.status + "[" + this.mediaPlayer.ClientSize.Width + "×" + this.mediaPlayer.ClientSize.Height + "]";
                 }
-        //        MyLog(dbMsg);
+                //        MyLog(dbMsg);
             }
             catch (Exception er)
             {
@@ -2358,7 +2513,7 @@ AddType video/MP2T .ts
                         dbMsg += "MediaEnded;メディアの再生が完了し、最後の位置にあります。";
                         PlayPouseButton.PerformClick();
                         plNextBbutton.PerformClick();
-                         break;
+                        break;
                     case 9:
                         dbMsg += "Transitioning;新しいメディアを準備中です。";
                         break;
@@ -2398,7 +2553,7 @@ AddType video/MP2T .ts
                 {
                     case 0:
                         dbMsg += "Undefined;WindowsMediaPlayerの状態が定義されていません。";
-            //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
                         break;
                     case 1:
                         dbMsg += "PlaylistChanging;新しい再生リストが読み込まれようとしています。";
@@ -2443,7 +2598,7 @@ AddType video/MP2T .ts
                         dbMsg += "BeginCodecAcquistion;コーデックの取得を開始してす";
                         break;
                     case 15:
-                        dbMsg +="EndCodecAcquisition;コーデックの取得が完了しました。";
+                        dbMsg += "EndCodecAcquisition;コーデックの取得が完了しました。";
                         break;
                     case 16:
                         dbMsg += "BeginLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得中です。";
@@ -2457,12 +2612,12 @@ AddType video/MP2T .ts
                     case 19:
                         dbMsg += "EndIndividualization;DRM 個別化は完了しました。";
                         break;
-                     case 20:
+                    case 20:
                         dbMsg += "MediaWaiting;メディアを待機中です。";
                         break;
                     case 21:
                         dbMsg += "OpeningUnknownURL;不明な種類の URL を開いています。";
-                         break;
+                        break;
                     default:
                         break;
                 }
@@ -2494,7 +2649,7 @@ AddType video/MP2T .ts
                 dbMsg += ",fileName=" + fileName;
                 System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
 
-                if (fileName.Contains(".m3u"))
+                if (fi.Extension.Equals(".m3u"))      //fileName.Contains(".m3u")
                 {
                     dbMsg += ">プレイリスト";
                     ReadPlayList(fileName);
@@ -2521,6 +2676,9 @@ AddType video/MP2T .ts
                         //またはその依存関係の 1 つが読み込めませんでした。
                         //厳密な名前付きのアセンブリが必要です。 (HRESULT からの例外:0x80131044)
 
+                    }else if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".swf"))
+                    {
+                        MakeFlash(fileName);
                     }
                     else
                     {
@@ -4267,7 +4425,7 @@ AddType video/MP2T .ts
                 Console.WriteLine(TAG + "でエラー発生" + er.Message + ";" + dbMsg);
             }
         }       //フォルダの中身をリストアップ
-        
+
         ///fileTreeの操作////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// FileTreeItemのクリック/セレクト動作
