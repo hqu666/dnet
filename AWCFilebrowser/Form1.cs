@@ -617,7 +617,7 @@ namespace file_tree_clock_web1
                 retMIME = "application/x-shockwave-flash";
                 //	retMIME = "video/x-flv";
             }
-            else if (-1 < extentionStr.IndexOf(".f4v", StringComparison.OrdinalIgnoreCase))
+             else if (-1 < extentionStr.IndexOf(".f4v", StringComparison.OrdinalIgnoreCase))
             {          //動画コーデック：H.264/音声コーデック：MP3、AAC、HE - AAC
                 retType = "video";
                 retMIME = "video/mp4";
@@ -1291,74 +1291,8 @@ AddType video/MP2T .ts
             return retStr;
         }
 
-        ////各プレイヤーの生成/////////////////////////////////////////////////////////////////ファイル操作///
-        ////web/////////////////////////////////////////////////////////////////ファイル操作///
-        private void InitPlayerPane(string contPlayer)
-        {
-            string TAG = "[InitPlayerPane]" + contPlayer;
-            string dbMsg = TAG;
-            try
-            {
-                if (this.playerWebBrowser != null && !contPlayer.Equals("web"))
-                {
-                    this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
-                    this.playerWebBrowser = null;
-                    dbMsg += ">webを削除";
-                }
-                if (this.mediaPlayer != null && !contPlayer.Equals("WMP"))
-                {
-                    this.MediaPlayerPanel.Controls.Remove(this.mediaPlayer);
-                    this.mediaPlayer = null;
-                    dbMsg += ">WMPを削除";
-                }
-                if (this.SFPlayer != null && !contPlayer.Equals("FLP"))
-                {
-                    this.MediaPlayerPanel.Controls.Remove(this.SFPlayer);
-                    this.SFPlayer = null;
-                    dbMsg += ">FLPを削除";
-                }
+        #region WebBlock
 
-                MyLog(dbMsg);
-            }
-            catch (Exception er)
-            {
-                this.mediaPlayer = null;
-                dbMsg += "<<以降でエラー発生>>" + er.Message;
-                MyLog(dbMsg);
-            }
-        }
-
-        /*		private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-				{
-					string selectItem = listBox1.SelectedItem.ToString();
-					FileInfo fi = new FileInfo( selectItem );
-					String infoStr = ",Exists;";
-					infoStr += fi.Exists;
-					infoStr += ",拡張子;";
-					infoStr += fi.Extension;
-					infoStr += "作成;";
-					infoStr += fi.CreationTime;
-					infoStr += ",アクセス;";
-					infoStr += fi.LastAccessTime;
-					infoStr += ",更新;";
-					infoStr += fi.LastWriteTime;
-					if (fi.Exists) {
-						infoStr += ",ファイルサイズ;";
-						infoStr += fi.Length;
-					} else {
-						MakeFolderList( selectItem );
-					}
-					infoStr += ",絶対パス;";
-					infoStr += fi.FullName;//       
-					infoStr += ",ファイル名;";
-					infoStr += fi.Name;
-					infoStr += ",親ディレクトリ;";
-					infoStr += fi.Directory;//     
-					infoStr += ",親ディレクトリ名;";
-					infoStr += fi.DirectoryName;
-					fileinfo.Text = infoStr;
-				}           //リストアイテムのクリック
-				*/
         private void WebBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
         {
             string TAG = "[WebBrowser1_DocumentCompleted]";
@@ -2125,34 +2059,103 @@ AddType video/MP2T .ts
          /*		http://html5-css3.jp/tips/youtube-html5video-window.html
 		  *		http://dobon.net/vb/dotnet/string/getencodingobject.html
 		  */
-         //Flash/////////////////////////////////////////////////////////////////////////////web//
-        #region FlashPlay
+
+        #endregion
+
+        //Flash/////////////////////////////////////////////////////////////////////////////web//
+        #region FlashBlock
+        /*
+         FLV・SWFファイルの再生 http://www.geocities.co.jp/NatureLand/2023/reference/Multimedia/movie02.html
+         Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
+         */
+        /// <summary>
+        /// Flashのmoveプレイヤーで渡されたファイルを再生
+        /// 
+        /// error : video_fileが設定されていません。
+        /// </summary>
+        /// <param name="fileName">再生ファイル名</param>
         private void MakeFlash(string fileName)
         {
             string TAG = "[MakeFlash]" + fileName;
             string dbMsg = TAG;
             try
             {
-                InitPlayerPane("FLP");
-                if (this.SFPlayer == null)
-                {
-                    InitializeFLComponent();
-                 }
-                dbMsg += ",assemblyPath=" + assemblyPath + ",assemblyName=" + assemblyName;
-                dbMsg += ",playerUrl=" + playerUrl;
-                playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "fladance.swf");       //☆デバッグ用を\bin\Debugにコピーしておく "EmbedFlash.swf"
-                dbMsg += ">>" + playerUrl;
-
+                this.MediaPlayerPanel.Controls.RemoveAt(0);
+                this.SFPlayer = null;
+                this.playerWebBrowser = null;
+                this.mediaPlayer = null;
+                InitializeFLComponent();
                 try
                 {
-                   // this.SFPlayer.LoadMovie(0, playerUrl);        //axShockwaveFlash1.LoadMovie(0, Application.StartupPath + "\\test.swf");
-                    this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                    System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
+                    if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v"))     
+                    {
+                        dbMsg += ",assemblyPath=" + assemblyPath;       // + ",assemblyName=" + assemblyName;
+                        playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "fladance.swf");       //ふらだんす   https://www.streaming.jp/fladance/
+                        dbMsg += ",playerUrl=" + playerUrl;
+                        this.SFPlayer.LoadMovie(0, playerUrl);        //axShockwaveFlash1.LoadMovie(0, Application.StartupPath + "\\test.swf");
+                                                                      //       this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                        string clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";
+                        this.SFPlayer.SetVariable("classid", clsId);
+                        string codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
+                        this.SFPlayer.SetVariable("codebase", codeBase);
+                                    //<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+                                    //codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="横幅" height="高さ">
+                        this.SFPlayer.SetVariable("src", fileName);
+                        this.SFPlayer.SetVariable("video_file", fileName);
+
+                        string flashVvars = "fms_app=&video_file=" + fileName + "&" + "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                        this.SFPlayer.FlashVars = flashVvars;
+                        string mineTypeStr = "application/x-shockwave-flash";       //video/x-flv ?  application/x-shockwave-flash  ?   mineType.Text;
+                        if (fi.Extension.Equals(".f4v"))
+                        {
+                            mineTypeStr = "video/mp4";       // mineType.Text;
+                        }
+                            dbMsg += ",mineTypeStr=" + mineTypeStr;
+                        string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                        //contlolPart += "<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>";
+                        //                    this.SFPlayer.Movie = fileName;    //contlolPart += "<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>";
+                        //   string EmbedStr =  "fms_app=" + '"' + playerUrl + '"' +           //ストリーミング再生の場合のみ設定可能
+                        //  string EmbedStr = '"' + wiPlayerID + '"' + " src=" + '"' + playerUrl + '"' +
+                        string EmbedStr = " video_file=" + '"' + fileName + '"' +
+                                                        " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +            // '"' + webWidth + '"'
+                                                        " type=" + '"' + mineTypeStr + '"' +
+                                                        " allowfullscreen=" + '"' + " true= " + '"' +
+                                                        " flashvars=" + '"' + flashVvars + '"' +
+                                                        " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                        " pluginspage=" + '"' + pluginspage + '"' +
+                                       //                " autoplay=" + true +
+                                                        "/>";
+
+                        //     this.SFPlayer.EmbedMovie = true;
+                        //           this.SFPlayer. = true;
+                        this.SFPlayer.SetVariable("src", playerUrl);
+                        this.SFPlayer.SetVariable("type", mineTypeStr);
+                        this.SFPlayer.SetVariable("flashvars", flashVvars);
+                        //this.SFPlayer.SetVariable("type", "application/x-shockwave-flash");
+                        //this.SFPlayer.SetVariable("pluginspage", pluginspage);
+                        //      LoadFLV(fileName);
+                        //         this.SFPlayer.Validating = fileName;
+                        //        this.SFPlayer.Visible = true;ではtrueにならない
+                        //<param name = "flashvars" value = "fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス
+                        //                                    &image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF
+                        //                                    &mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" />
+                        //<param name="allowFullScreen" value="フルスクリーン化を可能にするかどうか" />
+                        //<param name="movie" value="ふらだんすswfファイルのパス" />
+
+                        //<embed src="ふらだんすswfファイルのパス" width="横幅" height="高さ" allowFullScreen="フルスクリーン化を可能にするかどうか" flashvars="fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス&image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF&mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" /></object>
+                        this.SFPlayer.MovieData = fileName;
+                    }
+                    else if (fi.Extension.Equals(".swf"))
+                    {
+                        this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                                                              //   Movie   "M:\\sample\\EmbedFlash.swf" 
+                    }
+                    dbMsg += ",Movie=" + this.SFPlayer.Movie;
+                    dbMsg += ",MovieData=" + this.SFPlayer.MovieData;
+                    dbMsg += ",FlashVars=" + this.SFPlayer.FlashVars;
                     this.SFPlayer.FlashCall += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FlashCallEventHandler(this.SFPlayer_FlashCall);
-                    //            this.SFPlayer.Movie = fileName;
-                    //         this.SFPlayer.MovieData = fileName;
-                    //             LoadFLV(fileName);
-                    //         this.SFPlayer.Validating = fileName;
-                    //        this.SFPlayer.Visible = true;ではtrueにならない
+                    //          ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
                     this.SFPlayer.Play();
                 }
                 catch
@@ -2173,7 +2176,7 @@ AddType video/MP2T .ts
         //C#でFLVファイルをお手軽再生   http://zecl.hatenablog.com/entry/20081119/p1///////////////////////////////
         private void SFPlayer_FlashCall(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
         {
-            string TAG = "[InitializeFLComponent]";
+            string TAG = "[SFPlayer_FlashCall]";
             string dbMsg = TAG;
             try
             {
@@ -2228,12 +2231,8 @@ AddType video/MP2T .ts
             {
                 System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));   //?
                 this.SFPlayer = new AxShockwaveFlashObjects.AxShockwaveFlash();
-                ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).BeginInit();
+                ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).BeginInit();      //必須;http://bbs.wankuma.com/index.cgi?mode=al2&namber=9784&KLOG=22
                 this.SuspendLayout();           //必要？
-
-                // 
-                // this.SFPlayer
-                // 
                 this.SFPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
                 this.SFPlayer.Enabled = true;
                 this.SFPlayer.Location = new System.Drawing.Point(0, 0);
@@ -2241,27 +2240,25 @@ AddType video/MP2T .ts
                 this.SFPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("this.SFPlayer.OcxState")));
                 this.SFPlayer.Size = new System.Drawing.Size(this.MediaPlayerPanel.Width, this.MediaPlayerPanel.Height);
                 this.SFPlayer.TabIndex = 0;
-                 this.MediaPlayerPanel.Controls.Add(this.SFPlayer);
 
                 // 
                 // Form1
                 // 
-          //      this.AllowDrop = true;
-         //       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-         //       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         //       this.ClientSize = new System.Drawing.Size(394, 312);
-           //     this.Controls.Add(this.SFPlayer);
-         //       this.MaximizeBox = false;
-        //        this.Name = "Form1";
-         //       this.Text = "Form1";
-         //       this.Load += new System.EventHandler(this.Form1_Load);
+                //      this.AllowDrop = true;
+                //       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+                //       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+                this.MediaPlayerPanel.Controls.Add(this.SFPlayer);
+                // 
+                // Form1続き
+                // 
                 ////this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
                 ////this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
                 this.SFPlayer.FSCommand += new AxShockwaveFlashObjects._IShockwaveFlashEvents_FSCommandEventHandler(this.SFPlayer_FSCommand);
                 this.SFPlayer.RegionChanged += new System.EventHandler(this.SFPlayer_RegionChanged);
                 this.SFPlayer.Move += new System.EventHandler(this.SFPlayer_Move);
-                ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();
+                ((System.ComponentModel.ISupportInitialize)(this.SFPlayer)).EndInit();                   //必須
                 this.ResumeLayout(false);
+
                 InitAxShockwaveFlash();
                 MyLog(dbMsg);
             }
@@ -2317,43 +2314,38 @@ AddType video/MP2T .ts
         /// <param name="videoPath"></param>
         private void LoadFLV(string fileName)
         {
-            string TAG = "[LoadFLV]"+ fileName;
+            string TAG = "[LoadFLV]" + fileName;
             string dbMsg = TAG;
             try
             {
-                /*
-
-                                string mineTypeStr = mineType.Text;//	"video/x-ms-asf";     //.asf
-                                dbMsg += ",mineTypeStr=" + mineTypeStr;
-                                string pluginspage = "http://www.macromedia.com/go/getflashplayer";
-                                string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
-                                                                                                    //								"link_url ="+ nextMove + "&" +
-                                         "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
-                                string contlolPart ="";
-                                //contlolPart += "\t</head>\n";
-                                //contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
-                                //contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
-                                //                    " classid=" + '"' + clsId + '"' +
-                                //                " codebase=" + '"' + codeBase + '"' +
-                                //                " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
-                                //                 ">\n";
-                                contlolPart += "<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>";                        //常にバーを表示する
-                                contlolPart += "<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>";
-                                contlolPart += "<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>";
-                                contlolPart += "<embed name=" + '"' + wiPlayerID + '"' +
-                                                                " src=" + '"' + fileName + '"' +  
-                                                                " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +            // '"' + webWidth + '"'
-                                                                " type=" + '"' + mineTypeStr + '"' +
-                                                                " allowfullscreen=" + '"' + " true= " + '"' +
-                                                                " flashvars=" + '"' + flashVvars + '"' +
-                                                                " type=" + '"' + "application/x-shockwave-flash" + '"' +
-                                                                " pluginspage=" + '"' + pluginspage + '"' + "/>";
-                                dbMsg += ",contlolPart=" + contlolPart;
-                                this.SFPlayer.CallFunction(contlolPart);
-                                */
+                string mineTypeStr = mineType.Text;
+                dbMsg += ",mineTypeStr=" + mineTypeStr;
+                string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
+                                                                                    //								"link_url ="+ nextMove + "&" +
+                         "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                string contlolPart = "";
+                //contlolPart += "\t</head>\n";
+                //contlolPart += "\t<body style = " + '"' + "background-color: #000000;color:#ffffff;" + '"' + " >\n\t\t";
+                //contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                //                    " classid=" + '"' + clsId + '"' +
+                //                " codebase=" + '"' + codeBase + '"' +
+                //                " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                //                 ">\n";
+                contlolPart += "<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + flashVvars + '"' + "/>";                        //常にバーを表示する
+                contlolPart += "<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>";
+                contlolPart += "<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>";
+                contlolPart += "<embed name=" + '"' + wiPlayerID + '"' +
+                                                " src=" + '"' + fileName + '"' +
+                                                " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +            // '"' + webWidth + '"'
+                                                " type=" + '"' + mineTypeStr + '"' +
+                                                " allowfullscreen=" + '"' + " true= " + '"' +
+                                                " flashvars=" + '"' + flashVvars + '"' +
+                                                " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                " pluginspage=" + '"' + pluginspage + '"' + "/>";
+                dbMsg += ",contlolPart=" + contlolPart;
+                this.SFPlayer.CallFunction(contlolPart);
                 //SFPlayerのプロパティ		MovieData	""	string
-
-
                 //         this.SFPlayer.CallFunction("<invoke name=\"loadAndPlayVideo\" returntype=\"xml\"><arguments><string>" + fileName + "</string></arguments></invoke>");
                 MyLog(dbMsg);
             }
@@ -2457,6 +2449,7 @@ AddType video/MP2T .ts
         #endregion
 
         //windows media Player////////////////////////////////////////////////////////////Flash//
+        #region WMPBlock
         /// <summary>
         /// windows media Playerを生成
         /// </summary>
@@ -2519,7 +2512,174 @@ AddType video/MP2T .ts
             }
         }
         //AxWindowsMediaPlayer  https://so-zou.jp/software/tech/programming/c-sharp/media/video/ax-windows-media-player/
+        /// <summary>
+        /// 再生状況で発生するイベント
+        /// 自動送りに使用
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// https://msdn.microsoft.com/ja-jp/library/cc411009.aspx
+        private void WMP_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
+        {
+            string TAG = "[WMP_PlayStateChange]";
+            string dbMsg = TAG;
+            try
+            {
+                string rStr = PlayTitolLabel.Text + "\n";
+                dbMsg += e.newState + ";";
+                switch (e.newState)
+                {
+                    case 0:
+                        //          rStr += "Undefined;Windows Media Player の状態が定義されません。"; 
+                        dbMsg += "Undefined;Windows Media Player の状態が定義されません。";
+                        break;
+                    case 1:
+                        dbMsg += "Stopped;現在のメディア クリップの再生が停止されています。";
+                        break;
+                    case 2:
+                        dbMsg += "Paused;現在のメディア クリップの再生が一時停止されています。メディアを一時停止した場合は、再生が同じ位置から再開されます。";
+                        break;
+                    case 3:
+                        dbMsg += "Playing;現在のメディア クリップは再生中です。";
+                        break;
+                    case 4:
+                        dbMsg += "ScanForward;現在のメディア クリップは早送り中です";
+                        break;
+                    case 5:
+                        dbMsg += "ScanReverse;現在のメディア クリップは巻き戻し中です。";
+                        break;
+                    case 6:
+                        dbMsg += "Buffering;現在のメディア クリップはサーバーからの追加情報を取得中です。";
+                        break;
+                    case 7:
+                        dbMsg += "Waiting;接続は確立されましたが、サーバーがビットを送信していません。セッションの開始を待機中です。";
+                        break;
+                    case 8:
+                        dbMsg += "MediaEnded;メディアの再生が完了し、最後の位置にあります。";
+                        PlayPouseButton.PerformClick();
+                        plNextBbutton.PerformClick();
+                        break;
+                    case 9:
+                        dbMsg += "Transitioning;新しいメディアを準備中です。";
+                        break;
+                    case 10:
+                        dbMsg += "Ready;再生を開始する準備ができています。";
+                        if (this.mediaPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying)
+                        {
+                            PlayPouseButton.PerformClick();
+                        }
+                        break;
+                }
+                //      PlayTitolLabel.Text = (rStr);
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// http://blog.code-life.net/blog/2011/09/05/how-to-use-windows-media-player-activex-controll-3/
+        /// https://msdn.microsoft.com/ja-jp/library/cc411001.aspx
+        private void WMP_OpenStateChange(object sender, AxWMPLib._WMPOCXEvents_OpenStateChangeEvent e)
+        {
+            string TAG = "[WMP_OpenStateChange]";
+            string dbMsg = TAG;
+            try
+            {
+                dbMsg += e.newState + ";";
+                switch (e.newState)
+                {
+                    case 0:
+                        dbMsg += "Undefined;WindowsMediaPlayerの状態が定義されていません。";
+                        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
+                        break;
+                    case 1:
+                        dbMsg += "PlaylistChanging;新しい再生リストが読み込まれようとしています。";
+                        break;
+                    case 2:
+                        dbMsg += "PlaylistLocating;Windows Media Player が再生リストを探しています。再生リストは、ローカル (データベースまたはテキスト ファイル) でも、リモートでもかまいません。";
+                        break;
+                    case 3:
+                        dbMsg += "PlaylistConnecting;再生リストに接続中です。";
+                        break;
+                    case 4:
+                        dbMsg += "PlaylistLoading;再生リストが検出され、現在取り込んでいます";
+                        break;
+                    case 5:
+                        dbMsg += "PlaylistOpening;再生リストは取得済みで、現在解析され、読み込み中です。";
+                        break;
+                    case 6:
+                        dbMsg += "PlaylistOpenNoMedia;再生リストは開いています";
+                        break;
+                    case 7:
+                        dbMsg += "PlaylistChanged;新しい再生リストが currentPlaylist に割り当てられました。";
+                        break;
+                    case 8:
+                        dbMsg += "MediaChanging;新しいメディアが読み込まれようとしています。";
+                        break;
+                    case 9:
+                        dbMsg += "MediaLocating;Windows Media Player がメディア ファイルを検索中です。ファイルは、ローカルでもリモートでもかまいません。";
+                        break;
+                    case 10:
+                        dbMsg += "MediaConnecting;メディアを保持しているサーバーに接続中です。";
+                        break;
+                    case 11:
+                        dbMsg += "MediaLoading;メディアが検出され、現在取得中です。";
+                        break;
+                    case 12:
+                        dbMsg += "MediaOpening;メディアは取得済みで、現在開いているところです。";
+                        break;
+                    case 13:
+                        dbMsg += "MediaOpen;メディアは現在開いています";
+                        break;
+                    case 14:
+                        dbMsg += "BeginCodecAcquistion;コーデックの取得を開始してす";
+                        break;
+                    case 15:
+                        dbMsg += "EndCodecAcquisition;コーデックの取得が完了しました。";
+                        break;
+                    case 16:
+                        dbMsg += "BeginLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得中です。";
+                        break;
+                    case 17:
+                        dbMsg += "EndLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得しました。";
+                        break;
+                    case 18:
+                        dbMsg += "BeginIndividualization;DRM 個別化を開始しました。";
+                        break;
+                    case 19:
+                        dbMsg += "EndIndividualization;DRM 個別化は完了しました。";
+                        break;
+                    case 20:
+                        dbMsg += "MediaWaiting;メディアを待機中です。";
+                        break;
+                    case 21:
+                        dbMsg += "OpeningUnknownURL;不明な種類の URL を開いています。";
+                        break;
+                    default:
+                        break;
+                }
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        #endregion
+
         //プレイヤーコントロール///////////////////////////////////////////////////////////////プレイヤー作成///		
+        #region Player Contorole
         /// <summary>
         /// 再生/一時停止ボタンのクリック
         /// </summary>
@@ -2687,160 +2847,38 @@ AddType video/MP2T .ts
             }
         }
 
-        /// <summary>
-        /// 再生状況で発生するイベント
-        /// 自動送りに使用
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// https://msdn.microsoft.com/ja-jp/library/cc411009.aspx
-        private void WMP_PlayStateChange(object sender, AxWMPLib._WMPOCXEvents_PlayStateChangeEvent e)
-        {
-            string TAG = "[WMP_PlayStateChange]";
-            string dbMsg = TAG;
-            try
-            {
-                string rStr = PlayTitolLabel.Text + "\n";
-                dbMsg += e.newState + ";";
-                switch (e.newState)
-                {
-                    case 0:
-                        //          rStr += "Undefined;Windows Media Player の状態が定義されません。"; 
-                        dbMsg += "Undefined;Windows Media Player の状態が定義されません。";
-                        break;
-                    case 1:
-                        dbMsg += "Stopped;現在のメディア クリップの再生が停止されています。";
-                        break;
-                    case 2:
-                        dbMsg += "Paused;現在のメディア クリップの再生が一時停止されています。メディアを一時停止した場合は、再生が同じ位置から再開されます。";
-                        break;
-                    case 3:
-                        dbMsg += "Playing;現在のメディア クリップは再生中です。";
-                        break;
-                    case 4:
-                        dbMsg += "ScanForward;現在のメディア クリップは早送り中です";
-                        break;
-                    case 5:
-                        dbMsg += "ScanReverse;現在のメディア クリップは巻き戻し中です。";
-                        break;
-                    case 6:
-                        dbMsg += "Buffering;現在のメディア クリップはサーバーからの追加情報を取得中です。";
-                        break;
-                    case 7:
-                        dbMsg += "Waiting;接続は確立されましたが、サーバーがビットを送信していません。セッションの開始を待機中です。";
-                        break;
-                    case 8:
-                        dbMsg += "MediaEnded;メディアの再生が完了し、最後の位置にあります。";
-                        PlayPouseButton.PerformClick();
-                        plNextBbutton.PerformClick();
-                        break;
-                    case 9:
-                        dbMsg += "Transitioning;新しいメディアを準備中です。";
-                        break;
-                    case 10:
-                        dbMsg += "Ready;再生を開始する準備ができています。";
-                        if (this.mediaPlayer.playState != WMPLib.WMPPlayState.wmppsPlaying)
-                        {
-                            PlayPouseButton.PerformClick();
-                        }
-                        break;
-                }
-                //      PlayTitolLabel.Text = (rStr);
-                MyLog(dbMsg);
-            }
-            catch (Exception er)
-            {
-                dbMsg += "<<以降でエラー発生>>" + er.Message;
-                MyLog(dbMsg);
-            }
-        }
+        #endregion
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// http://blog.code-life.net/blog/2011/09/05/how-to-use-windows-media-player-activex-controll-3/
-        /// https://msdn.microsoft.com/ja-jp/library/cc411001.aspx
-        private void WMP_OpenStateChange(object sender, AxWMPLib._WMPOCXEvents_OpenStateChangeEvent e)
+
+        /////////////////////////////////////////////////プレイヤーコントロール/////windows media Player//
+        ////各プレイヤーの生成/////////////////////////////////////////////////////////////////ファイル操作///
+        #region Player Common
+
+        private void InitPlayerPane(string contPlayer)
         {
-            string TAG = "[WMP_OpenStateChange]";
+            string TAG = "[InitPlayerPane]" + contPlayer;
             string dbMsg = TAG;
             try
             {
-                dbMsg += e.newState + ";";
-                switch (e.newState)
+                if (this.playerWebBrowser != null && !contPlayer.Equals("web"))
                 {
-                    case 0:
-                        dbMsg += "Undefined;WindowsMediaPlayerの状態が定義されていません。";
-                        //            PlayTitolLabel.Text = ("Undefined;WindowsMediaPlayerの状態が定義されていません");
-                        break;
-                    case 1:
-                        dbMsg += "PlaylistChanging;新しい再生リストが読み込まれようとしています。";
-                        break;
-                    case 2:
-                        dbMsg += "PlaylistLocating;Windows Media Player が再生リストを探しています。再生リストは、ローカル (データベースまたはテキスト ファイル) でも、リモートでもかまいません。";
-                        break;
-                    case 3:
-                        dbMsg += "PlaylistConnecting;再生リストに接続中です。";
-                        break;
-                    case 4:
-                        dbMsg += "PlaylistLoading;再生リストが検出され、現在取り込んでいます";
-                        break;
-                    case 5:
-                        dbMsg += "PlaylistOpening;再生リストは取得済みで、現在解析され、読み込み中です。";
-                        break;
-                    case 6:
-                        dbMsg += "PlaylistOpenNoMedia;再生リストは開いています";
-                        break;
-                    case 7:
-                        dbMsg += "PlaylistChanged;新しい再生リストが currentPlaylist に割り当てられました。";
-                        break;
-                    case 8:
-                        dbMsg += "MediaChanging;新しいメディアが読み込まれようとしています。";
-                        break;
-                    case 9:
-                        dbMsg += "MediaLocating;Windows Media Player がメディア ファイルを検索中です。ファイルは、ローカルでもリモートでもかまいません。";
-                        break;
-                    case 10:
-                        dbMsg += "MediaConnecting;メディアを保持しているサーバーに接続中です。";
-                        break;
-                    case 11:
-                        dbMsg += "MediaLoading;メディアが検出され、現在取得中です。";
-                        break;
-                    case 12:
-                        dbMsg += "MediaOpening;メディアは取得済みで、現在開いているところです。";
-                        break;
-                    case 13:
-                        dbMsg += "MediaOpen;メディアは現在開いています";
-                        break;
-                    case 14:
-                        dbMsg += "BeginCodecAcquistion;コーデックの取得を開始してす";
-                        break;
-                    case 15:
-                        dbMsg += "EndCodecAcquisition;コーデックの取得が完了しました。";
-                        break;
-                    case 16:
-                        dbMsg += "BeginLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得中です。";
-                        break;
-                    case 17:
-                        dbMsg += "EndLicenseAcquisition;DRM 保護付きのコンテンツを再生するライセンスを取得しました。";
-                        break;
-                    case 18:
-                        dbMsg += "BeginIndividualization;DRM 個別化を開始しました。";
-                        break;
-                    case 19:
-                        dbMsg += "EndIndividualization;DRM 個別化は完了しました。";
-                        break;
-                    case 20:
-                        dbMsg += "MediaWaiting;メディアを待機中です。";
-                        break;
-                    case 21:
-                        dbMsg += "OpeningUnknownURL;不明な種類の URL を開いています。";
-                        break;
-                    default:
-                        break;
+                    this.MediaPlayerPanel.Controls.Remove(this.playerWebBrowser);
+                    this.playerWebBrowser = null;
+                    dbMsg += ">webを削除";
                 }
+                if (this.mediaPlayer != null && !contPlayer.Equals("WMP"))
+                {
+                    this.MediaPlayerPanel.Controls.Remove(this.mediaPlayer);
+                    this.mediaPlayer = null;
+                    dbMsg += ">WMPを削除";
+                }
+                if (this.SFPlayer != null && !contPlayer.Equals("FLP"))
+                {
+                    this.MediaPlayerPanel.Controls.Remove(this.SFPlayer);
+                    this.SFPlayer = null;
+                    dbMsg += ">FLPを削除";
+                }
+
                 MyLog(dbMsg);
             }
             catch (Exception er)
@@ -2851,8 +2889,6 @@ AddType video/MP2T .ts
             }
         }
 
-
-        /////////////////////////////////////////////////プレイヤーコントロール/////windows media Player//
         /// <summary>
         /// 各再生動作に入る前のファイル有無チェックとプレイヤーの振り分け
         /// プレイリストは読み込み動作へ
@@ -2897,7 +2933,7 @@ AddType video/MP2T .ts
                         //厳密な名前付きのアセンブリが必要です。 (HRESULT からの例外:0x80131044)
 
                     }
-                    else if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".swf"))
+                    else if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".swf") || fi.Extension.Equals(".f4v")) 
                     {
                         MakeFlash(fileName);
                     }
@@ -2932,6 +2968,8 @@ AddType video/MP2T .ts
                 MyLog(dbMsg);
             }
         }
+        #endregion
+
         /// <summary>
         ///リサイズ時の再描画 ////////////////////////////////////////////////////////////////////////////////
         /// </summary>
