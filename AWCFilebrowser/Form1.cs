@@ -2064,6 +2064,162 @@ AddType video/MP2T .ts
 
         //Flash/////////////////////////////////////////////////////////////////////////////web//
         #region FlashBlock
+        /// <summary>
+        /// ふらだんす   https://www.streaming.jp/fladance/
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void LoadFladance(string fileName)
+        {
+            string TAG = "[LoadFladance]" + fileName;
+            string dbMsg = TAG;
+            try
+            {
+                dbMsg += ",assemblyPath=" + assemblyPath;       // + ",assemblyName=" + assemblyName;
+                playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "fladance.swf");       //
+                dbMsg += ",playerUrl=" + playerUrl;
+                this.SFPlayer.LoadMovie(0, playerUrl + "?" + fileName);        //axShockwaveFlash1.LoadMovie(0, Application.StartupPath + "\\test.swf");
+                                                              //       this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                string clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";
+                this.SFPlayer.SetVariable("classid", clsId);
+                string codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
+                this.SFPlayer.SetVariable("codebase", codeBase);
+                //<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
+                //codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="横幅" height="高さ">
+                this.SFPlayer.SetVariable("src", fileName);
+                this.SFPlayer.SetVariable("video_file", fileName);
+
+                string flashVvars = "fms_app=&video_file=" + fileName + "&" + "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
+                this.SFPlayer.FlashVars = flashVvars;
+                string mineTypeStr = "application/x-shockwave-flash";       //video/x-flv ?  application/x-shockwave-flash  ?   mineType.Text;
+                System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
+                if (fi.Extension.Equals(".f4v"))
+                {
+                    mineTypeStr = "video/mp4";       // mineType.Text;
+                }
+                dbMsg += ",mineTypeStr=" + mineTypeStr;
+                string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+                //contlolPart += "<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>";
+                //                    this.SFPlayer.Movie = fileName;    //contlolPart += "<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>";
+                //   string EmbedStr =  "fms_app=" + '"' + playerUrl + '"' +           //ストリーミング再生の場合のみ設定可能
+                //  string EmbedStr = '"' + wiPlayerID + '"' + " src=" + '"' + playerUrl + '"' +
+                string EmbedStr = " video_file=" + '"' + fileName + '"' +
+                                                " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +            // '"' + webWidth + '"'
+                                                " type=" + '"' + mineTypeStr + '"' +
+                                                " allowfullscreen=" + '"' + " true= " + '"' +
+                                                " flashvars=" + '"' + flashVvars + '"' +
+                                                " type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                " pluginspage=" + '"' + pluginspage + '"' +
+                                                //                " autoplay=" + true +
+                                                "/>";
+
+                //     this.SFPlayer.EmbedMovie = true;
+                //           this.SFPlayer. = true;
+                this.SFPlayer.SetVariable("src", playerUrl);
+                this.SFPlayer.SetVariable("type", mineTypeStr);
+                this.SFPlayer.SetVariable("flashvars", flashVvars);
+                //this.SFPlayer.SetVariable("type", "application/x-shockwave-flash");
+                //this.SFPlayer.SetVariable("pluginspage", pluginspage);
+                //      LoadFLV(fileName);
+                //         this.SFPlayer.Validating = fileName;
+                //        this.SFPlayer.Visible = true;ではtrueにならない
+                //<param name = "flashvars" value = "fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス
+                //                                    &image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF
+                //                                    &mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" />
+                //<param name="allowFullScreen" value="フルスクリーン化を可能にするかどうか" />
+                //<param name="movie" value="ふらだんすswfファイルのパス" />
+
+                //<embed src="ふらだんすswfファイルのパス" width="横幅" height="高さ" allowFullScreen="フルスクリーン化を可能にするかどうか" flashvars="fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス&image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF&mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" /></object>
+                this.SFPlayer.MovieData = fileName;
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+        /// <summary>
+        /// Adobe Flash Player」https://www.mi-j.com/service/FLASH/player/index.html　
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void LoadFlvplayer(string fileName)
+        {
+            string TAG = "[LoadFlvplayer]" + fileName;
+            string dbMsg = TAG;
+            try
+            {
+                dbMsg += ",assemblyPath=" + assemblyPath;       // + ",assemblyName=" + assemblyName;
+                playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "flvplayer-305.swf");  
+                dbMsg += ",playerUrl=" + playerUrl;
+                this.SFPlayer.LoadMovie(0, playerUrl);        //axShockwaveFlash1.LoadMovie(0, Application.StartupPath + "\\test.swf");
+                                                              //       this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
+                string clsId = "clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+                this.SFPlayer.SetVariable("classid", clsId);
+                string codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,115,0";
+                this.SFPlayer.SetVariable("codebase", codeBase);
+                   this.SFPlayer.SetVariable("src", fileName);
+                this.SFPlayer.SetVariable("video_file", fileName);
+
+                string flashVvars = "flvmov=" + '"' + fileName + '"';
+                this.SFPlayer.FlashVars = flashVvars;
+                string mineTypeStr = "application/x-shockwave-flash";       //video/x-flv ?  application/x-shockwave-flash  ?   mineType.Text;
+                System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
+                if (fi.Extension.Equals(".f4v"))
+                {
+                    mineTypeStr = "video/mp4";       // mineType.Text;
+                }
+                dbMsg += ",mineTypeStr=" + mineTypeStr;
+                string pluginspage = "http://www.macromedia.com/go/getflashplayer";
+
+
+                //         < param name = "allowFullScreen" value = "true" />
+                //            < param name = "FlashVars" value = "flvmov=rtmp://051.mediaimage.jp/test/media/test-480-270-500k.flv" />
+                //               < embed width = "480" height = "270" src = "https://www.mi-j.com/flvplayer/flvplayer-305.swf"
+                //                              flashvars = "flvmov=rtmp://051.mediaimage.jp/test/media/test-480-270-500k.flv" allowFullScreen = "true" ></ embed >
+                //                        </ object >
+                string EmbedStr = " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +
+                                   " src=" + '"' + playerUrl + '"' +
+                                  "flashvars=" + '"' + " flvmov=" + fileName + '"' + " allowFullScreen = "+ '"' + "true" + '"' ;
+                this.SFPlayer.SetVariable("MovieData", EmbedStr);
+                //this.SFPlayer.SetVariable("src", playerUrl);
+                // this.SFPlayer.SetVariable("type", mineTypeStr);
+                // this.SFPlayer.SetVariable("flashvars", flashVvars);
+                //    this.SFPlayer.MovieData = fileName;
+                /*				playerUrl = assemblyPath.Replace(assemblyName, "flvplayer-305.swf");       //☆デバッグ用を\bin\Debugにコピーしておく
+                                                                                                          //	string flashVvars = "fms_app=&video_file=" + fileName + "&" +       // & amp;
+                               contlolPart += "<object id=" + '"' + wiPlayerID + '"' +
+                                                                                   " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                                                                   " classid=" + '"' + clsId + '"' +
+                                                                               " codebase=" + '"' + codeBase + '"' +
+                                                                                    //	" type=" + '"' + "application/x-shockwave-flash" + '"' +
+                                                                                    //						" data=" + '"' + playerUrl + '"' +
+                                                                                    ">\n";
+                               contlolPart += "\t\t\t<param name =" + '"' + "movie" + '"' + " value=" + '"' + playerUrl + '"' + "/>\n";
+                               contlolPart += "\t\t\t<param name=" + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>\n";
+                               contlolPart += "\t\t\t<param name=" + '"' + "FlashVars" + '"' + " value=" + '"' + fileName + '"' + "/>\n";
+                               contlolPart += "\t\t\t\t<embed name=" + '"' + wiPlayerID + '"' +
+                                                               " width=" + '"' + webWidth + '"' + " height=" + '"' + webHeight + '"' +
+                                                               " src=" + '"' + playerUrl + '"' +
+                                                               " flashvars=" + '"' + fileName + '"' +           //" flashvars=" + '"' + @"flv=" + fileName + +'"' +
+                                                               " allowFullScreen=" + '"' + "true" + '"' +
+                                                      ">\n";
+                               contlolPart += "\t\t\t\t</ embed>\n";
+                               comentStr = souceName + " ; プレイヤーには「を使っています。";
+               */
+
+                MyLog(dbMsg);
+            }
+            catch (Exception er)
+            {
+                this.mediaPlayer = null;
+                dbMsg += "<<以降でエラー発生>>" + er.Message;
+                MyLog(dbMsg);
+            }
+        }
+
+
         /*
          FLV・SWFファイルの再生 http://www.geocities.co.jp/NatureLand/2023/reference/Multimedia/movie02.html
          Flash 4 で新しくサポートされたスクリプトメソッド       http://kb2.adobe.com/jp/cps/228/228681.html
@@ -2090,62 +2246,9 @@ AddType video/MP2T .ts
                     System.IO.FileInfo fi = new System.IO.FileInfo(fileName);
                     if (fi.Extension.Equals(".flv") || fi.Extension.Equals(".f4v"))     
                     {
-                        dbMsg += ",assemblyPath=" + assemblyPath;       // + ",assemblyName=" + assemblyName;
-                        playerUrl = assemblyPath.Replace("AWSFileBroeser.exe", "fladance.swf");       //ふらだんす   https://www.streaming.jp/fladance/
-                        dbMsg += ",playerUrl=" + playerUrl;
-                        this.SFPlayer.LoadMovie(0, playerUrl);        //axShockwaveFlash1.LoadMovie(0, Application.StartupPath + "\\test.swf");
-                                                                      //       this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
-                        string clsId = "clsid:d27cdb6e-ae6d-11cf-96b8-444553540000";
-                        this.SFPlayer.SetVariable("classid", clsId);
-                        string codeBase = "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0";
-                        this.SFPlayer.SetVariable("codebase", codeBase);
-                                    //<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"
-                                    //codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=10,0,0,0" width="横幅" height="高さ">
-                        this.SFPlayer.SetVariable("src", fileName);
-                        this.SFPlayer.SetVariable("video_file", fileName);
-
-                        string flashVvars = "fms_app=&video_file=" + fileName + "&" + "image_file=&link_url=&autoplay=true&mute=false&controllbar=true&buffertime=10" + '"';
-                        this.SFPlayer.FlashVars = flashVvars;
-                        string mineTypeStr = "application/x-shockwave-flash";       //video/x-flv ?  application/x-shockwave-flash  ?   mineType.Text;
-                        if (fi.Extension.Equals(".f4v"))
-                        {
-                            mineTypeStr = "video/mp4";       // mineType.Text;
-                        }
-                            dbMsg += ",mineTypeStr=" + mineTypeStr;
-                        string pluginspage = "http://www.macromedia.com/go/getflashplayer";
-                        //contlolPart += "<param name= " + '"' + "allowFullScreen" + '"' + " value=" + '"' + "true" + '"' + "/>";
-                        //                    this.SFPlayer.Movie = fileName;    //contlolPart += "<param name =" + '"' + "movie" + '"' + " value=" + '"' + fileName + '"' + "/>";
-                        //   string EmbedStr =  "fms_app=" + '"' + playerUrl + '"' +           //ストリーミング再生の場合のみ設定可能
-                        //  string EmbedStr = '"' + wiPlayerID + '"' + " src=" + '"' + playerUrl + '"' +
-                        string EmbedStr = " video_file=" + '"' + fileName + '"' +
-                                                        " width=" + '"' + this.MediaPlayerPanel.Width + '"' + " height= " + '"' + this.MediaPlayerPanel.Height + '"' +            // '"' + webWidth + '"'
-                                                        " type=" + '"' + mineTypeStr + '"' +
-                                                        " allowfullscreen=" + '"' + " true= " + '"' +
-                                                        " flashvars=" + '"' + flashVvars + '"' +
-                                                        " type=" + '"' + "application/x-shockwave-flash" + '"' +
-                                                        " pluginspage=" + '"' + pluginspage + '"' +
-                                       //                " autoplay=" + true +
-                                                        "/>";
-
-                        //     this.SFPlayer.EmbedMovie = true;
-                        //           this.SFPlayer. = true;
-                        this.SFPlayer.SetVariable("src", playerUrl);
-                        this.SFPlayer.SetVariable("type", mineTypeStr);
-                        this.SFPlayer.SetVariable("flashvars", flashVvars);
-                        //this.SFPlayer.SetVariable("type", "application/x-shockwave-flash");
-                        //this.SFPlayer.SetVariable("pluginspage", pluginspage);
-                        //      LoadFLV(fileName);
-                        //         this.SFPlayer.Validating = fileName;
-                        //        this.SFPlayer.Visible = true;ではtrueにならない
-                        //<param name = "flashvars" value = "fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス
-                        //                                    &image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF
-                        //                                    &mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" />
-                        //<param name="allowFullScreen" value="フルスクリーン化を可能にするかどうか" />
-                        //<param name="movie" value="ふらだんすswfファイルのパス" />
-
-                        //<embed src="ふらだんすswfファイルのパス" width="横幅" height="高さ" allowFullScreen="フルスクリーン化を可能にするかどうか" flashvars="fms_app=FMSアプリケーションディレクトリのパス&video_file=動画ファイルのパス&image_file=サムネイル画像のパス&link_url=リンク先のURL&autoplay=オートプレイのON・OFF&mute=ミュートのON・OFF&volume=音量&controller=操作パネルの表示・非表示&buffertime=バッファ時間" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" /></object>
-                        this.SFPlayer.MovieData = fileName;
-                    }
+                      //  LoadFladance(fileName);
+                        LoadFlvplayer( fileName);
+                     }
                     else if (fi.Extension.Equals(".swf"))
                     {
                         this.SFPlayer.LoadMovie(0, fileName); //でthis.SFPlayer.Movieにセットされるが再生はされない
