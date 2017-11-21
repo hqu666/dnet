@@ -2141,7 +2141,7 @@ AddType video/MP2T .ts
         }
 
         /// <summary>
-        /// Adobe Flash Player」https://www.mi-j.com/service/FLASH/player/index.html　
+        /// Adobe Flash Player https://www.mi-j.com/service/FLASH/player/index.html　
         /// </summary>
         /// <param name="fileName"></param>
         private void LoadFlvplayer(string fileName)
