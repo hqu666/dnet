@@ -27,7 +27,7 @@
 		private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("ListViewGroup", System.Windows.Forms.HorizontalAlignment.Left);
             this.fileTree = new System.Windows.Forms.TreeView();
             this.fileTreeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.titolToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -541,10 +541,10 @@
             this.SizeColumnHeader,
             this.UpDateColumnHeader});
             this.FilelistView.Dock = System.Windows.Forms.DockStyle.Fill;
-            listViewGroup5.Header = "ListViewGroup";
-            listViewGroup5.Name = "listViewGroup1";
+            listViewGroup3.Header = "ListViewGroup";
+            listViewGroup3.Name = "listViewGroup1";
             this.FilelistView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup5});
+            listViewGroup3});
             this.FilelistView.HideSelection = false;
             this.FilelistView.LabelEdit = true;
             this.FilelistView.Location = new System.Drawing.Point(0, 0);
